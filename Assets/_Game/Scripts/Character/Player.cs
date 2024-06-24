@@ -7,23 +7,21 @@ public class Player : Character
 {
     [SerializeField] private Transform atkRangeTf;
 
-    public void SetupAttackRange()
+    public void InitAttackRange()
     {
-        atkRangeTf.transform.localScale = new Vector3(atkRange, 0.1f, atkRange);
+        atkRangeTf.localScale = new Vector3(atkRange, 0.1f, atkRange);
     }
 
     protected override void OnInit()
     {
         base.OnInit();
-        SetupAttackRange();
+        InitAttackRange();
     }
 
-    void Update()
+    protected override void Update()
     {
+        DetectNearestTarget();
         ListenControllerInput();
-        if (IsStanding) {
-            Invoke(nameof(ThrowWeapon), 0.5f);
-        }
     }
 
     void FixedUpdate()
@@ -31,10 +29,47 @@ public class Player : Character
         ProcessMoving();
     }
 
+    private void OnMouseUp()
+    {
+        if(GameManager.IsState(GameState.GamePlay))
+        {
+            ProcessAttack();
+        }
+    }
+
+    private void DetectNearestTarget()
+    {
+        float curDis = 0;
+
+        if (targetsInRange.Count > 0)
+        {
+            for (int i = 0; i < targetsInRange.Count; i++)
+            {
+                targetsInRange[i].ToggleIndicator(false);
+                float dist = Vector3.Distance(targetsInRange[i].TF.position, TF.position);
+                if (curDis == 0)
+                {
+                    curDis = dist;
+                    curTargetChar = targetsInRange[i];
+                }
+
+                if (dist < curDis)
+                {
+                    curDis = dist;
+                    curTargetChar = targetsInRange[i];
+                }
+            }
+            curTargetChar.ToggleIndicator(true);
+        }
+        else
+        {
+            curTargetChar = null;
+        }
+    }
+
     private void ProcessMoving()
     {
-        Vector3 curDir = PlayerController.Instance.CurDir;
-        rb.velocity = curDir * speed * Time.fixedDeltaTime;
+        rb.velocity = PlayerController.Instance.CurDir * speed * Time.fixedDeltaTime;
     }
 
     private void LookAtCurDirection()
@@ -49,23 +84,5 @@ public class Player : Character
     {
         PlayerController.Instance.SetCurDirection();
         LookAtCurDirection();
-    }
-
-    public void OnTriggerStay(Collider other)
-    {
-        if(other.CompareTag("Enemy"))
-        {
-            curTargetObject = other.gameObject;
-            curTargetObject.GetComponent<Enemy>().ToggleIndicator(true);
-        }
-    }
-
-    public void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Enemy"))
-        {
-            curTargetObject = null;
-            other.gameObject.GetComponent<Enemy>().ToggleIndicator(false);
-        }
     }
 }

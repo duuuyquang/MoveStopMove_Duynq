@@ -12,7 +12,7 @@ public class Enemy : Character
         ToggleIndicator(false);
     }
 
-    public void ToggleIndicator(bool value)
+    public override void ToggleIndicator(bool value)
     {
         indicator.SetActive(value);
     }

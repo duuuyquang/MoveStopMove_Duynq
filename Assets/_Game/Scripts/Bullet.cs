@@ -5,22 +5,32 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     private float speed;
-    private Vector3 movingDir;
+    private Vector3 targetPos;
     [SerializeField] Transform avatar;
     private Player player;
 
+    private bool IsDestination => Vector3.Distance(transform.position, targetPos) < 0.1f; 
+
     void Update()
     {
-        transform.Translate(movingDir * speed * Time.deltaTime);
-        //transform.position = Vector3.MoveTowards(transform.position, movingDir, speed * Time.deltaTime);
-        avatar.Rotate(new Vector3(0, 1, 0), 15);
+        MovingToTarget();
     }
 
-    public void OnInit(Player player, float speed, Vector3 direction)
+    private void MovingToTarget()
+    {
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
+        avatar.Rotate(new Vector3(0, 1, 0), 15);
+        if (IsDestination)
+        {
+            OnDespawn();
+        }
+    }
+
+    public void OnInit(Player player, float speed, Vector3 pos)
     {
         this.speed = speed;
         this.player = player;
-        movingDir = direction;
+        targetPos = pos;
 
     }
 
@@ -32,16 +42,7 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.tag);
         if(other.CompareTag("Enemy"))
-        {
-            OnDespawn();
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if(other.CompareTag("AttackRange"))
         {
             OnDespawn();
         }

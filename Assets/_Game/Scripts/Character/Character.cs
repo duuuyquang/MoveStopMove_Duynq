@@ -13,17 +13,22 @@ public class Character : MonoBehaviour
     [SerializeField] protected float speed;
 
     private string curAnim;
-    protected GameObject curTargetObject = null;
+    protected Character curTargetChar = null;
+    protected List<Character> targetsInRange = new List<Character>();
 
     protected int bulletCharge;
     public bool HasBullet => bulletCharge > 0;
-    public bool HasTargetInRange => curTargetObject != null;
+    public bool HasTargetInRange => curTargetChar != null;
 
     public bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
 
     public void Start()
     {
         OnInit();
+    }
+
+    protected virtual void Update()
+    {
     }
 
     protected virtual void OnInit()
@@ -47,11 +52,11 @@ public class Character : MonoBehaviour
         }
     }
 
-    protected void ThrowWeapon()
+    protected void ProcessAttack()
     {
-        if (HasBullet && HasTargetInRange)
+        if(HasBullet && HasTargetInRange)
         {
-            curWeapon.Throw(curTargetObject.transform.position - TF.position);
+            curWeapon.Throw(TF.position + (curTargetChar.TF.position - TF.position).normalized * atkRange/2);
             bulletCharge--;
         }
     }
@@ -59,6 +64,31 @@ public class Character : MonoBehaviour
     public void ReloadBullet(int chargeNum)
     {
         bulletCharge += chargeNum;
+    }
+
+    public virtual void ToggleIndicator(bool value)
+    {
+
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            Character character = Cache.GetChars(other);
+            character.ToggleIndicator(true);
+            targetsInRange.Add(character);
+        }
+    }
+
+    public void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            Character character = Cache.GetChars(other);
+            character.ToggleIndicator(false);
+            targetsInRange.Remove(character);
+        }
     }
 
 }
