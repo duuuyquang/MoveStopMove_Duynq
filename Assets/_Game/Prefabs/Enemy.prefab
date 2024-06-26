@@ -229,7 +229,7 @@ MonoBehaviour:
   curWeapon: {fileID: 5579794950706686892}
   initAtkRange: 0
   speed: 0
-  weaponType: 4
+  weaponType: 7
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
   TF: {fileID: 1018027850579156445}
   indicator: {fileID: 6703033279302982736}
@@ -315,7 +315,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 2, y: 2}
+  m_SizeDelta: {x: 1.2, y: 1.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8290367572513040190
 CanvasRenderer:

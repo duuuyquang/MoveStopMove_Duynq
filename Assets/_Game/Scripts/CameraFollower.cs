@@ -23,13 +23,13 @@ public class CameraFollower : Singleton<CameraFollower>
     {
         if (player == null)
         {
-            player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+            player = GameObject.FindGameObjectWithTag(Const.TAG_NAME_PLAYER).GetComponent<Player>();
         }
         else if (!GameManager.IsState(GameState.Finish))
         {
-            float sizeOffset = player.CurSize * 10f;
+            float sizeOffset = player.CurAttackRange;
 
-            targetPos = player.TF.position + offset + new Vector3(0, sizeOffset * 1.3f, -sizeOffset);
+            targetPos = player.TF.position + new Vector3(0, sizeOffset * 1.3f, -sizeOffset * 0.9f);
             TF.position = Vector3.MoveTowards(TF.position, targetPos, speed * Time.fixedDeltaTime);
         }
     }

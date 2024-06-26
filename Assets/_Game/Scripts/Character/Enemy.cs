@@ -9,9 +9,11 @@ public class Enemy : Character
 {
     [SerializeField] Canvas indicator;
 
+    private string curState;
+
     protected override void OnInit()
     {
-        //base.OnInit();
+        base.OnInit();
         ToggleIndicator(false);
     }
 
@@ -20,4 +22,12 @@ public class Enemy : Character
         indicator.enabled = value;
     }
 
+    public override void OnTriggerEnter(Collider other)
+    {
+        base.OnTriggerEnter(other);
+        if (other.CompareTag(Const.TAG_NAME_BULLET))
+        {
+            ToggleIndicator(false);
+        }
+    }
 }

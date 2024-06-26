@@ -1,22 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using UnityEditor;
 using UnityEngine;
 
 public class Player : Character
 {
     [SerializeField] private Transform atkRangeTF;
-
-    public void InitAttackRange()
-    {
-        atkRangeTF.localScale = new Vector3(initAtkRange, 0.1f, initAtkRange);
-    }
-
     protected override void OnInit()
     {
         base.OnInit();
-        InitAttackRange();
+        InitAttackRangeUI();
+    }
+
+    public void InitAttackRangeUI()
+    {
+        atkRangeTF.localScale = new Vector3(initAtkRange, 0.1f, initAtkRange);
     }
 
     protected override void Update()
@@ -25,8 +20,8 @@ public class Player : Character
         if (GameManager.IsState(GameState.GamePlay))
         {
             ListenControllerInput();
-            UpdateAnim();
             UpdateAttackStatus();
+            UpdateAnim();
         }
     }
 
@@ -68,11 +63,11 @@ public class Player : Character
     {
         if (IsStanding && !IsAttacking)
         {
-            ChangeAnim(ANIM_NAME_IDLE);
+            ChangeAnim(Const.ANIM_NAME_IDLE);
         }
         if (!IsStanding && !IsAttacking)
         {
-            ChangeAnim(ANIM_NAME_RUN);
+            ChangeAnim(Const.ANIM_NAME_RUN);
         }
     }
 

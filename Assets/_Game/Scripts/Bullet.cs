@@ -58,8 +58,10 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Enemy"))
+        Character character = Cache.GetChars(other);
+        if (character)
         {
+            weapon.Owner.RemoveTargetInRange(character);
             OnDespawn();
         }
     }
