@@ -27,7 +27,9 @@ public class CameraFollower : Singleton<CameraFollower>
         }
         else if (!GameManager.IsState(GameState.Finish))
         {
-            targetPos = player.TF.position + offset;
+            float sizeOffset = player.CurSize * 10f;
+
+            targetPos = player.TF.position + offset + new Vector3(0, sizeOffset * 1.3f, -sizeOffset);
             TF.position = Vector3.MoveTowards(TF.position, targetPos, speed * Time.fixedDeltaTime);
         }
     }

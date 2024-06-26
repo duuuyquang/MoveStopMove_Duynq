@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    private float speed;
+    [SerializeField] Transform bulletObj;
     private Vector3 targetPos;
-    [SerializeField] Transform avatar;
-    private Player player;
+    private Weapon weapon;
 
-    private bool IsDestination => Vector3.Distance(transform.position, targetPos) < 0.1f; 
+    private bool IsDestination => Vector3.Distance(TF.position, targetPos) < 0.1f;
+
+    public Transform TF;
 
     void Update()
     {
@@ -18,25 +19,40 @@ public class Bullet : MonoBehaviour
 
     private void MovingToTarget()
     {
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
-        avatar.Rotate(new Vector3(0, 1, 0), 15);
+        TF.position = Vector3.MoveTowards(TF.position, targetPos, weapon.speed * Time.deltaTime);
+        if(weapon.spinAngle > 0f)
+        {
+            bulletObj.Rotate(Vector3.back, weapon.spinAngle);
+        }
         if (IsDestination)
         {
             OnDespawn();
         }
     }
 
-    public void OnInit(Player player, float speed, Vector3 pos)
+    public void OnInit(Weapon weapon, Vector3 pos)
     {
-        this.speed = speed;
-        this.player = player;
+        this.weapon = weapon;
         targetPos = pos;
+        CreateWeaponPrefab();
+    }
 
+    private void CreateWeaponPrefab()
+    {
+        GameObject weaponPrefab = Instantiate(weapon.WeaponPrefab, bulletObj);
+        bulletObj.transform.LookAt(targetPos);
+        // fix actual direction to the target
+        bulletObj.transform.eulerAngles += new Vector3(90f, 0f, 0f);
+
+        float ownerCurSize = weapon.Owner.CurSize;
+        transform.localScale += Vector3.one * (ownerCurSize - 1f) * 0.5f;
     }
 
     public void OnDespawn()
     {
-        player.ReloadBullet(1);
+        weapon.Reload(1);
+        weapon.Owner.ToggleWeapon(true);
+        weapon.Owner.SetSizeBigger();
         Destroy(gameObject);
     }
 

@@ -1,15 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using UnityEditor;
 using UnityEngine;
 
 public class Player : Character
 {
-    [SerializeField] private Transform atkRangeTf;
+    [SerializeField] private Transform atkRangeTF;
 
     public void InitAttackRange()
     {
-        atkRangeTf.localScale = new Vector3(atkRange, 0.1f, atkRange);
+        atkRangeTF.localScale = new Vector3(initAtkRange, 0.1f, initAtkRange);
     }
 
     protected override void OnInit()
@@ -20,51 +21,18 @@ public class Player : Character
 
     protected override void Update()
     {
-        DetectNearestTarget();
-        ListenControllerInput();
+        base.Update();
+        if (GameManager.IsState(GameState.GamePlay))
+        {
+            ListenControllerInput();
+            UpdateAnim();
+            UpdateAttackStatus();
+        }
     }
 
     void FixedUpdate()
     {
         ProcessMoving();
-    }
-
-    private void OnMouseUp()
-    {
-        if(GameManager.IsState(GameState.GamePlay))
-        {
-            ProcessAttack();
-        }
-    }
-
-    private void DetectNearestTarget()
-    {
-        float curDis = 0;
-
-        if (targetsInRange.Count > 0)
-        {
-            for (int i = 0; i < targetsInRange.Count; i++)
-            {
-                targetsInRange[i].ToggleIndicator(false);
-                float dist = Vector3.Distance(targetsInRange[i].TF.position, TF.position);
-                if (curDis == 0)
-                {
-                    curDis = dist;
-                    curTargetChar = targetsInRange[i];
-                }
-
-                if (dist < curDis)
-                {
-                    curDis = dist;
-                    curTargetChar = targetsInRange[i];
-                }
-            }
-            curTargetChar.ToggleIndicator(true);
-        }
-        else
-        {
-            curTargetChar = null;
-        }
     }
 
     private void ProcessMoving()
@@ -80,9 +48,44 @@ public class Player : Character
         }
     }
 
+    private void LookAtTarget()
+    {
+        if (curTargetChar != null)
+        {
+            // we don't want player look down when his size scales bigger
+            Vector3 targetDir = new Vector3(curTargetChar.TF.position.x, TF.position.y, curTargetChar.TF.position.z);
+            TF.LookAt(targetDir);
+        }
+    }
+
     private void ListenControllerInput()
     {
         PlayerController.Instance.SetCurDirection();
         LookAtCurDirection();
+    }
+
+    private void UpdateAnim()
+    {
+        if (IsStanding && !IsAttacking)
+        {
+            ChangeAnim(ANIM_NAME_IDLE);
+        }
+        if (!IsStanding && !IsAttacking)
+        {
+            ChangeAnim(ANIM_NAME_RUN);
+        }
+    }
+
+    private void UpdateAttackStatus()
+    {
+        if (IsStanding)
+        {
+            LookAtTarget();
+            ProcessAttack();
+        }
+        else
+        {
+            StopAttack();
+        }
     }
 }
