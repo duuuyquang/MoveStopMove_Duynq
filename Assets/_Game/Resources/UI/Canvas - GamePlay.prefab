@@ -750,7 +750,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bbf38ec084a6cd408e37baa60c2c872, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelText: {fileID: 0}
+  levelText: {fileID: 4188289307059077369}
+  aliveNumText: {fileID: 1030029623738252649}
 --- !u!114 &3968517475169787248
 MonoBehaviour:
   m_ObjectHideFlags: 0

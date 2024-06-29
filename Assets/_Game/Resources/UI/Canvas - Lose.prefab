@@ -583,9 +583,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7281308437919780878}
-        m_TargetAssemblyTypeName: UICanvas, Assembly-CSharp
-        m_MethodName: Close
-        m_Mode: 4
+        m_TargetAssemblyTypeName: CanvasLose, Assembly-CSharp
+        m_MethodName: RetryButton
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

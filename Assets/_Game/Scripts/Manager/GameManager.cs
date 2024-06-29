@@ -11,7 +11,8 @@ public class GameManager : Singleton<GameManager>
 
     private static GameState gameState;
 
-    public Character Winner { get; set; }
+    private int curAliveNum;
+    public int CurAliveNum { get { return curAliveNum; } }
 
     public static void ChangeState(GameState state)
     {
@@ -37,14 +38,36 @@ public class GameManager : Singleton<GameManager>
     void Start()
     {
         UIManager.Instance.OpenUI<CanvasMainMenu>();
-        cameraFollower.OnInit();
+        OnInit();
+    }
+
+    private void Update()
+    {
+        if (IsState(GameState.GamePlay))
+        {
+            CheckWinCondition();
+        }
     }
 
     public void OnInit()
     {
         ChangeState(GameState.MainMenu);
-        Winner = null;
+        curAliveNum = LevelManager.Instance.CurLevel.totalNum;
         cameraFollower.OnInit();
+    }
+
+    public void UpdateAliveNumText()
+    {
+        UIManager.Instance.OpenUI<CanvasGamePlay>().UpdateAliveNumText(--curAliveNum);
+    }
+
+    private void CheckWinCondition()
+    {
+        if (EnemyManager.Instance.IsAllEnemiesDead)
+        {
+            ChangeState(GameState.Finish);
+            UIManager.Instance.OpenUI<CanvasWin>();
+        }
     }
 }
 

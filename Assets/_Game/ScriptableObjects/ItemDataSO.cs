@@ -3,14 +3,15 @@ using UnityEngine;
 
 public enum WeaponType
 {
-    Axe = 0,
-    Hammer = 1,
-    Bloom = 2,
-    Boomerang = 3,
-    Mace = 4,
-    Umbrella = 5,
-    Bat = 6,
-    Lollipop = 7
+    None = 0,
+    Axe = 1,
+    Hammer = 2,
+    Bloom = 3,
+    Boomerang = 4,
+    Mace = 5,
+    Umbrella = 6,
+    Bat = 7,
+    Lollipop = 8
 }
 
 public enum ItemType
@@ -29,10 +30,10 @@ public enum ItemType
 
 public class ItemDataSO : ScriptableObject
 {
-    [SerializeField] GameObject[] weapons;
+    [SerializeField] Transform[] weapons;
     [SerializeField] GameObject[] items;
 
-    public GameObject GetWeapon(WeaponType index)
+    public Transform GetWeapon(WeaponType index)
     {
         return weapons[(int)index];
     }

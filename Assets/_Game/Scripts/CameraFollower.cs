@@ -6,9 +6,9 @@ public class CameraFollower : Singleton<CameraFollower>
 {
 
     private const float EULER_X_GAME_MENU = 20f;
-    private const float EULER_X_GAME_PLAY = 50f;
+    private const float EULER_X_GAME_PLAY = 60f;
 
-    private Vector3 OFFSET_GAME_MENU = new Vector3(0f, 5f, -7f);
+    private Vector3 OFFSET_GAME_MENU = new Vector3(0f, 3f, -6f);
     private Vector3 OFFSET_GAME_PLAY = new Vector3(0f, 10f, -9f);
 
     public Vector3 offset = Vector3.zero;
@@ -25,7 +25,7 @@ public class CameraFollower : Singleton<CameraFollower>
         {
             player = GameObject.FindGameObjectWithTag(Const.TAG_NAME_PLAYER).GetComponent<Player>();
         }
-        else if (!GameManager.IsState(GameState.Finish))
+        else if (GameManager.IsState(GameState.GamePlay))
         {
             float sizeOffset = player.CurAttackRange;
 
@@ -36,6 +36,31 @@ public class CameraFollower : Singleton<CameraFollower>
 
     public void OnInit()
     {
-        TF.position = offset;
+        SetupMenuMode();
+    }
+
+    public void SetupMenuMode()
+    {
+        TF.eulerAngles = new Vector3(EULER_X_GAME_MENU, 0, 0);
+        TF.position = OFFSET_GAME_MENU;
+    }
+
+    public void SetupGamePlayMode()
+    {
+        StartCoroutine(IECameraTransition());
+    }
+
+    IEnumerator IECameraTransition()
+    {
+        int desiredFPS = 45;
+        float count = 0f;
+        float targetRotateX = EULER_X_GAME_PLAY - TF.eulerAngles.x;
+        float rotateUnit = targetRotateX / desiredFPS;
+        while (count < targetRotateX)
+        {
+            TF.Rotate(rotateUnit, 0, 0);
+            count += rotateUnit;
+            yield return new WaitForEndOfFrame();
+        }
     }
 }

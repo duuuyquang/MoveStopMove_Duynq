@@ -17,10 +17,13 @@ public class CanvasWin : UICanvas
     {
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>();
+        LevelManager.Instance.OnInit(0);
     }
 
     public void NextButton()
     {
-        Close(0);
+        UIManager.Instance.CloseAll();
+        UIManager.Instance.OpenUI<CanvasMainMenu>();
+        LevelManager.Instance.OnInitNextLevel();
     }
 }

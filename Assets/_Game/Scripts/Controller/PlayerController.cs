@@ -12,6 +12,11 @@ public class PlayerController : Singleton<PlayerController>
     private Vector3 curDir = Vector3.zero;
     public Vector3 CurDir { get { return curDir; } set { curDir = value; } }
 
+    public void OnInit()
+    {
+        curDir = Vector3.zero;
+    }
+
     public void SetCurDirection()
     {
         if (!screenRect.Contains(Input.mousePosition) || Input.GetMouseButtonUp(0))
@@ -33,6 +38,11 @@ public class PlayerController : Singleton<PlayerController>
                 curDir = mouseEndPoint - mouseStartPoint;
                 curDir = new Vector3(curDir.x, 0, curDir.y).normalized;
             }
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            curDir = Vector3.zero;
         }
     }
 }

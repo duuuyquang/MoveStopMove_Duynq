@@ -12,13 +12,14 @@ public class Character : MonoBehaviour
     [SerializeField] protected float speed;
     private string curAnim = Const.ANIM_NAME_IDLE;
     public Transform TF;
-    public bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
+    public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
 
     //------------------ Combat props ------------------------
     private IEnumerator attackCoroutine;
     [SerializeField] protected Weapon curWeapon;
     [SerializeField] protected float initAtkRange;
     [SerializeField] protected WeaponType weaponType;
+    [SerializeField] protected Transform atkRangeTF;
     protected float curSize;
     public float CurSize { get { return curSize; } }
     public float CurAttackRange { get { return initAtkRange * curSize; } }
@@ -30,35 +31,73 @@ public class Character : MonoBehaviour
     public bool HasTargetInRange => curTargetChar != null;
 
     //------------------ Status props ------------------------
-    protected bool IsAttacking { get; set; } = false;
-    protected bool IsDie { get; set; } = false;
+    protected bool isAttacking = false;
+    public bool IsAttacking { get { return isAttacking; } }
+
+    protected bool isDead = false;
+    public bool IsDead { get { return isDead; } }
 
     //------------------ Data props --------------------------
     public ItemDataSO itemDataSO;
 
-    public void Start()
+    [SerializeField] ParticleSystem BulletPartical;
+
+    protected virtual void Start()
     {
         OnInit();
     }
 
     protected virtual void Update()
     {
-        if (GameManager.IsState(GameState.GamePlay))
+        if (GameManager.IsState(GameState.GamePlay) && !isDead)
         {
             DetectNearestTarget();
+            UpdateMovementAnim();
         }
     }
 
-    protected virtual void OnInit()
+    public virtual void OnInit()
     {
         InitSize();
         InitWeapon();
+        InitAttackRangeTF();
         ChangeAnim(Const.ANIM_NAME_IDLE);
+        ToggleWeapon(true);
+        isDead = false;
+        isAttacking = false;
+        targetsInRange.Clear();
+        curTargetChar = null;
+    }
+
+
+    protected void InitWeapon()
+    {
+        curWeapon.OnInit(this, 1);
+    }
+
+    protected void InitSize()
+    {
+        curSize = 1f;
+        TF.localScale = Vector3.one;
+    }
+    protected void InitAttackRangeTF()
+    {
+        atkRangeTF.localScale = new Vector3(initAtkRange, 0.1f, initAtkRange);
     }
 
     public virtual void OnDespawn()
     {
-        Destroy(gameObject);
+        if(gameObject)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    public void ScaleSizeUp()
+    {
+        curSize += Const.CHARACTER_UPSCALE_UNIT;
+        TF.localScale = Vector3.one * curSize;
+        TF.position += Vector3.up * Const.CHARACTER_UPSCALE_UNIT;
     }
 
     public void ChangeAnim(string animName)
@@ -71,30 +110,15 @@ public class Character : MonoBehaviour
         }
     }
 
-    protected void InitWeapon()
-    {
-        curWeapon.OnInit(this, 1);
-    }
-
-    protected void InitSize()
-    {
-        curSize = 1f;
-        TF.localScale = Vector3.one;
-    }
-
-    public void SetSizeBigger()
-    {
-        curSize += Const.CHARACTER_UPSCALE_UNIT;
-        TF.localScale = Vector3.one * curSize;
-        TF.position += Vector3.up * Const.CHARACTER_UPSCALE_UNIT;
-    }
-
-    private void DetectNearestTarget()
+    protected virtual void DetectNearestTarget()
     {
         float nearestDist = 0;
         curTargetChar = null;
         foreach (Character enemy in targetsInRange) {
-            enemy.ToggleIndicator(false);
+            if (enemy.IsDead)
+            {
+                continue;
+            }
             float checkingDist = Vector3.Distance(enemy.TF.position, TF.position);
             if (nearestDist == 0)
             {
@@ -108,11 +132,6 @@ public class Character : MonoBehaviour
                 curTargetChar = enemy;
             }
         }
-
-        if (curTargetChar != null)
-        {
-            curTargetChar.ToggleIndicator(true);
-        }
     }
 
     public void RemoveTargetInRange(Character character)
@@ -121,43 +140,91 @@ public class Character : MonoBehaviour
         targetsInRange.Remove(character);
     }
 
-    protected void ProcessAttack()
+    public void CheckAndProcessAttack()
     {
         if (curWeapon.HasBullet && HasTargetInRange && !IsAttacking)
         {
-            IsAttacking = true;
-            attackCoroutine = IEAttack();
-            StartCoroutine(attackCoroutine);
+            ProcessAttack();
         }
+    }
+
+    private void ProcessAttack()
+    {
+        isAttacking = true;
+        attackCoroutine = IEAttack();
+        StartCoroutine(attackCoroutine);
     }
 
     protected void StopAttack()
     {
-        IsAttacking = false;
+        isAttacking = false;
         if (attackCoroutine != null)
         {
             StopCoroutine(attackCoroutine);
         }
     }
+    private void ProcessDie()
+    {
+        Invoke(nameof(OnDespawn), 2f);
+        isDead = true;
+        BulletPartical.Play();
+        ToggleIndicator(false);
+        StopMoving();
+        ChangeAnim(Const.ANIM_NAME_DIE);
+        GameManager.Instance.UpdateAliveNumText();
+    }
 
     IEnumerator IEAttack()
     {
+        Vector3 targetPos = TF.position + (curTargetChar.TF.position - TF.position).normalized * CurAttackRange * 0.5f;
+        LookAtTarget(targetPos);
         ChangeAnim(Const.ANIM_NAME_ATTACK);
+        yield return new WaitForSeconds(0.3f);
+        if(!IsDead)
+        {
+            LookAtTarget(targetPos);
+            ToggleWeapon(false);
+            curWeapon.Throw(targetPos);
+            curWeapon.BulletCharge--;
+        }
+        isAttacking = false;
+    }
 
-        yield return new WaitForSeconds(0.7f);
+    protected void LookAtTarget(Vector3 targetPos)
+    {
+        //if (curTargetChar != null)
+        //{
+            // we don't want player looks down when his size scales bigger
+            Vector3 targetDir = new Vector3(targetPos.x, TF.position.y, targetPos.z);
+            TF.LookAt(targetDir);
+        //}
+    }
 
-        ToggleWeapon(false);
-        curWeapon.Throw(TF.position + (curTargetChar.TF.position - TF.position).normalized * CurAttackRange / 2);
-        curWeapon.BulletCharge--;
-        IsAttacking = false;
+    protected virtual void UpdateMovementAnim()
+    {
+        if (IsStanding && !IsAttacking)
+        {
+            ChangeAnim(Const.ANIM_NAME_IDLE);
+        }
+        if (!IsStanding && !IsAttacking)
+        {
+            ChangeAnim(Const.ANIM_NAME_RUN);
+        }
     }
 
     public void ToggleWeapon(bool value)
     {
-        curWeapon.gameObject.SetActive(value);
+        if(curWeapon)
+        {
+            curWeapon.gameObject.SetActive(value);
+        }
     }
 
     public virtual void ToggleIndicator(bool value)
+    {
+    }
+
+    public virtual void StopMoving()
     {
     }
 
@@ -166,19 +233,20 @@ public class Character : MonoBehaviour
         bool isCharacter = other.CompareTag(Const.TAG_NAME_ENEMY) || other.CompareTag(Const.TAG_NAME_PLAYER);
         if (isCharacter)
         {
-            Character character = Cache.GetChars(other);
-            if(!character.IsDie)
+            Character character = Cache.GetChar(other);
+            if(!character.isDead)
             {
-                character.ToggleIndicator(true);
                 targetsInRange.Add(character);
             }
         }
         
-        if (other.CompareTag(Const.TAG_NAME_BULLET) && !IsDie)
+        if (other.CompareTag(Const.TAG_NAME_BULLET) && !isDead)
         {
-            IsDie = true;
-            ChangeAnim(Const.ANIM_NAME_DIE);
-            Invoke(nameof(OnDespawn), 2f);
+            Bullet bullet = Cache.GetBullet(other);
+            if(bullet && this != bullet.Weapon.Owner)
+            {
+                ProcessDie();
+            }
         }
     }
 
@@ -187,9 +255,9 @@ public class Character : MonoBehaviour
         bool isCharacter = other.CompareTag(Const.TAG_NAME_ENEMY) || other.CompareTag(Const.TAG_NAME_PLAYER);
         if (isCharacter)
         {
-            Character character = Cache.GetChars(other);
-            character.ToggleIndicator(false);
+            Character character = Cache.GetChar(other);
             targetsInRange.Remove(character);
+            character.ToggleIndicator(false);
         }
     }
 

@@ -2,32 +2,74 @@ using UnityEngine;
 
 public class Player : Character
 {
-    [SerializeField] private Transform atkRangeTF;
-    protected override void OnInit()
-    {
-        base.OnInit();
-        InitAttackRangeUI();
-    }
-
-    public void InitAttackRangeUI()
-    {
-        atkRangeTF.localScale = new Vector3(initAtkRange, 0.1f, initAtkRange);
-    }
-
     protected override void Update()
     {
         base.Update();
-        if (GameManager.IsState(GameState.GamePlay))
+        if (GameManager.IsState(GameState.GamePlay) && !isDead)
         {
             ListenControllerInput();
             UpdateAttackStatus();
-            UpdateAnim();
+        }
+        if (GameManager.IsState(GameState.Finish) && !isDead)
+        {
+            ChangeAnim(Const.ANIM_NAME_DANCE);
         }
     }
 
     void FixedUpdate()
     {
-        ProcessMoving();
+        if (!isDead)
+        {
+            ProcessMoving();
+        }
+    }
+
+    public override void OnInit()
+    {
+        base.OnInit();
+        PlayerController.Instance.OnInit();
+        TF.position = Vector3.zero;
+        TF.eulerAngles = new Vector3(0, 210, 0);
+    }
+
+    public override void OnDespawn()
+    {
+        GameManager.ChangeState(GameState.Finish);
+        UIManager.Instance.OpenUI<CanvasLose>();
+    }
+
+    protected override void DetectNearestTarget()
+    {
+        base.DetectNearestTarget();
+        foreach (Character enemy in targetsInRange)
+        {
+            if(enemy)
+            {
+                enemy.ToggleIndicator(false);
+            }
+        }
+        
+        if (curTargetChar != null)
+        {
+            curTargetChar.ToggleIndicator(true);
+        }
+    }
+
+    protected override void UpdateMovementAnim()
+    {
+        base.UpdateMovementAnim();
+        if (!IsAttacking)
+        {
+            LookAtCurDirection();
+        }
+    }
+
+    private void LookAtCurDirection()
+    {
+        if (!IsStanding)
+        {
+            TF.LookAt(TF.position + PlayerController.Instance.CurDir);
+        }
     }
 
     private void ProcessMoving()
@@ -35,52 +77,26 @@ public class Player : Character
         rb.velocity = PlayerController.Instance.CurDir * speed * Time.fixedDeltaTime;
     }
 
-    private void LookAtCurDirection()
-    {
-        if (Vector3.Distance(rb.velocity, Vector3.zero) >= 0.1f)
-        {
-            TF.LookAt(TF.position + PlayerController.Instance.CurDir);
-        }
-    }
-
-    private void LookAtTarget()
-    {
-        if (curTargetChar != null)
-        {
-            // we don't want player look down when his size scales bigger
-            Vector3 targetDir = new Vector3(curTargetChar.TF.position.x, TF.position.y, curTargetChar.TF.position.z);
-            TF.LookAt(targetDir);
-        }
-    }
-
     private void ListenControllerInput()
     {
         PlayerController.Instance.SetCurDirection();
-        LookAtCurDirection();
-    }
-
-    private void UpdateAnim()
-    {
-        if (IsStanding && !IsAttacking)
-        {
-            ChangeAnim(Const.ANIM_NAME_IDLE);
-        }
-        if (!IsStanding && !IsAttacking)
-        {
-            ChangeAnim(Const.ANIM_NAME_RUN);
-        }
     }
 
     private void UpdateAttackStatus()
     {
         if (IsStanding)
         {
-            LookAtTarget();
-            ProcessAttack();
+            CheckAndProcessAttack();
         }
         else
         {
             StopAttack();
         }
+    }
+
+    public override void StopMoving()
+    {
+        base.StopMoving();
+        rb.velocity = Vector3.zero;
     }
 }
