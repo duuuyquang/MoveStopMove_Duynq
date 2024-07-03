@@ -1,5 +1,4 @@
 using UnityEngine;
-using static Unity.VisualScripting.Dependencies.Sqlite.SQLite3;
 
 public class Weapon : MonoBehaviour
 {
@@ -16,22 +15,31 @@ public class Weapon : MonoBehaviour
     public int BulletCharge { get { return bulletCharge; } set { bulletCharge = Mathf.Max(0, value); } }
     public bool HasBullet => bulletCharge > 0;
 
-    public float speed;
-    public float spinSpeed;
+    private float speed;
+    public float Speed { get { return speed; } }
+
+    private float spinSpeed;
+    public float SpinSpeed { get { return spinSpeed; } }
 
     public Bullet bulletPrefab;
     public Transform TF;
 
-    public void OnInit(Character owner, int bulletNum)
+    public void OnInit(Character owner)
     {
         this.owner = owner;
-        bulletCharge = bulletNum;
         ChangeWeapon(owner.WeaponType);
+        InitStats();
+    }
+
+    private void InitStats()
+    {
+        speed = owner.BaseAttackSpeed;
+        spinSpeed = 10f;
+        bulletCharge = Const.WEAPON_BASE_BULLET_AMOUNT;
     }
 
     private void ChangeWeapon(WeaponType type)
     {
-        Debug.Log(curType);
         if (curType != type)
         {
             curType = type;
@@ -52,7 +60,7 @@ public class Weapon : MonoBehaviour
 
     public void Reload(int chargeNum)
     {
-        BulletCharge += chargeNum;
+        bulletCharge += chargeNum;
         Owner.ToggleWeapon(true);
     }
 }

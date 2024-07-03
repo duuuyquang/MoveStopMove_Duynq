@@ -38,6 +38,7 @@ public class GameManager : Singleton<GameManager>
     void Start()
     {
         UIManager.Instance.OpenUI<CanvasMainMenu>();
+        UIManager.Instance.GetUI<CanvasGamePlay>().CloseDirectly();
         OnInit();
     }
 
@@ -52,7 +53,7 @@ public class GameManager : Singleton<GameManager>
     public void OnInit()
     {
         ChangeState(GameState.MainMenu);
-        curAliveNum = LevelManager.Instance.CurLevel.totalNum;
+        curAliveNum = LevelManager.Instance.CurLevel.totalNum + 1;
         cameraFollower.OnInit();
     }
 
@@ -63,7 +64,7 @@ public class GameManager : Singleton<GameManager>
 
     private void CheckWinCondition()
     {
-        if (EnemyManager.Instance.IsAllEnemiesDead)
+        if (EnemyManager.Instance.IsAllEnemiesDead && !CameraFollower.Instance.Player.IsDead)
         {
             ChangeState(GameState.Finish);
             UIManager.Instance.OpenUI<CanvasWin>();

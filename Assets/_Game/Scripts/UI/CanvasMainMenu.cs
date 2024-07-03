@@ -18,6 +18,6 @@ public class CanvasMainMenu : UICanvas
     public void ShopButton()
     {
         Close(0);
-        UIManager.Instance.OpenUI<CanvasShop>();
+        UIManager.Instance.OpenUI<CanvasWeaponShop>();
     }
 }

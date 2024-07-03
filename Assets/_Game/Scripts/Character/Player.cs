@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Player : Character
@@ -12,7 +13,7 @@ public class Player : Character
         }
         if (GameManager.IsState(GameState.Finish) && !isDead)
         {
-            ChangeAnim(Const.ANIM_NAME_DANCE);
+            SetWinningStatus();
         }
     }
 
@@ -27,9 +28,24 @@ public class Player : Character
     public override void OnInit()
     {
         base.OnInit();
+        InitTransform();
+        InitIndicator();
         PlayerController.Instance.OnInit();
+    }
+
+    private void InitTransform()
+    {
         TF.position = Vector3.zero;
         TF.eulerAngles = new Vector3(0, 210, 0);
+    }
+
+    protected override void InitBasicStats()
+    {
+        base.InitBasicStats();
+        Name = "AbcXz";
+        CombatPoint = 0;
+        ColorType = (ColorType) UnityEngine.Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
+        WeaponType = (WeaponType)UnityEngine.Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length);
     }
 
     public override void OnDespawn()
@@ -45,13 +61,13 @@ public class Player : Character
         {
             if(enemy)
             {
-                enemy.ToggleIndicator(false);
+                enemy.ToggleTargetIndicator(false);
             }
         }
         
         if (curTargetChar != null)
         {
-            curTargetChar.ToggleIndicator(true);
+            curTargetChar.ToggleTargetIndicator(true);
         }
     }
 
@@ -98,5 +114,14 @@ public class Player : Character
     {
         base.StopMoving();
         rb.velocity = Vector3.zero;
+        PlayerController.Instance.CurDir = Vector3.zero;
+    }
+
+    public void SetWinningStatus()
+    {
+        TF.eulerAngles = new Vector3(0, 200, 0);
+        ChangeAnim(Const.ANIM_NAME_DANCE);
+        StopMoving();
+        ToggleAtkRange(false);
     }
 }

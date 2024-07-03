@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public class Enemy : Character
 {
     [SerializeField] NavMeshAgent agent;
-    [SerializeField] Canvas indicator;
+
+    private List<string> nameList = new List<string>() {"Dazzle","Crystal","Lina","Clink","Axe","Phantom","Sniper","TrollWarlord","BrewMaster","Hoodwink","Winranger","Traxex","Enchantress","Luna"};
 
     private IState curState;
 
@@ -33,7 +36,21 @@ public class Enemy : Character
     {
         base.OnInit();
         SetState(new IdleState());
-        ToggleIndicator(false);
+        ToggleTargetIndicator(false);
+    }
+
+    protected override void InitBasicStats()
+    {
+        base.InitBasicStats();
+        Name = GetRandomName();
+        CombatPoint = Random.Range(0, CameraFollower.Instance.Player.CombatPoint + 1);
+        ColorType = (ColorType)Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
+        WeaponType = (WeaponType)Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length);
+    }
+
+    private string GetRandomName()
+    {
+        return nameList[Random.Range(0, nameList.Count)];
     }
 
     public override void OnDespawn()
@@ -76,8 +93,8 @@ public class Enemy : Character
         agent.ResetPath();
     }
 
-    public override void ToggleIndicator(bool value)
+    public override void ToggleTargetIndicator(bool value)
     {
-        indicator.enabled = value;
+        targetIndicator.enabled = value;
     }
 }

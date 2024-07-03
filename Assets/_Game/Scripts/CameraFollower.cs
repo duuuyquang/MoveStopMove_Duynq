@@ -11,25 +11,28 @@ public class CameraFollower : Singleton<CameraFollower>
     private Vector3 OFFSET_GAME_MENU = new Vector3(0f, 3f, -6f);
     private Vector3 OFFSET_GAME_PLAY = new Vector3(0f, 10f, -9f);
 
+    private Camera cam;
+
     public Vector3 offset = Vector3.zero;
     [SerializeField] private float speed = 1f;
 
     private Vector3 targetPos;
 
-    public Player player;
+    [SerializeField] private Player player;
+    public Player Player { get { return player; } }
+
     public Transform TF;
+
 
     void LateUpdate()
     {
-        if (player == null)
+        if (!player)
         {
             player = GameObject.FindGameObjectWithTag(Const.TAG_NAME_PLAYER).GetComponent<Player>();
         }
         else if (GameManager.IsState(GameState.GamePlay))
         {
-            float sizeOffset = player.CurAttackRange;
-
-            targetPos = player.TF.position + new Vector3(0, sizeOffset * 1.3f, -sizeOffset * 0.9f);
+            targetPos = player.TF.position + new Vector3(0, player.CurAttackRange * 1.3f, -player.CurAttackRange * 0.9f);
             TF.position = Vector3.MoveTowards(TF.position, targetPos, speed * Time.fixedDeltaTime);
         }
     }
@@ -62,5 +65,20 @@ public class CameraFollower : Singleton<CameraFollower>
             count += rotateUnit;
             yield return new WaitForEndOfFrame();
         }
+    }
+
+    public Camera GetCameraComponent()
+    {
+        if(!cam)
+        {
+            cam = GetComponent<Camera>();
+        }
+
+        return cam;
+    }
+
+    public Player GetPlayer()
+    {
+        return player;
     }
 }

@@ -6,36 +6,49 @@ using UnityEngine.AI;
 
 public class EnemyManager : Singleton<EnemyManager>
 {
-    private const int MAX_ENEMY_ON_RUNTIME = 10;
+    private const int MAX_ENEMIES_ON_RUNTIME = 10;
 
     private Vector3 lastSpawnedPos;
-
+    
     private NavMeshHit navMeshHit;
 
     [SerializeField] Enemy enemyPrefab;
+    [SerializeField] Canvas canvas;
 
     private List<Enemy> enemiesReadyList = new List<Enemy>();
     private List<Enemy> spawnedEnemiesList = new List<Enemy>();
     public bool IsAllEnemiesDead => (enemiesReadyList.Count <= 0 && spawnedEnemiesList.Count <= 0);
+    public bool IsSpawnable => spawnedEnemiesList.Count < MAX_ENEMIES_ON_RUNTIME && enemiesReadyList.Count > 0;
 
     public void Update()
     {
-        if (GameManager.IsState(GameState.GamePlay))
-        {
-            if (spawnedEnemiesList.Count < MAX_ENEMY_ON_RUNTIME && enemiesReadyList.Count > 0)
-            {
-                Spawn();
-            }
-        }
+        CheckToSpawn();
     }
 
     public void OnInit()
     {
-        ClearAllList();
-        PreLoadEnemyList();
+        ClearAllLists();
+        PreLoadEnemiesReadyList();
+        InitSpawn();
+    }
+
+    private void InitSpawn()
+    {
+        for (int i = 0; i < MAX_ENEMIES_ON_RUNTIME; i++)
+        {
+            Spawn();
+        }
+    }
+
+    private void CheckToSpawn()
+    {
+        if (GameManager.IsState(GameState.GamePlay) && IsSpawnable)
+        {
+            Spawn();
+        }
     }
     
-    private void ClearAllList()
+    private void ClearAllLists()
     {
         while (enemiesReadyList.Count > 0)
         {
@@ -72,12 +85,15 @@ public class EnemyManager : Singleton<EnemyManager>
             if(Vector3.Distance(navMeshHit.position, playerPos) < playerAtkRange)
             {
                 GetValidSpawnPos();
-            }
-
-            foreach(Enemy enemy in spawnedEnemiesList) {
-                if (Vector3.Distance(navMeshHit.position, enemy.TF.position) < 5f)
+            } 
+            else
+            {
+                foreach (Enemy enemy in spawnedEnemiesList)
                 {
-                    GetValidSpawnPos();
+                    if (Vector3.Distance(navMeshHit.position, enemy.TF.position) < 5f)
+                    {
+                        GetValidSpawnPos();
+                    }
                 }
             }
         }
@@ -90,7 +106,7 @@ public class EnemyManager : Singleton<EnemyManager>
         return spawnedEnemiesList.Remove(enemy);
     }
 
-    private void PreLoadEnemyList()
+    private void PreLoadEnemiesReadyList()
     {
         for (int i = 0; i < LevelManager.Instance.CurLevel.totalNum; i++)
         {

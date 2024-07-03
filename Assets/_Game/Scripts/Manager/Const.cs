@@ -11,7 +11,7 @@ public static class Const
     public const string ANIM_NAME_ATTACK        = "attack";
     public const string ANIM_NAME_DIE           = "die";
 
-    public const float CHARACTER_UPSCALE_UNIT   = 0.1f;
+    public const float CHARACTER_UPSCALE_UNIT   = 0.2f;
 
     public const int WEAPON_BASE_BULLET_AMOUNT  = 1;
 }

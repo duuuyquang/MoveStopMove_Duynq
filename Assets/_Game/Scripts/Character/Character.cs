@@ -1,31 +1,61 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
 public class Character : MonoBehaviour
 {
+    public const int SIZE_SCALE_UP_THRESHOLD_1 = 2;
+    public const int SIZE_SCALE_UP_THRESHOLD_2 = 6;
+    public const int SIZE_SCALE_UP_THRESHOLD_3 = 12;
+    public const int SIZE_SCALE_UP_THRESHOLD_4 = 24;
+    public const int SIZE_SCALE_UP_THRESHOLD_5 = 48;
+
     //------------------ Movement props ---------------------
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator animator;
     [SerializeField] protected float speed;
     private string curAnim = Const.ANIM_NAME_IDLE;
     public Transform TF;
+
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
 
+    //------------------ Basic props -------------------------
+    private string charName;
+    public string Name { get { return charName; } set { if (value.Length < 15) { charName = value; } } }
+
+    [SerializeField] protected Renderer charRenderer;
+    private ColorType colorType;
+    public ColorType ColorType { get { return colorType; } set { colorType = value; } }
+
     //------------------ Combat props ------------------------
+    protected int[] upSizeThresholds = { 1, 6, 16, 31, 51, 76 }; // kill 5 enemies same scale to up scale
+
+    private int combatPoint;
+    public int CombatPoint { get { return combatPoint; } set { combatPoint = Mathf.Max(0, value); } }
+
     private IEnumerator attackCoroutine;
+
     [SerializeField] protected Weapon curWeapon;
-    [SerializeField] protected float initAtkRange;
     [SerializeField] protected WeaponType weaponType;
     [SerializeField] protected Transform atkRangeTF;
+    [SerializeField] protected float baseAtkRange;
+    [SerializeField] protected float baseAtkSpeed;
     protected float curSize;
+
     public float CurSize { get { return curSize; } }
-    public float CurAttackRange { get { return initAtkRange * curSize; } }
-    public WeaponType WeaponType { get { return weaponType; } }
+    public float CurAttackRange { get { return baseAtkRange * curSize; } }
+    public float BaseAttackSpeed { get { return baseAtkSpeed; } }
+    public WeaponType WeaponType { get { return weaponType; } set { weaponType = value; } }
 
     //------------------ Navigation props --------------------
+    [SerializeField] protected Canvas targetIndicator;
+    [SerializeField] Indicator indicatorPrefab;
+    protected Indicator indicator;
+
     protected List<Character> targetsInRange = new List<Character>();
     protected Character curTargetChar = null;
     public bool HasTargetInRange => curTargetChar != null;
@@ -39,8 +69,10 @@ public class Character : MonoBehaviour
 
     //------------------ Data props --------------------------
     public ItemDataSO itemDataSO;
+    public ColorDataSO colorDataSO;
 
-    [SerializeField] ParticleSystem BulletPartical;
+    [SerializeField] ParticleSystem bulletPartical;
+    [SerializeField] ParticleSystem sizeUpPartical;
 
     protected virtual void Start()
     {
@@ -58,31 +90,82 @@ public class Character : MonoBehaviour
 
     public virtual void OnInit()
     {
-        InitSize();
-        InitWeapon();
-        InitAttackRangeTF();
-        ChangeAnim(Const.ANIM_NAME_IDLE);
-        ToggleWeapon(true);
-        isDead = false;
-        isAttacking = false;
-        targetsInRange.Clear();
-        curTargetChar = null;
+        InitBasicStats();
+        InitDependentFactors();
+        InitInDependentFactors();
     }
 
-
-    protected void InitWeapon()
+    protected virtual void InitBasicStats()
     {
-        curWeapon.OnInit(this, 1);
+        InitAttackRangeTF();
     }
 
-    protected void InitSize()
+    private void InitDependentFactors()
+    {
+        InitWeapon();
+        InitIndicator();
+        ChangeColor(ColorType);
+        SetupSizeByInitCombatPoint(CombatPoint);
+    }
+
+    private void InitInDependentFactors()
+    {
+        InitStatus();
+        ClearTargets();
+        ChangeAnim(Const.ANIM_NAME_IDLE);
+    }
+
+    protected virtual void InitIndicator()
+    {
+        indicator = Instantiate(indicatorPrefab, UIManager.Instance.GetUI<CanvasGamePlay>().transform);
+        indicator.OnInit(this);
+    }
+
+    protected virtual void InitWeapon()
+    {
+        curWeapon.OnInit(this);
+        ToggleWeapon(true);
+    }
+
+    private void InitSize()
     {
         curSize = 1f;
         TF.localScale = Vector3.one;
     }
+
+    protected void SetupSizeByInitCombatPoint(int initPoint)
+    {
+        InitSize();
+        for (int i = 0; i < upSizeThresholds.Length; i++)
+        {
+            if (initPoint >= upSizeThresholds[i])
+            {
+                ProcessScaleSizeUp(false);
+            }
+        }
+    }
+
+    protected void ClearTargets()
+    {
+        targetsInRange.Clear();
+        curTargetChar = null;
+    }
+
+    protected void InitStatus()
+    {
+        isDead = false;
+        isAttacking = false;
+    }
+
     protected void InitAttackRangeTF()
     {
-        atkRangeTF.localScale = new Vector3(initAtkRange, 0.1f, initAtkRange);
+        atkRangeTF.localScale = new Vector3(baseAtkRange, 0.1f, baseAtkRange);
+        atkRangeTF.gameObject.SetActive(true);
+    }
+
+    protected void ToggleAtkRange(bool value)
+    {
+        atkRangeTF.gameObject.SetActive(value);
     }
 
     public virtual void OnDespawn()
@@ -93,11 +176,9 @@ public class Character : MonoBehaviour
         }
     }
 
-    public void ScaleSizeUp()
+    protected void ChangeColor(ColorType type)
     {
-        curSize += Const.CHARACTER_UPSCALE_UNIT;
-        TF.localScale = Vector3.one * curSize;
-        TF.position += Vector3.up * Const.CHARACTER_UPSCALE_UNIT;
+        charRenderer.material = colorDataSO.GetMat(type);
     }
 
     public void ChangeAnim(string animName)
@@ -136,7 +217,7 @@ public class Character : MonoBehaviour
 
     public void RemoveTargetInRange(Character character)
     {
-        character.ToggleIndicator(false);
+        character.ToggleTargetIndicator(false);
         targetsInRange.Remove(character);
     }
 
@@ -167,8 +248,8 @@ public class Character : MonoBehaviour
     {
         Invoke(nameof(OnDespawn), 2f);
         isDead = true;
-        BulletPartical.Play();
-        ToggleIndicator(false);
+        bulletPartical.Play();
+        ToggleTargetIndicator(false);
         StopMoving();
         ChangeAnim(Const.ANIM_NAME_DIE);
         GameManager.Instance.UpdateAliveNumText();
@@ -187,17 +268,15 @@ public class Character : MonoBehaviour
             curWeapon.Throw(targetPos);
             curWeapon.BulletCharge--;
         }
+        yield return new WaitForSeconds(0.2f);
         isAttacking = false;
     }
 
     protected void LookAtTarget(Vector3 targetPos)
     {
-        //if (curTargetChar != null)
-        //{
-            // we don't want player looks down when his size scales bigger
-            Vector3 targetDir = new Vector3(targetPos.x, TF.position.y, targetPos.z);
-            TF.LookAt(targetDir);
-        //}
+        // we don't want character looks down when its size scales bigger
+        Vector3 targetDir = new Vector3(targetPos.x, TF.position.y, targetPos.z);
+        TF.LookAt(targetDir);
     }
 
     protected virtual void UpdateMovementAnim()
@@ -220,7 +299,7 @@ public class Character : MonoBehaviour
         }
     }
 
-    public virtual void ToggleIndicator(bool value)
+    public virtual void ToggleTargetIndicator(bool value)
     {
     }
 
@@ -243,8 +322,10 @@ public class Character : MonoBehaviour
         if (other.CompareTag(Const.TAG_NAME_BULLET) && !isDead)
         {
             Bullet bullet = Cache.GetBullet(other);
-            if(bullet && this != bullet.Weapon.Owner)
+            if(bullet && this != bullet.Weapon.Owner && !bullet.Weapon.Owner.isDead)
             {
+                bullet.Weapon.Owner.RemoveTargetInRange(this);
+                bullet.Weapon.Owner.CheckToScaleSizeUp(CombatPoint);
                 ProcessDie();
             }
         }
@@ -257,8 +338,74 @@ public class Character : MonoBehaviour
         {
             Character character = Cache.GetChar(other);
             targetsInRange.Remove(character);
-            character.ToggleIndicator(false);
+            character.ToggleTargetIndicator(false);
         }
+    }
+
+    public void CheckToScaleSizeUp(int opponentCombatPoint)
+    {
+        bool onPointToScale = false;
+        int oldCombatPoint = CombatPoint;
+        CombatPoint += GetCombatPointInReturn(opponentCombatPoint);
+        indicator.UpdateCombatPoint(CombatPoint);
+
+        for (int i = 0; i < upSizeThresholds.Length; i++)
+        {
+            if (oldCombatPoint < upSizeThresholds[i] && CombatPoint >= upSizeThresholds[i])
+            {
+                onPointToScale = true;
+                break;
+            }
+        }
+
+        if (onPointToScale)
+        {
+            ProcessScaleSizeUp();
+        }
+    }
+
+    protected void ProcessScaleSizeUp(bool vfxOn = true)
+    {
+        curSize += Const.CHARACTER_UPSCALE_UNIT;
+        TF.localScale = Vector3.one * curSize;
+        TF.position += Vector3.up * Const.CHARACTER_UPSCALE_UNIT;
+        if (vfxOn)
+        {
+            StartCoroutine(IEScaleUp());
+            //Invoke(nameof(TriggerScaleUpVFX), 0.1f);
+        }
+    }
+
+    IEnumerator IEScaleUp()
+    {
+        if (!IsDead)
+        {
+            sizeUpPartical.Play();
+            yield return new WaitForSeconds(0.3f);
+            sizeUpPartical.Stop();
+        }
+    }
+
+    private void TriggerScaleUpVFX()
+    {
+        if (!IsDead)
+        {
+            sizeUpPartical.Play();
+        }
+    }
+
+    public int GetCombatPointInReturn(int point)
+    {
+        int returnPoint = upSizeThresholds.Length + 1;
+        for (int i = 0; i < upSizeThresholds.Length; i++)
+        {
+            if(point <= upSizeThresholds[i])
+            {
+                returnPoint = i + 1;
+                break;
+            }
+        }
+        return returnPoint;
     }
 
 }

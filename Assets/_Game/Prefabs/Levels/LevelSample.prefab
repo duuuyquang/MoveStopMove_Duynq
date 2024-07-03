@@ -255,7 +255,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 1, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8072014203214411234}
@@ -278,7 +278,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NavMeshData: {fileID: 23800000, guid: bb13a2b2afc2d5845b2296484d70e774, type: 2}
-  totalNum: 50
+  totalNum: 49
   TF: {fileID: 4338164917770901203}
 --- !u!1 &8523389231228735172
 GameObject:
@@ -506,7 +506,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.3
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!208 &3020793261841612760
 NavMeshObstacle:
@@ -517,7 +517,7 @@ NavMeshObstacle:
   m_GameObject: {fileID: 9065212283904059211}
   m_Enabled: 1
   serializedVersion: 3
-  m_Shape: 1
+  m_Shape: 0
   m_Extents: {x: 0.5, y: 0.5, z: 0.5}
   m_MoveThreshold: 0.1
   m_Carve: 0
@@ -641,7 +641,7 @@ NavMeshObstacle:
   m_GameObject: {fileID: 9161056603941363128}
   m_Enabled: 1
   serializedVersion: 3
-  m_Shape: 1
+  m_Shape: 0
   m_Extents: {x: 0.5, y: 1, z: 0.5}
   m_MoveThreshold: 0.1
   m_Carve: 0

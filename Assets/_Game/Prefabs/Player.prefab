@@ -238,11 +238,16 @@ MonoBehaviour:
   animator: {fileID: 4215411811959438596}
   speed: 120
   TF: {fileID: 662879286636102630}
+  charRenderer: {fileID: 4215411811955114948}
   curWeapon: {fileID: 4466613921538061053}
-  initAtkRange: 9
-  weaponType: 0
+  weaponType: 1
   atkRangeTF: {fileID: 3745716423870258850}
+  baseAtkRange: 8
+  baseAtkSpeed: 10
+  targetIndicator: {fileID: 0}
+  indicatorPrefab: {fileID: 5015059682914106551, guid: 7ce682697718eea4b8b98e14c3bf3b5b, type: 3}
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
+  colorDataSO: {fileID: 11400000, guid: 9e84c9a472450ba47b7affb38dd01b89, type: 2}
   BulletPartical: {fileID: 866045519746643090}
 --- !u!1 &3557999984504607940
 GameObject:
@@ -289,8 +294,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 4193671266626322596, guid: d3c7e1734abb5d946b58b2ba1370111d, type: 3}
-  speed: 9
-  spinAngle: 8
   TF: {fileID: 9222290469748741909}
 --- !u!1 &5008465739778426154
 GameObject:
@@ -673,6 +676,11 @@ Transform:
 --- !u!4 &4215411811950072572 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8592876449704432068, guid: bbeda7966273e13499a302f05a00fbf2, type: 3}
+  m_PrefabInstance: {fileID: 5602514426192642872}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &4215411811955114948 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8592876449707639036, guid: bbeda7966273e13499a302f05a00fbf2, type: 3}
   m_PrefabInstance: {fileID: 5602514426192642872}
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &4215411811959438596 stripped
