@@ -45,10 +45,13 @@ public class Character : MonoBehaviour
     [SerializeField] protected float baseAtkRange;
     [SerializeField] protected float baseAtkSpeed;
     protected float curSize;
+    protected float bonusAtkRange;
 
+    public Weapon CurWeapon { get { return curWeapon; } }
     public float CurSize { get { return curSize; } }
-    public float CurAttackRange { get { return baseAtkRange * curSize; } }
+    public float CurAttackRange { get { return (baseAtkRange + bonusAtkRange) * curSize; } }
     public float BaseAttackSpeed { get { return baseAtkSpeed; } }
+    public float BonusAttackRange { get { return bonusAtkRange; } set { bonusAtkRange = Mathf.Max(value,0); } }
     public WeaponType WeaponType { get { return weaponType; } set { weaponType = value; } }
 
     //------------------ Navigation props --------------------
@@ -61,11 +64,19 @@ public class Character : MonoBehaviour
     public bool HasTargetInRange => curTargetChar != null;
 
     //------------------ Status props ------------------------
-    protected bool isAttacking = false;
-    public bool IsAttacking { get { return isAttacking; } }
+    protected StatusType curStatus;
+    public StatusType CurStatus { get { return curStatus; } }
+    public bool IsStatus(StatusType status)
+    {
+        return curStatus == status;
+    }
 
-    protected bool isDead = false;
-    public bool IsDead { get { return isDead; } }
+    public enum StatusType
+    {
+        Normal = 0,
+        Attacking = 1,
+        Dead = 2
+    }
 
     //------------------ Data props --------------------------
     public ItemDataSO itemDataSO;
@@ -74,16 +85,14 @@ public class Character : MonoBehaviour
     [SerializeField] ParticleSystem bulletPartical;
     [SerializeField] ParticleSystem sizeUpPartical;
 
-    protected virtual void Start()
-    {
-        OnInit();
-    }
-
     protected virtual void Update()
     {
-        if (GameManager.IsState(GameState.GamePlay) && !isDead)
+        if (GameManager.IsState(GameState.GamePlay))
         {
-            DetectNearestTarget();
+            if(!IsStatus(StatusType.Dead))
+            {
+                DetectNearestTarget();
+            }
             UpdateMovementAnim();
         }
     }
@@ -92,23 +101,23 @@ public class Character : MonoBehaviour
     {
         InitBasicStats();
         InitDependentFactors();
-        InitInDependentFactors();
+        InitIndependentFactors();
     }
 
     protected virtual void InitBasicStats()
     {
-        InitAttackRangeTF();
+        InitSize();
     }
 
     private void InitDependentFactors()
     {
+        SetupSizeByInitCombatPoint(CombatPoint);
         InitWeapon();
         InitIndicator();
         ChangeColor(ColorType);
-        SetupSizeByInitCombatPoint(CombatPoint);
     }
 
-    private void InitInDependentFactors()
+    private void InitIndependentFactors()
     {
         InitStatus();
         ClearTargets();
@@ -125,6 +134,7 @@ public class Character : MonoBehaviour
     {
         curWeapon.OnInit(this);
         ToggleWeapon(true);
+        SetAttackRangeTF(baseAtkRange + bonusAtkRange);
     }
 
     private void InitSize()
@@ -135,7 +145,6 @@ public class Character : MonoBehaviour
 
     protected void SetupSizeByInitCombatPoint(int initPoint)
     {
-        InitSize();
         for (int i = 0; i < upSizeThresholds.Length; i++)
         {
             if (initPoint >= upSizeThresholds[i])
@@ -153,13 +162,12 @@ public class Character : MonoBehaviour
 
     protected void InitStatus()
     {
-        isDead = false;
-        isAttacking = false;
+        curStatus = StatusType.Normal;
     }
 
-    protected void InitAttackRangeTF()
+    protected void SetAttackRangeTF(float atkRange)
     {
-        atkRangeTF.localScale = new Vector3(baseAtkRange, 0.1f, baseAtkRange);
+        atkRangeTF.localScale = new Vector3(atkRange, 0.1f, atkRange);
         atkRangeTF.gameObject.SetActive(true);
     }
 
@@ -181,6 +189,11 @@ public class Character : MonoBehaviour
         charRenderer.material = colorDataSO.GetMat(type);
     }
 
+    protected void ChangeColorDeath(ColorType type)
+    {
+        charRenderer.material = colorDataSO.GetMatDeath(type);
+    }
+
     public void ChangeAnim(string animName)
     {
         if (curAnim != animName)
@@ -191,12 +204,28 @@ public class Character : MonoBehaviour
         }
     }
 
+    protected void ChangeStatus(StatusType type)
+    {
+        if(curStatus == StatusType.Dead)
+        {
+            return;
+        }
+
+        if (curStatus != type)
+        {
+            curStatus = type;
+        }
+    }
+
+    public virtual void SetState(IState state)
+    { }
+
     protected virtual void DetectNearestTarget()
     {
         float nearestDist = 0;
         curTargetChar = null;
         foreach (Character enemy in targetsInRange) {
-            if (enemy.IsDead)
+            if (enemy.IsStatus(StatusType.Dead))
             {
                 continue;
             }
@@ -223,7 +252,7 @@ public class Character : MonoBehaviour
 
     public void CheckAndProcessAttack()
     {
-        if (curWeapon.HasBullet && HasTargetInRange && !IsAttacking)
+        if (curWeapon.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking))
         {
             ProcessAttack();
         }
@@ -231,45 +260,32 @@ public class Character : MonoBehaviour
 
     private void ProcessAttack()
     {
-        isAttacking = true;
+        ChangeStatus(StatusType.Attacking);
+        ChangeAnim(Const.ANIM_NAME_ATTACK);
         attackCoroutine = IEAttack();
         StartCoroutine(attackCoroutine);
     }
 
     protected void StopAttack()
     {
-        isAttacking = false;
+        ChangeStatus(StatusType.Normal);
         if (attackCoroutine != null)
         {
             StopCoroutine(attackCoroutine);
         }
     }
-    private void ProcessDie()
-    {
-        Invoke(nameof(OnDespawn), 2f);
-        isDead = true;
-        bulletPartical.Play();
-        ToggleTargetIndicator(false);
-        StopMoving();
-        ChangeAnim(Const.ANIM_NAME_DIE);
-        GameManager.Instance.UpdateAliveNumText();
-    }
 
     IEnumerator IEAttack()
     {
         Vector3 targetPos = TF.position + (curTargetChar.TF.position - TF.position).normalized * CurAttackRange * 0.5f;
-        LookAtTarget(targetPos);
-        ChangeAnim(Const.ANIM_NAME_ATTACK);
-        yield return new WaitForSeconds(0.3f);
-        if(!IsDead)
+        yield return new WaitForSeconds(0.4f);
+        if(!IsStatus(StatusType.Dead))
         {
-            LookAtTarget(targetPos);
+            curWeapon.OnShoot(targetPos);
             ToggleWeapon(false);
-            curWeapon.Throw(targetPos);
-            curWeapon.BulletCharge--;
         }
-        yield return new WaitForSeconds(0.2f);
-        isAttacking = false;
+
+        ChangeStatus(StatusType.Normal);
     }
 
     protected void LookAtTarget(Vector3 targetPos)
@@ -279,15 +295,43 @@ public class Character : MonoBehaviour
         TF.LookAt(targetDir);
     }
 
+    private void ProcessDie()
+    {
+        Invoke(nameof(OnDespawn), 2f);
+        ChangeStatus(StatusType.Dead);
+        bulletPartical.Play();
+        ChangeColorDeath(ColorType);
+        ToggleTargetIndicator(false);
+        StopMoving();
+        GameManager.Instance.UpdateAliveNumText();
+    }
+
     protected virtual void UpdateMovementAnim()
     {
-        if (IsStanding && !IsAttacking)
+        if (IsStatus(StatusType.Dead))
         {
-            ChangeAnim(Const.ANIM_NAME_IDLE);
+            ChangeAnim(Const.ANIM_NAME_DIE);
         }
-        if (!IsStanding && !IsAttacking)
+
+        if(IsStatus(StatusType.Normal))
         {
-            ChangeAnim(Const.ANIM_NAME_RUN);
+            if (IsStanding)
+            {
+                ChangeAnim(Const.ANIM_NAME_IDLE);
+            } 
+            else
+            {
+                ChangeAnim(Const.ANIM_NAME_RUN);
+            }
+        }
+
+        if(IsStatus(StatusType.Attacking))
+        {
+            //ChangeAnim(Const.ANIM_NAME_ATTACK);
+            if (curTargetChar)
+            {
+                LookAtTarget(curTargetChar.TF.position);
+            }
         }
     }
 
@@ -307,36 +351,33 @@ public class Character : MonoBehaviour
     {
     }
 
-    public virtual void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
-        bool isCharacter = other.CompareTag(Const.TAG_NAME_ENEMY) || other.CompareTag(Const.TAG_NAME_PLAYER);
-        if (isCharacter)
+        Character character = Cache.GetChar(other);
+        if (character)
         {
-            Character character = Cache.GetChar(other);
-            if(!character.isDead)
+            if(!character.IsStatus(StatusType.Dead))
             {
                 targetsInRange.Add(character);
             }
         }
         
-        if (other.CompareTag(Const.TAG_NAME_BULLET) && !isDead)
+        Bullet bullet = Cache.GetBullet(other);
+        if(bullet && this != bullet.Weapon.Owner && !bullet.IsDropped && !IsStatus(StatusType.Dead))
         {
-            Bullet bullet = Cache.GetBullet(other);
-            if(bullet && this != bullet.Weapon.Owner && !bullet.Weapon.Owner.isDead)
-            {
-                bullet.Weapon.Owner.RemoveTargetInRange(this);
-                bullet.Weapon.Owner.CheckToScaleSizeUp(CombatPoint);
-                ProcessDie();
-            }
+            ProcessDie();
+            bullet.Weapon.Owner.RemoveTargetInRange(this);
+            bullet.Weapon.Owner.CheckToScaleSizeUp(CombatPoint);
+            GameManager.Instance.SetRecordHighestPoint(bullet.Weapon.Owner.CombatPoint);
         }
+
     }
 
     public void OnTriggerExit(Collider other)
     {
-        bool isCharacter = other.CompareTag(Const.TAG_NAME_ENEMY) || other.CompareTag(Const.TAG_NAME_PLAYER);
-        if (isCharacter)
+        Character character = Cache.GetChar(other);
+        if (character)
         {
-            Character character = Cache.GetChar(other);
             targetsInRange.Remove(character);
             character.ToggleTargetIndicator(false);
         }
@@ -371,24 +412,13 @@ public class Character : MonoBehaviour
         TF.position += Vector3.up * Const.CHARACTER_UPSCALE_UNIT;
         if (vfxOn)
         {
-            StartCoroutine(IEScaleUp());
-            //Invoke(nameof(TriggerScaleUpVFX), 0.1f);
-        }
-    }
-
-    IEnumerator IEScaleUp()
-    {
-        if (!IsDead)
-        {
-            sizeUpPartical.Play();
-            yield return new WaitForSeconds(0.3f);
-            sizeUpPartical.Stop();
+            Invoke(nameof(TriggerScaleUpVFX), 0.1f);
         }
     }
 
     private void TriggerScaleUpVFX()
     {
-        if (!IsDead)
+        if (!IsStatus(StatusType.Dead))
         {
             sizeUpPartical.Play();
         }
@@ -407,5 +437,4 @@ public class Character : MonoBehaviour
         }
         return returnPoint;
     }
-
 }

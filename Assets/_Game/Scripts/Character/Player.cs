@@ -6,12 +6,12 @@ public class Player : Character
     protected override void Update()
     {
         base.Update();
-        if (GameManager.IsState(GameState.GamePlay) && !isDead)
+        if (GameManager.IsState(GameState.GamePlay) && !IsStatus(StatusType.Dead))
         {
             ListenControllerInput();
             UpdateAttackStatus();
         }
-        if (GameManager.IsState(GameState.Finish) && !isDead)
+        if (GameManager.IsState(GameState.Finish) && !IsStatus(StatusType.Dead))
         {
             SetWinningStatus();
         }
@@ -19,7 +19,7 @@ public class Player : Character
 
     void FixedUpdate()
     {
-        if (!isDead)
+        if (!IsStatus(StatusType.Dead))
         {
             ProcessMoving();
         }
@@ -46,6 +46,7 @@ public class Player : Character
         CombatPoint = 0;
         ColorType = (ColorType) UnityEngine.Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
         WeaponType = (WeaponType)UnityEngine.Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length);
+        //WeaponType = WeaponType.Axe;
     }
 
     public override void OnDespawn()
@@ -74,7 +75,7 @@ public class Player : Character
     protected override void UpdateMovementAnim()
     {
         base.UpdateMovementAnim();
-        if (!IsAttacking)
+        if (IsStatus(StatusType.Normal))
         {
             LookAtCurDirection();
         }

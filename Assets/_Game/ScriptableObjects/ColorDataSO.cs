@@ -20,6 +20,7 @@ public class ColorDataSO : ScriptableObject
 {
     [SerializeField] Material[] materials;
     [SerializeField] Material[] materialGUIs;
+    [SerializeField] Material[] materialDeaths;
 
     public Material GetMat(ColorType index)
     {
@@ -29,5 +30,10 @@ public class ColorDataSO : ScriptableObject
     public Material GetMatGUI(ColorType index)
     {
         return materialGUIs[(int)index];
+    }
+
+    public Material GetMatDeath(ColorType index)
+    {
+        return materialDeaths[(int)index];
     }
 }

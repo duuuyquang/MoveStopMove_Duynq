@@ -14,7 +14,7 @@ public class LevelManager : Singleton<LevelManager>
     public Level CurLevel { get { return curLevel; } }
     public Player Player { get { return player; } }
 
-    void Awake()
+    void Start()
     {
         OnInit(initLevel);
     }

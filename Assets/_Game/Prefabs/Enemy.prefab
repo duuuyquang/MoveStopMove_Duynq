@@ -403,8 +403,8 @@ MonoBehaviour:
   curWeapon: {fileID: 5579794950706686892}
   weaponType: 0
   atkRangeTF: {fileID: 431542723759777090}
-  baseAtkRange: 8
-  baseAtkSpeed: 7
+  baseAtkRange: 11
+  baseAtkSpeed: 9
   targetIndicator: {fileID: 6703033279302982736}
   indicatorPrefab: {fileID: 5015059682914106551, guid: 7ce682697718eea4b8b98e14c3bf3b5b, type: 3}
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}

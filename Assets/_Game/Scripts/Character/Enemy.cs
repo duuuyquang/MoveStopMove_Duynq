@@ -25,7 +25,7 @@ public class Enemy : Character
         base.Update();
         if (GameManager.IsState(GameState.GamePlay))
         {
-            if (curState != null && !IsDead)
+            if (curState != null && !IsStatus(StatusType.Dead))
             {
                 curState.OnExecute(this);
             }
@@ -43,9 +43,10 @@ public class Enemy : Character
     {
         base.InitBasicStats();
         Name = GetRandomName();
-        CombatPoint = Random.Range(0, CameraFollower.Instance.Player.CombatPoint + 1);
+        CombatPoint = Random.Range(0, GameManager.Instance.RecordHighestPoint + 1);
         ColorType = (ColorType)Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
         WeaponType = (WeaponType)Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length);
+        //WeaponType = WeaponType.Axe;
     }
 
     private string GetRandomName()
@@ -66,7 +67,7 @@ public class Enemy : Character
         SetDestination(TF.position + new Vector3(randomX, 0, randomZ));
     }
 
-    private void SetDestination(Vector3 destination)
+    public void SetDestination(Vector3 destination)
     {
         curDestination = destination;
         if(agent.isOnNavMesh)
@@ -75,7 +76,7 @@ public class Enemy : Character
         }
     }
 
-    public void SetState(IState state)
+    public override void SetState(IState state)
     {
         if(curState != state)
         {
@@ -90,7 +91,10 @@ public class Enemy : Character
     public override void StopMoving()
     {
         base.StopMoving();
-        agent.ResetPath();
+        if(agent.isOnNavMesh)
+        {
+            agent.ResetPath();
+        }
     }
 
     public override void ToggleTargetIndicator(bool value)

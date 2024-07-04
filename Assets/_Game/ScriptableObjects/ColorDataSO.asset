@@ -32,3 +32,13 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 05ef37e9c24f36c4f8730f2e023952a5, type: 2}
   - {fileID: 2100000, guid: 64cb4ba1c6f180140a52c0f6fe1bf48b, type: 2}
   - {fileID: 2100000, guid: adb578bd00440714ca49417e5a3242ce, type: 2}
+  materialDeaths:
+  - {fileID: 2100000, guid: 7ae59d3347eab734099b1fc2b0c16812, type: 2}
+  - {fileID: 2100000, guid: 462d91545d503f64cbea5830592a5d3e, type: 2}
+  - {fileID: 2100000, guid: e322bde237427a743b5a883c72858f26, type: 2}
+  - {fileID: 2100000, guid: 7236278a05c875142a3302035e8c9ea5, type: 2}
+  - {fileID: 2100000, guid: 93fd5bdec99b1744180cc11ffc1d9af3, type: 2}
+  - {fileID: 2100000, guid: cf730ac31f267294dbf170c007fd0b75, type: 2}
+  - {fileID: 2100000, guid: 093d388e85473954f9a4cb6cb957015c, type: 2}
+  - {fileID: 2100000, guid: 468de0aa8796b8e4c9f7aad0166c488c, type: 2}
+  - {fileID: 2100000, guid: f5fe3e4d66a9ab2468beda67431f6c7c, type: 2}

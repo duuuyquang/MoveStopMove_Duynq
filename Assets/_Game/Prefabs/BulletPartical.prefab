@@ -44,6 +44,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CFXR2 Blood Shape Splash
       objectReference: {fileID: 0}
+    - target: {fileID: 4553287630450876387, guid: 82fee651cb1808b4a8808dd2f315330c, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 4553287630450876396, guid: 82fee651cb1808b4a8808dd2f315330c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

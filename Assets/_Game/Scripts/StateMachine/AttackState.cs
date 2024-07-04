@@ -16,10 +16,21 @@ public class AttackState : IState
         if (count >= delayTime)
         {
             enemy.CheckAndProcessAttack();
-            if(Random.Range(0,10) < 5)
+            if(enemy.CurWeapon.IsGrab)
+            {
+                if (enemy.CurWeapon.CurBullet && enemy.CurWeapon.CurBullet.IsDropped)
+                {
+                    Vector3 targetPos = new Vector3(enemy.CurWeapon.CurBullet.TF.position.x, enemy.TF.position.y, enemy.CurWeapon.CurBullet.TF.position.z);
+                    enemy.SetState(new RunToDestination(targetPos));
+                }
+                return;
+            }
+
+            if (Random.Range(0, 10) < 5)
             {
                 enemy.SetState(new PatrolState());
-            } else
+            }
+            else
             {
                 enemy.SetState(new IdleState());
             }

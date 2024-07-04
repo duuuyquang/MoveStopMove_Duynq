@@ -2,17 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
+using static Character;
 
 public enum GameState { MainMenu, GamePlay, Finish, Revive, Setting }
 
 public class GameManager : Singleton<GameManager>
 {
-    [SerializeField] CameraFollower cameraFollower;
-
     private static GameState gameState;
 
     private int curAliveNum;
     public int CurAliveNum { get { return curAliveNum; } }
+
+    private int recordHighestPoint;
+    public int RecordHighestPoint { get { return recordHighestPoint; } }
 
     public static void ChangeState(GameState state)
     {
@@ -54,7 +56,8 @@ public class GameManager : Singleton<GameManager>
     {
         ChangeState(GameState.MainMenu);
         curAliveNum = LevelManager.Instance.CurLevel.totalNum + 1;
-        cameraFollower.OnInit();
+        recordHighestPoint = 0;
+        CameraFollower.Instance.OnInit();
     }
 
     public void UpdateAliveNumText()
@@ -64,10 +67,18 @@ public class GameManager : Singleton<GameManager>
 
     private void CheckWinCondition()
     {
-        if (EnemyManager.Instance.IsAllEnemiesDead && !CameraFollower.Instance.Player.IsDead)
+        if (EnemyManager.Instance.IsAllEnemiesDead && !LevelManager.Instance.Player.IsStatus(StatusType.Dead))
         {
             ChangeState(GameState.Finish);
             UIManager.Instance.OpenUI<CanvasWin>();
+        }
+    }
+
+    public void SetRecordHighestPoint(int point)
+    {
+        if(point > recordHighestPoint)
+        {
+            recordHighestPoint = point;
         }
     }
 }

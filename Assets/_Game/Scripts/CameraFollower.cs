@@ -28,7 +28,7 @@ public class CameraFollower : Singleton<CameraFollower>
     {
         if (!player)
         {
-            player = GameObject.FindGameObjectWithTag(Const.TAG_NAME_PLAYER).GetComponent<Player>();
+            player = LevelManager.Instance.Player;
         }
         else if (GameManager.IsState(GameState.GamePlay))
         {
@@ -57,9 +57,9 @@ public class CameraFollower : Singleton<CameraFollower>
     {
         int desiredFPS = 45;
         float count = 0f;
-        float targetRotateX = EULER_X_GAME_PLAY - TF.eulerAngles.x;
-        float rotateUnit = targetRotateX / desiredFPS;
-        while (count < targetRotateX)
+        float amountToRotate = EULER_X_GAME_PLAY - TF.eulerAngles.x;
+        float rotateUnit = amountToRotate / desiredFPS;
+        while (count < amountToRotate)
         {
             TF.Rotate(rotateUnit, 0, 0);
             count += rotateUnit;

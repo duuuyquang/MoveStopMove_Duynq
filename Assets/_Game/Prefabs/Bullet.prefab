@@ -120,6 +120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e082f5d5ff03fe54a98a52cfce4cf935, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bulletCollider: {fileID: 3962500398290578070}
   TF: {fileID: 4657930851155721223}
 --- !u!54 &1416643678597764498
 Rigidbody:

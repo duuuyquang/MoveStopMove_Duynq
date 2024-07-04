@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static Character;
 using static UnityEngine.GraphicsBuffer;
 
 public class Indicator : MonoBehaviour
@@ -41,7 +42,7 @@ public class Indicator : MonoBehaviour
             indicator.transform.position = screenPos + Vector3.up * offset * 3f;
         }
 
-        if(targetChar && targetChar.IsDead || GameManager.IsState(GameState.Finish))
+        if(targetChar && targetChar.IsStatus(StatusType.Dead) || GameManager.IsState(GameState.Finish))
         {
             Destroy(gameObject);
         }

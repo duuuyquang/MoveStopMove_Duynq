@@ -70,10 +70,12 @@ public class EnemyManager : Singleton<EnemyManager>
     public void Spawn()
     {
         Enemy enemy = enemiesReadyList[enemiesReadyList.Count - 1];
-        spawnedEnemiesList.Add(enemy);
-        enemiesReadyList.Remove(enemy);
+        enemy.OnInit();
         enemy.TF.position = GetValidSpawnPos();
         enemy.gameObject.SetActive(true);
+
+        spawnedEnemiesList.Add(enemy);
+        enemiesReadyList.Remove(enemy);
     }
 
     public Vector3 GetValidSpawnPos()
