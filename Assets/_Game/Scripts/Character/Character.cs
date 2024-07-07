@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum StatusType { Normal, Attacking, Dead }
+
 public class Character : MonoBehaviour
 {
     //------------------ Movement props ---------------------
@@ -16,7 +18,7 @@ public class Character : MonoBehaviour
 
     //------------------ Basic props -------------------------
     private string charName;
-    public string Name { get { return charName; } set { if (value.Length < 15) { charName = value; } } }
+    public string Name { get { return charName; } set { if (value.Length < 25) { charName = value; } } }
 
     [SerializeField] protected Renderer charRenderer;
     private ColorType colorType;
@@ -30,7 +32,7 @@ public class Character : MonoBehaviour
 
     private IEnumerator attackCoroutine;
 
-    [SerializeField] protected Weapon curWeapon;
+    [SerializeField] protected WeaponHolder curWeapon;
     [SerializeField] protected WeaponType weaponType;
     [SerializeField] protected Transform atkRangeTF;
     [SerializeField] protected float baseAtkRange;
@@ -38,10 +40,10 @@ public class Character : MonoBehaviour
     protected float curSize;
     protected float bonusAtkRange;
 
-    public Weapon CurWeapon { get { return curWeapon; } }
-    public float CurSize { get { return curSize; } }
-    public float CurAttackRange { get { return (baseAtkRange + bonusAtkRange) * curSize; } }
-    public float BaseAttackSpeed { get { return baseAtkSpeed; } }
+    public WeaponHolder CurWeapon => curWeapon;
+    public float CurSize => curSize;
+    public float CurAttackRange => (baseAtkRange + bonusAtkRange) * curSize;
+    public float BaseAttackSpeed => baseAtkSpeed;
     public float BonusAttackRange { get { return bonusAtkRange; } set { bonusAtkRange = Mathf.Max(value,0); } }
     public WeaponType WeaponType { get { return weaponType; } set { weaponType = value; } }
 
@@ -56,18 +58,8 @@ public class Character : MonoBehaviour
 
     //------------------ Status props ------------------------
     protected StatusType curStatus;
-    public StatusType CurStatus { get { return curStatus; } }
-    public bool IsStatus(StatusType status)
-    {
-        return curStatus == status;
-    }
-
-    public enum StatusType
-    {
-        Normal = 0,
-        Attacking = 1,
-        Dead = 2
-    }
+    public StatusType CurStatus => curStatus;
+    public bool IsStatus(StatusType status) => curStatus == status;
 
     //------------------ Data props --------------------------
     public ItemDataSO itemDataSO;
@@ -84,7 +76,7 @@ public class Character : MonoBehaviour
             {
                 DetectNearestTarget();
             }
-            UpdateMovementAnim();
+            UpdateAnimation();
         }
     }
 
@@ -125,7 +117,7 @@ public class Character : MonoBehaviour
     {
         curWeapon.OnInit(this);
         ToggleWeapon(true);
-        SetAttackRadiusTF((baseAtkRange + bonusAtkRange) * 2f);
+        SetAttackRangeTF(baseAtkRange + bonusAtkRange);
     }
 
     private void InitSize()
@@ -156,15 +148,10 @@ public class Character : MonoBehaviour
         curStatus = StatusType.Normal;
     }
 
-    protected void SetAttackRadiusTF(float atkRadius)
+    protected void SetAttackRangeTF(float atkRange)
     {
-        atkRangeTF.localScale = new Vector3(atkRadius, 0.1f, atkRadius);
+        atkRangeTF.localScale = new Vector3(atkRange * 2f, 0.1f, atkRange * 2f);
         atkRangeTF.gameObject.SetActive(true);
-    }
-
-    protected void ToggleAtkRange(bool value)
-    {
-        atkRangeTF.gameObject.SetActive(value);
     }
 
     public virtual void OnDespawn()
@@ -294,7 +281,7 @@ public class Character : MonoBehaviour
         GameManager.Instance.UpdateAliveNumText();
     }
 
-    protected virtual void UpdateMovementAnim()
+    protected virtual void UpdateAnimation()
     {
         if (IsStatus(StatusType.Dead))
         {
@@ -323,20 +310,17 @@ public class Character : MonoBehaviour
         }
     }
 
+    protected void ToggleAtkRangeTF(bool value)
+    {
+        atkRangeTF.gameObject.SetActive(value);
+    }
+
     public void ToggleWeapon(bool value)
     {
         if(curWeapon)
         {
             curWeapon.gameObject.SetActive(value);
         }
-    }
-
-    public virtual void ToggleTargetIndicator(bool value)
-    {
-    }
-
-    public virtual void StopMoving()
-    {
     }
 
     protected virtual void OnTriggerEnter(Collider other)
@@ -428,8 +412,14 @@ public class Character : MonoBehaviour
         return returnPoint;
     }
 
-    public virtual void ShowCombatPointGainned(int point)
+    protected virtual void ShowCombatPointGainned(int point)
     {
+    }
+    public virtual void ToggleTargetIndicator(bool value)
+    {
+    }
 
+    public virtual void StopMoving()
+    {
     }
 }

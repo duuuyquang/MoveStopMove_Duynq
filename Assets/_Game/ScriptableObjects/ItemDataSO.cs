@@ -30,10 +30,10 @@ public enum ItemType
 
 public class ItemDataSO : ScriptableObject
 {
-    [SerializeField] Transform[] weapons;
+    [SerializeField] Weapon[] weapons;
     [SerializeField] GameObject[] items;
 
-    public Transform GetWeapon(WeaponType index)
+    public Weapon GetWeapon(WeaponType index)
     {
         return weapons[(int)index];
     }

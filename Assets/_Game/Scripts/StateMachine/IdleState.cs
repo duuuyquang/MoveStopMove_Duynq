@@ -38,7 +38,7 @@ public class IdleState : IState
 
     public bool RollToAttack()
     {
-        return Random.Range(0f, 10f) < 5f;
+        return Random.Range(0, 10) < 8;
     }
 
     public void OnExit(Enemy enemy)

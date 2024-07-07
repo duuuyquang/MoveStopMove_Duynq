@@ -7,7 +7,6 @@ public class CombatPointText : MonoBehaviour
 {
     [SerializeField] Transform TF;
     [SerializeField] TextMeshProUGUI point;
-
     [SerializeField] float speed;
 
     private float count = 0f;

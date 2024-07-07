@@ -17,10 +17,10 @@ public class CameraFollower : Singleton<CameraFollower>
     private Vector3 targetPos;
 
     [SerializeField] private Player player;
-    public Player Player { get { return player; } }
+    public Player Player => player;
 
     [SerializeField] private Camera cam;
-    public Camera Camera { get { return cam; } }
+    public Camera Camera => cam;
 
     public Transform TF;
 

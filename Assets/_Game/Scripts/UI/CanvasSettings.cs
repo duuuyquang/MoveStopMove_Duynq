@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CanvasSettings : UICanvas
@@ -28,6 +26,7 @@ public class CanvasSettings : UICanvas
     {
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>();
+        LevelManager.Instance.OnInit(0);
     }
 
     public override void Close(float time)
@@ -43,6 +42,6 @@ public class CanvasSettings : UICanvas
     public void ContinueButton()
     {
         base.CloseDirectly();
-        //GameManager.ChangeState(GameState.GamePlay);
+        GameManager.ChangeState(GameState.GamePlay);
     }
 }

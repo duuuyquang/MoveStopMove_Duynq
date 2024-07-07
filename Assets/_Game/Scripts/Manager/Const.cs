@@ -14,4 +14,6 @@ public static class Const
     public const float CHARACTER_UPSCALE_UNIT   = 0.1f;
 
     public const int WEAPON_BASE_BULLET_AMOUNT  = 1;
+
+    public const int COMBAT_POINT_DEFAULT_SIZE  = 60;
 }

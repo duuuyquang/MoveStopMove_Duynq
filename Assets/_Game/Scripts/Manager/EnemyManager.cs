@@ -102,7 +102,7 @@ public class EnemyManager : Singleton<EnemyManager>
             {
                 foreach (Enemy enemy in spawnedEnemiesList)
                 {
-                    if (Vector3.Distance(navMeshHit.position, enemy.TF.position) < playerAtkRange)
+                    if (Vector3.Distance(navMeshHit.position, enemy.TF.position) < 5f)
                     {
                         GetValidSpawnPos();
                     }

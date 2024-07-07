@@ -4,6 +4,7 @@ public class AttackState : IState
 {
     float delayTime = Random.Range(0f, 1.5f);
     float count = 0f;
+    bool isAttacked = false;
 
     public void OnEnter(Enemy enemy)
     {
@@ -15,10 +16,15 @@ public class AttackState : IState
         count += Time.deltaTime;
         if (count >= delayTime)
         {
-            enemy.CheckAndProcessAttack();
+            if(!isAttacked)
+            {
+                enemy.CheckAndProcessAttack();
+                isAttacked = true;
+            }
+
             if(enemy.CurWeapon.IsGrab)
             {
-                if (enemy.CurWeapon.CurBullet && enemy.CurWeapon.CurBullet.IsDropped && enemy.IsStatus(Character.StatusType.Normal))
+                if (enemy.CurWeapon.CurBullet && enemy.CurWeapon.CurBullet.IsDropped && enemy.IsStatus(StatusType.Normal))
                 {
                     Vector3 targetPos = new Vector3(enemy.CurWeapon.CurBullet.TF.position.x, enemy.TF.position.y, enemy.CurWeapon.CurBullet.TF.position.z);
                     enemy.SetState(new RunToDestination(targetPos));
@@ -26,7 +32,8 @@ public class AttackState : IState
                 return;
             }
 
-            if (enemy.IsStatus(Character.StatusType.Normal)) {
+            if (enemy.IsStatus(StatusType.Normal)) 
+            {
                 if (Random.Range(0, 10) < 5)
                 {
                     enemy.SetState(new PatrolState());

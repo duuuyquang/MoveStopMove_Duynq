@@ -7,14 +7,18 @@ public class Player : Character
     protected override void Update()
     {
         base.Update();
-        if (GameManager.IsState(GameState.GamePlay) && !IsStatus(StatusType.Dead))
+        if (!IsStatus(StatusType.Dead))
         {
-            ListenControllerInput();
-            UpdateAttackStatus();
-        }
-        if (GameManager.IsState(GameState.Finish) && !IsStatus(StatusType.Dead))
-        {
-            SetWinningStatus();
+            if (GameManager.IsState(GameState.GamePlay))
+            {
+                ListenControllerInput();
+                UpdateAttackStatus();
+            }
+
+            if (GameManager.IsState(GameState.Finish))
+            {
+                OnWinning();
+            }
         }
     }
 
@@ -33,6 +37,14 @@ public class Player : Character
         PlayerController.Instance.OnInit();
     }
 
+    private void OnWinning()
+    {
+        TF.eulerAngles = new Vector3(0, 200, 0);
+        ChangeAnim(Const.ANIM_NAME_DANCE);
+        StopMoving();
+        ToggleAtkRangeTF(false);
+    }
+
     private void InitTransform()
     {
         TF.position = Vector3.zero;
@@ -46,7 +58,6 @@ public class Player : Character
         CombatPoint = 0;
         ColorType = (ColorType) UnityEngine.Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
         WeaponType = (WeaponType)UnityEngine.Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length);
-        WeaponType = WeaponType.Axe;
     }
 
     public override void OnDespawn()
@@ -72,9 +83,9 @@ public class Player : Character
         }
     }
 
-    protected override void UpdateMovementAnim()
+    protected override void UpdateAnimation()
     {
-        base.UpdateMovementAnim();
+        base.UpdateAnimation();
         if (IsStatus(StatusType.Normal))
         {
             LookAtCurDirection();
@@ -118,18 +129,10 @@ public class Player : Character
         PlayerController.Instance.CurDir = Vector3.zero;
     }
 
-    public void SetWinningStatus()
-    {
-        TF.eulerAngles = new Vector3(0, 200, 0);
-        ChangeAnim(Const.ANIM_NAME_DANCE);
-        StopMoving();
-        ToggleAtkRange(false);
-    }
-
-    public override void ShowCombatPointGainned(int point)
+    protected override void ShowCombatPointGainned(int point)
     {
         CombatPointText prefab = Instantiate(combatPointTextPrefab, UIManager.Instance.GetUI<CanvasGamePlay>().transform);
         prefab.transform.position = CameraFollower.Instance.Camera.WorldToScreenPoint(TF.position) + Vector3.up * 200f;
-        prefab.SetPoint(point, 40f * CurSize);
+        prefab.SetPoint(point, Const.COMBAT_POINT_DEFAULT_SIZE * CurSize);
     }
 }

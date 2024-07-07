@@ -6,19 +6,16 @@ using static Character;
 
 public class Bullet : MonoBehaviour
 {
-    //[SerializeField] Collider bulletCollider;
-
-
     //------------------- Transform specs -------------------------
     private float speed;
     private float spinSpeed;
     private Vector3 rotateAxis;
 
     private Vector3 targetPos;
-    private Weapon weapon;
-    public Weapon Weapon { get { return weapon; } }
+    private WeaponHolder weapon;
+    public WeaponHolder Weapon => weapon;
 
-    private Transform weaponPrefab;
+    private Weapon weaponPrefab;
     private bool IsDestination => Vector3.Distance(TF.position + Vector3.up * (TF.position.y - targetPos.y), targetPos) < 0.1f;
 
     public Transform TF;
@@ -30,14 +27,14 @@ public class Bullet : MonoBehaviour
     private bool isGrab = false;
     private bool isDropped = false;
     private float grabTimer = 0;
-    public bool IsDropped { get { return isDropped; } }
+    public bool IsDropped => isDropped;
 
     void Update()
     {
         ProcessBehavior();
     }
 
-    public void OnInit(Weapon weapon, Vector3 targetPos)
+    public void OnInit(WeaponHolder weapon, Vector3 targetPos)
     {
         this.weapon = weapon;
         this.targetPos = targetPos;
@@ -110,7 +107,6 @@ public class Bullet : MonoBehaviour
         {
             if (grabTimer == 0)
             {
-                //bulletCollider.enabled = false;
                 isDropped = true;
                 StopMoving();
                 SetDroppedShape();
@@ -118,7 +114,7 @@ public class Bullet : MonoBehaviour
 
             grabTimer += Time.deltaTime;
 
-            if (!weapon || weapon && (Vector3.Distance(weapon.Owner.TF.position, TF.position) <= 1.5f || weapon.Owner.IsStatus(StatusType.Dead)) || grabTimer >= 5f)
+            if (!weapon || weapon && (Vector3.Distance(weapon.Owner.TF.position, TF.position) <= 1.5f) || grabTimer >= 5f)
             {
                 OnDespawn();
             }
@@ -130,7 +126,7 @@ public class Bullet : MonoBehaviour
     private void MovingToTarget()
     {
         TF.position = Vector3.MoveTowards(TF.position, targetPos, speed * Time.deltaTime);
-        weaponPrefab.Rotate(rotateAxis, spinSpeed * Time.deltaTime * 100f);
+        weaponPrefab.transform.Rotate(rotateAxis, spinSpeed * Time.deltaTime * 100f);
     }
 
     public void OnDespawn()
@@ -150,8 +146,8 @@ public class Bullet : MonoBehaviour
 
     private void SetDroppedShape()
     {
-        weaponPrefab.localPosition = new Vector3(0, 0, 1);
-        weaponPrefab.localEulerAngles = new Vector3(-50, 180, 0);
+        weaponPrefab.transform.localPosition = new Vector3(0, 0, 1);
+        weaponPrefab.transform.localEulerAngles = new Vector3(-50, 180, 0);
     }
 
     private void SetTargetPos(Vector3 pos)

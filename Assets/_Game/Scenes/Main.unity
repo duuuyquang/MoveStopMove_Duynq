@@ -1043,7 +1043,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4267485089185142045, guid: 908a000e0ca21724c9c8b5cfa7c2b353, type: 3}
       propertyPath: speed
-      value: 150
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 4267485089185142045, guid: 908a000e0ca21724c9c8b5cfa7c2b353, type: 3}
       propertyPath: collider
@@ -1051,7 +1051,7 @@ PrefabInstance:
       objectReference: {fileID: 1636234100}
     - target: {fileID: 4267485089185142045, guid: 908a000e0ca21724c9c8b5cfa7c2b353, type: 3}
       propertyPath: baseAtkRange
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4267485089185142045, guid: 908a000e0ca21724c9c8b5cfa7c2b353, type: 3}
       propertyPath: baseAtkSpeed

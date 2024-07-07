@@ -52,7 +52,6 @@ public class Enemy : Character
         CombatPoint = Random.Range(0, EnemyManager.Instance.RecordHighestPoint + 1);
         ColorType = (ColorType)Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
         WeaponType = (WeaponType)Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length);
-        //WeaponType = WeaponType.Axe;
     }
 
     private string GetRandomName()
