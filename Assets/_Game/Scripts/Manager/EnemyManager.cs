@@ -1,8 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SocialPlatforms;
+using Random = UnityEngine.Random;
 
 public class EnemyManager : Singleton<EnemyManager>
 {
@@ -13,12 +16,16 @@ public class EnemyManager : Singleton<EnemyManager>
     private NavMeshHit navMeshHit;
 
     [SerializeField] Enemy enemyPrefab;
-    [SerializeField] Canvas canvas;
+    [SerializeField] GameObject test;
+    [SerializeField] GameObject test2;
 
     private List<Enemy> enemiesReadyList = new List<Enemy>();
     private List<Enemy> spawnedEnemiesList = new List<Enemy>();
     public bool IsAllEnemiesDead => (enemiesReadyList.Count <= 0 && spawnedEnemiesList.Count <= 0);
     public bool IsSpawnable => spawnedEnemiesList.Count < MAX_ENEMIES_ON_RUNTIME && enemiesReadyList.Count > 0;
+
+    private int recordHighestPoint;
+    public int RecordHighestPoint { get { return recordHighestPoint; } }
 
     public void Update()
     {
@@ -27,6 +34,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
     public void OnInit()
     {
+        recordHighestPoint = 0;
         ClearAllLists();
         PreLoadEnemiesReadyList();
         InitSpawn();
@@ -80,19 +88,21 @@ public class EnemyManager : Singleton<EnemyManager>
 
     public Vector3 GetValidSpawnPos()
     {
-        float   playerAtkRange = LevelManager.Instance.Player.CurAttackRange;
+        float playerAtkRange = LevelManager.Instance.Player.CurAttackRange;
+        float multiDist = 3f;
         Vector3 playerPos = LevelManager.Instance.Player.TF.position;
-        if (NavMesh.SamplePosition(playerPos + Random.insideUnitSphere * playerAtkRange * 2f, out navMeshHit, playerAtkRange * 5f, NavMesh.AllAreas))
+        Vector3 randDirection = new Vector3(Random.Range(-playerAtkRange, playerAtkRange), 0f, Random.Range(-playerAtkRange, playerAtkRange)) * multiDist;
+        if (NavMesh.SamplePosition(playerPos + randDirection, out navMeshHit, playerAtkRange * multiDist, NavMesh.AllAreas))
         {
-            if(Vector3.Distance(navMeshHit.position, playerPos) < playerAtkRange)
+            if (Vector3.Distance(navMeshHit.position, playerPos) < playerAtkRange * multiDist * 0.5f)
             {
                 GetValidSpawnPos();
-            } 
+            }
             else
             {
                 foreach (Enemy enemy in spawnedEnemiesList)
                 {
-                    if (Vector3.Distance(navMeshHit.position, enemy.TF.position) < 5f)
+                    if (Vector3.Distance(navMeshHit.position, enemy.TF.position) < playerAtkRange)
                     {
                         GetValidSpawnPos();
                     }
@@ -115,6 +125,14 @@ public class EnemyManager : Singleton<EnemyManager>
             Enemy enemy = Instantiate(enemyPrefab, transform);
             enemy.gameObject.SetActive(false);
             enemiesReadyList.Add(enemy);
+        }
+    }
+
+    public void SetRecordHighestPoint(int point)
+    {
+        if (point > recordHighestPoint)
+        {
+            recordHighestPoint = point;
         }
     }
 }

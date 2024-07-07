@@ -6,7 +6,6 @@ public class IdleState : IState
 {
     private float time;
     private float count;
-    private bool triggerAttack;
 
     public void OnEnter(Enemy enemy)
     {
@@ -21,7 +20,14 @@ public class IdleState : IState
 
         if (enemy.HasTargetInRange)
         {
-            enemy.SetState(new AttackState());
+            if (RollToAttack())
+            {
+                enemy.SetState(new AttackState());
+            }
+            else
+            {
+                enemy.SetState(new PatrolState());
+            }
         }
 
         if (count >= time )

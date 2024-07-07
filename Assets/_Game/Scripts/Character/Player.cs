@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Player : Character
 {
+    [SerializeField] CombatPointText combatPointTextPrefab; 
     protected override void Update()
     {
         base.Update();
@@ -29,7 +30,6 @@ public class Player : Character
     {
         base.OnInit();
         InitTransform();
-        InitIndicator();
         PlayerController.Instance.OnInit();
     }
 
@@ -46,7 +46,7 @@ public class Player : Character
         CombatPoint = 0;
         ColorType = (ColorType) UnityEngine.Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
         WeaponType = (WeaponType)UnityEngine.Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length);
-        //WeaponType = WeaponType.Axe;
+        WeaponType = WeaponType.Axe;
     }
 
     public override void OnDespawn()
@@ -124,5 +124,12 @@ public class Player : Character
         ChangeAnim(Const.ANIM_NAME_DANCE);
         StopMoving();
         ToggleAtkRange(false);
+    }
+
+    public override void ShowCombatPointGainned(int point)
+    {
+        CombatPointText prefab = Instantiate(combatPointTextPrefab, UIManager.Instance.GetUI<CanvasGamePlay>().transform);
+        prefab.transform.position = CameraFollower.Instance.Camera.WorldToScreenPoint(TF.position) + Vector3.up * 200f;
+        prefab.SetPoint(point, 40f * CurSize);
     }
 }

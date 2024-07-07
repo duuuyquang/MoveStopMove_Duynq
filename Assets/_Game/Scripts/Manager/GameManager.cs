@@ -13,9 +13,6 @@ public class GameManager : Singleton<GameManager>
     private int curAliveNum;
     public int CurAliveNum { get { return curAliveNum; } }
 
-    private int recordHighestPoint;
-    public int RecordHighestPoint { get { return recordHighestPoint; } }
-
     public static void ChangeState(GameState state)
     {
         gameState = state;
@@ -56,7 +53,6 @@ public class GameManager : Singleton<GameManager>
     {
         ChangeState(GameState.MainMenu);
         curAliveNum = LevelManager.Instance.CurLevel.totalNum + 1;
-        recordHighestPoint = 0;
         CameraFollower.Instance.OnInit();
     }
 
@@ -71,14 +67,6 @@ public class GameManager : Singleton<GameManager>
         {
             ChangeState(GameState.Finish);
             UIManager.Instance.OpenUI<CanvasWin>();
-        }
-    }
-
-    public void SetRecordHighestPoint(int point)
-    {
-        if(point > recordHighestPoint)
-        {
-            recordHighestPoint = point;
         }
     }
 }

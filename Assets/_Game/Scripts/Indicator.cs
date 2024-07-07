@@ -1,48 +1,57 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static Character;
-using static UnityEngine.GraphicsBuffer;
 
 public class Indicator : MonoBehaviour
 {
     [SerializeField] Transform indicator;
     private Character targetChar;
-    private Camera cam;
-    private float offset = 60f;
+    private float offsetScreen = 70f;
+    private float offsetChar = 120f;
+    private float offsetPointer = 50f;
 
     [SerializeField] TextMeshProUGUI nameTextMesh;
     [SerializeField] TextMeshProUGUI pointTextMesh;
     [SerializeField] Image backgroundImage;
+    [SerializeField] Image pointerImage;
 
     public ColorDataSO colorDataSO;
 
-    private void Start()
-    {
-        cam = CameraFollower.Instance.GetCameraComponent();
-    }
     private void LateUpdate()
     {
-        if (targetChar)
+        if(targetChar)
         {
-            Vector3 screenPos = cam.WorldToScreenPoint(targetChar.TF.position);
-            if(IsInScreen(screenPos))
+            Vector3 charPosOnScreen = CameraFollower.Instance.Camera.WorldToScreenPoint(targetChar.TF.position);
+            if (IsInScreen(charPosOnScreen))
             {
+                pointerImage.gameObject.SetActive(false);
                 nameTextMesh.gameObject.SetActive(true);
-            } 
+                indicator.position = charPosOnScreen + Vector3.up * offsetChar;
+            }
             else
             {
+                pointerImage.gameObject.SetActive(true);
                 nameTextMesh.gameObject.SetActive(false);
+                pointerImage.transform.LookAt(indicator.position);
+                pointerImage.transform.Rotate(0, 90, 0);
+
+                Vector3 playerPos = CameraFollower.Instance.Camera.WorldToScreenPoint(LevelManager.Instance.Player.TF.position);
+                Vector3 charPosOutScreen = playerPos + (CameraFollower.Instance.Camera.WorldToScreenPoint(targetChar.TF.position) - playerPos);
+                float restrictedX = Mathf.Max(0 + offsetScreen, Mathf.Min(Screen.width - offsetScreen, charPosOutScreen.x));
+                float restrictedY = Mathf.Max(0 + offsetScreen * 1.1f, Mathf.Min(Screen.height - offsetScreen * 1.1f, charPosOutScreen.y));
+                charPosOutScreen = new Vector3(restrictedX, restrictedY, 0f);
+                indicator.position = charPosOutScreen;
+
+                Vector3 pointerPos = charPosOutScreen + (charPosOutScreen - playerPos).normalized * offsetPointer;
+                restrictedX = Mathf.Max(0, Mathf.Min(Screen.width, pointerPos.x));
+                restrictedY = Mathf.Max(0 + offsetScreen * 0.5f, Mathf.Min(Screen.height - offsetScreen * 0.5f, pointerPos.y));
+                pointerImage.transform.position = new Vector3(restrictedX, restrictedY, 0f);
             }
-            float restrictedX = Mathf.Max(Mathf.Min(Screen.width - offset, screenPos.x), 0 + offset);
-            float restrictedY = Mathf.Max(Mathf.Min(Screen.height - offset * 3.5f, screenPos.y), 0 - offset * 1.5f);
-            screenPos = new Vector3(restrictedX, restrictedY, 0);
-            indicator.transform.position = screenPos + Vector3.up * offset * 3f;
         }
 
-        if(targetChar && targetChar.IsStatus(StatusType.Dead) || GameManager.IsState(GameState.Finish))
+        if (targetChar && targetChar.IsStatus(StatusType.Dead) || GameManager.IsState(GameState.Finish))
         {
             Destroy(gameObject);
         }
@@ -53,7 +62,10 @@ public class Indicator : MonoBehaviour
         targetChar = character;
         nameTextMesh.text = character.Name;
         pointTextMesh.text = character.CombatPoint.ToString();
+
         backgroundImage.material = colorDataSO.GetMatGUI(character.ColorType);
+        pointerImage.material = colorDataSO.GetMatGUI(character.ColorType);
+        nameTextMesh.color = colorDataSO.GetColor(character.ColorType);
     }
 
     public void UpdateName(string name)
@@ -68,7 +80,7 @@ public class Indicator : MonoBehaviour
 
     public bool IsInScreen(Vector3 screenPos)
     {
-        if(screenPos.x  > Screen.width || screenPos.x < 0 || screenPos.y > Screen.height || screenPos.y < 0)
+        if(screenPos.x  > Screen.width || screenPos.x < 0 || screenPos.y > Screen.height - offsetScreen * 0.5f || screenPos.y < 0)
         {
             return false;
         } 

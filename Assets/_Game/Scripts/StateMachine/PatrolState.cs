@@ -6,7 +6,7 @@ public class PatrolState : IState
 {
     private float distance = Random.Range(5f, 20f);
 
-    private float delayAttackTimer = Random.Range(0f, 0.6f);
+    private float delayAttackTimer = Random.Range(0f, .5f);
     private float count = 0f;
 
     public void OnEnter(Enemy enemy)

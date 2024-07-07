@@ -61,7 +61,7 @@ public class Weapon : MonoBehaviour
                 owner.BonusAttackRange += 3f;
                 break;
             case WeaponType.Bloom:
-                spinSpeed = 0f;
+                spinSpeed = 6f;
                 owner.BonusAttackRange += 1f;
                 break;
             case WeaponType.Boomerang:
@@ -74,17 +74,20 @@ public class Weapon : MonoBehaviour
                 speed += 2f;
                 break;
             case WeaponType.Mace:
-                spinSpeed = 2f;
-                speed += 2f;
-                break;
-            case WeaponType.Hammer:
                 spinSpeed = 1f;
                 speed += 1f;
+                owner.BonusAttackRange += 2f;
+                break;
+            case WeaponType.Hammer:
+                spinSpeed = 15f;
+                speed += 2f;
+                owner.BonusAttackRange += 1f;
+                rotateAxis = Vector3.up;
                 break;
             case WeaponType.Axe:
                 isGrab = true;
-                speed += 1f;
-                owner.BonusAttackRange += 3f;
+                speed += 3f;
+                owner.BonusAttackRange += 2f;
                 break;
         }
         bulletCharge = Const.WEAPON_BASE_BULLET_AMOUNT;

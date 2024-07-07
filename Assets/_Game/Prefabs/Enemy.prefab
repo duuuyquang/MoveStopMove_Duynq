@@ -403,9 +403,10 @@ MonoBehaviour:
   curWeapon: {fileID: 5579794950706686892}
   weaponType: 0
   atkRangeTF: {fileID: 431542723759777090}
-  baseAtkRange: 11
-  baseAtkSpeed: 9
+  baseAtkRange: 4
+  baseAtkSpeed: 8
   targetIndicator: {fileID: 6703033279302982736}
+  targetIndicatorImage: {fileID: 2616514746662846724}
   indicatorPrefab: {fileID: 5015059682914106551, guid: 7ce682697718eea4b8b98e14c3bf3b5b, type: 3}
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
   colorDataSO: {fileID: 11400000, guid: 9e84c9a472450ba47b7affb38dd01b89, type: 2}
@@ -422,7 +423,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 2.5
+  m_Speed: 2
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -519,7 +520,7 @@ GameObject:
   - component: {fileID: 8290367572513040190}
   - component: {fileID: 2616514746662846724}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Image - TargetIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -565,14 +566,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7283019, g: 0.15802766, b: 0.15802766, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 148b58c10fedad348b4f4280f3b143a3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4af5df566a03ac34f89e5064de26e736, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

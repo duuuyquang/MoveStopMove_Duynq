@@ -23,16 +23,16 @@ public class LevelManager : Singleton<LevelManager>
     {
         LoadLevel(level);
         player.OnInit();
-        EnemyManager.Instance.OnInit();
         GameManager.Instance.OnInit();
+        EnemyManager.Instance.OnInit();
     }
 
     public void OnInitNextLevel()
     {
         LoadLevel(curLevel.Index + 1);
         player.OnInit();
-        EnemyManager.Instance.OnInit();
         GameManager.Instance.OnInit();
+        EnemyManager.Instance.OnInit();
     }
 
     public void OnDespawn()

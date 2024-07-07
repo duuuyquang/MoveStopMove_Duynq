@@ -18,7 +18,7 @@ public class AttackState : IState
             enemy.CheckAndProcessAttack();
             if(enemy.CurWeapon.IsGrab)
             {
-                if (enemy.CurWeapon.CurBullet && enemy.CurWeapon.CurBullet.IsDropped)
+                if (enemy.CurWeapon.CurBullet && enemy.CurWeapon.CurBullet.IsDropped && enemy.IsStatus(Character.StatusType.Normal))
                 {
                     Vector3 targetPos = new Vector3(enemy.CurWeapon.CurBullet.TF.position.x, enemy.TF.position.y, enemy.CurWeapon.CurBullet.TF.position.z);
                     enemy.SetState(new RunToDestination(targetPos));
@@ -26,13 +26,15 @@ public class AttackState : IState
                 return;
             }
 
-            if (Random.Range(0, 10) < 5)
-            {
-                enemy.SetState(new PatrolState());
-            }
-            else
-            {
-                enemy.SetState(new IdleState());
+            if (enemy.IsStatus(Character.StatusType.Normal)) {
+                if (Random.Range(0, 10) < 5)
+                {
+                    enemy.SetState(new PatrolState());
+                }
+                else
+                {
+                    enemy.SetState(new IdleState());
+                }
             }
         }
     }

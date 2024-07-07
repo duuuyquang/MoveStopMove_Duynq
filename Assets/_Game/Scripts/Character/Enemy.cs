@@ -36,14 +36,20 @@ public class Enemy : Character
     {
         base.OnInit();
         SetState(new IdleState());
+        ChangeTargetIndicatorColor(ColorType);
         ToggleTargetIndicator(false);
+    }
+
+    private void ChangeTargetIndicatorColor(ColorType type)
+    {
+        targetIndicatorImage.color = colorDataSO.GetColor(type);
     }
 
     protected override void InitBasicStats()
     {
         base.InitBasicStats();
         Name = GetRandomName();
-        CombatPoint = Random.Range(0, GameManager.Instance.RecordHighestPoint + 1);
+        CombatPoint = Random.Range(0, EnemyManager.Instance.RecordHighestPoint + 1);
         ColorType = (ColorType)Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
         WeaponType = (WeaponType)Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length);
         //WeaponType = WeaponType.Axe;
@@ -76,7 +82,7 @@ public class Enemy : Character
         }
     }
 
-    public override void SetState(IState state)
+    public void SetState(IState state)
     {
         if(curState != state)
         {
@@ -99,6 +105,6 @@ public class Enemy : Character
 
     public override void ToggleTargetIndicator(bool value)
     {
-        targetIndicator.enabled = value;
+        targetIndicatorImage.enabled = value;
     }
 }
