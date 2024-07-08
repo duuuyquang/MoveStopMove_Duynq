@@ -16,6 +16,7 @@ public class Indicator : MonoBehaviour
     [SerializeField] TextMeshProUGUI pointTextMesh;
     [SerializeField] Image backgroundImage;
     [SerializeField] Image pointerImage;
+    [SerializeField] Transform pointerImageTF;
 
     public ColorDataSO colorDataSO;
 
@@ -26,16 +27,16 @@ public class Indicator : MonoBehaviour
             Vector3 charPosOnScreen = CameraFollower.Instance.Camera.WorldToScreenPoint(targetChar.TF.position);
             if (IsInScreen(charPosOnScreen))
             {
-                pointerImage.gameObject.SetActive(false);
+                pointerImageTF.gameObject.SetActive(false);
                 nameTextMesh.gameObject.SetActive(true);
                 indicator.position = charPosOnScreen + Vector3.up * offsetChar;
             }
             else
             {
-                pointerImage.gameObject.SetActive(true);
+                pointerImageTF.gameObject.SetActive(true);
                 nameTextMesh.gameObject.SetActive(false);
-                pointerImage.transform.LookAt(indicator.position);
-                pointerImage.transform.Rotate(0, 90, 0);
+                pointerImageTF.LookAt(indicator.position);
+                pointerImageTF.Rotate(0, 90, 0);
 
                 Vector3 playerPos = CameraFollower.Instance.Camera.WorldToScreenPoint(LevelManager.Instance.Player.TF.position);
                 Vector3 charPosOutScreen = playerPos + (CameraFollower.Instance.Camera.WorldToScreenPoint(targetChar.TF.position) - playerPos);
@@ -47,11 +48,11 @@ public class Indicator : MonoBehaviour
                 Vector3 pointerPos = charPosOutScreen + (charPosOutScreen - playerPos).normalized * offsetPointer;
                 restrictedX = Mathf.Max(0, Mathf.Min(Screen.width, pointerPos.x));
                 restrictedY = Mathf.Max(0 + offsetScreen * 0.5f, Mathf.Min(Screen.height - offsetScreen * 0.5f, pointerPos.y));
-                pointerImage.transform.position = new Vector3(restrictedX, restrictedY, 0f);
+                pointerImageTF.position = new Vector3(restrictedX, restrictedY, 0f);
             }
         }
 
-        if (targetChar && targetChar.IsStatus(StatusType.Dead) || GameManager.IsState(GameState.Finish))
+        if (!targetChar || targetChar && targetChar.IsStatus(StatusType.Dead))
         {
             Destroy(gameObject);
         }

@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 
 public class EnemyManager : Singleton<EnemyManager>
 {
-    private const int MAX_ENEMIES_ON_RUNTIME = 10;
+    private const int MAX_ENEMIES_ON_RUNTIME = 15;
 
     private Vector3 lastSpawnedPos;
     
@@ -89,7 +89,7 @@ public class EnemyManager : Singleton<EnemyManager>
     public Vector3 GetValidSpawnPos()
     {
         float playerAtkRange = LevelManager.Instance.Player.CurAttackRange;
-        float multiDist = 3f;
+        float multiDist = 5f;
         Vector3 playerPos = LevelManager.Instance.Player.TF.position;
         Vector3 randDirection = new Vector3(Random.Range(-playerAtkRange, playerAtkRange), 0f, Random.Range(-playerAtkRange, playerAtkRange)) * multiDist;
         if (NavMesh.SamplePosition(playerPos + randDirection, out navMeshHit, playerAtkRange * multiDist, NavMesh.AllAreas))

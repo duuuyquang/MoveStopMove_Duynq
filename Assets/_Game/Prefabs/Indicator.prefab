@@ -93,6 +93,7 @@ MonoBehaviour:
   pointTextMesh: {fileID: 5039276686590947237}
   backgroundImage: {fileID: 2371207115048927224}
   pointerImage: {fileID: 3781640818070356587}
+  pointerImageTF: {fileID: 2960098460610245486}
   colorDataSO: {fileID: 11400000, guid: 9e84c9a472450ba47b7affb38dd01b89, type: 2}
 --- !u!1 &2028026601704600192
 GameObject:
