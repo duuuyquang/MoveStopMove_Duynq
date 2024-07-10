@@ -15,5 +15,5 @@ public static class Const
 
     public const int WEAPON_BASE_BULLET_AMOUNT  = 1;
 
-    public const int COMBAT_POINT_DEFAULT_SIZE  = 60;
+    public const int COMBAT_POINT_DEFAULT_SIZE  = 80;
 }

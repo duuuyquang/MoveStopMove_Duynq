@@ -8,14 +8,14 @@ public class CanvasLose : UICanvas{
     public void MainMenuButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>();
+        UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoin(GameManager.Instance.TotalCoin);
         LevelManager.Instance.OnInit(0);
     }
 
     public void RetryButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>();
+        UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoin(GameManager.Instance.TotalCoin);
         LevelManager.Instance.OnInit(0);
     }
 }

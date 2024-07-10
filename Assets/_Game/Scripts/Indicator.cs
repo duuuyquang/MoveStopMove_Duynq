@@ -4,9 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using static Character;
 
-public class Indicator : MonoBehaviour
+public class Indicator : GameUnit
 {
-    [SerializeField] Transform indicator;
     private Character targetChar;
     private float offsetScreen = 70f;
     private float offsetChar = 120f;
@@ -29,13 +28,13 @@ public class Indicator : MonoBehaviour
             {
                 pointerImageTF.gameObject.SetActive(false);
                 nameTextMesh.gameObject.SetActive(true);
-                indicator.position = charPosOnScreen + Vector3.up * offsetChar;
+                TF.position = charPosOnScreen + Vector3.up * offsetChar;
             }
             else
             {
                 pointerImageTF.gameObject.SetActive(true);
                 nameTextMesh.gameObject.SetActive(false);
-                pointerImageTF.LookAt(indicator.position);
+                pointerImageTF.LookAt(TF.position);
                 pointerImageTF.Rotate(0, 90, 0);
 
                 Vector3 playerPos = CameraFollower.Instance.Camera.WorldToScreenPoint(LevelManager.Instance.Player.TF.position);
@@ -43,7 +42,7 @@ public class Indicator : MonoBehaviour
                 float restrictedX = Mathf.Max(0 + offsetScreen, Mathf.Min(Screen.width - offsetScreen, charPosOutScreen.x));
                 float restrictedY = Mathf.Max(0 + offsetScreen * 1.1f, Mathf.Min(Screen.height - offsetScreen * 1.1f, charPosOutScreen.y));
                 charPosOutScreen = new Vector3(restrictedX, restrictedY, 0f);
-                indicator.position = charPosOutScreen;
+                TF.position = charPosOutScreen;
 
                 Vector3 pointerPos = charPosOutScreen + (charPosOutScreen - playerPos).normalized * offsetPointer;
                 restrictedX = Mathf.Max(0, Mathf.Min(Screen.width, pointerPos.x));
@@ -54,7 +53,8 @@ public class Indicator : MonoBehaviour
 
         if (!targetChar || targetChar && targetChar.IsStatus(StatusType.Dead))
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
+            SimplePool.Despawn(this);
         }
     }
 

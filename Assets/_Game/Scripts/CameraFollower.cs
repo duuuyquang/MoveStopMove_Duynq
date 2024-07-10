@@ -8,7 +8,7 @@ public class CameraFollower : Singleton<CameraFollower>
     private const float EULER_X_GAME_MENU = 20f;
     private const float EULER_X_GAME_PLAY = 60f;
 
-    private Vector3 OFFSET_GAME_MENU = new Vector3(0f, 3f, -6f);
+    private Vector3 OFFSET_GAME_MENU = new Vector3(0f, 2f, -7f);
     private Vector3 OFFSET_GAME_PLAY = new Vector3(0f, 10f, -9f);
 
     public Vector3 offset = Vector3.zero;

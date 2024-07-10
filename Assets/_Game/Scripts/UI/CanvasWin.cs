@@ -16,14 +16,14 @@ public class CanvasWin : UICanvas
     public void MainMenuButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>();
+        UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoin(GameManager.Instance.TotalCoin);
         LevelManager.Instance.OnInit(0);
     }
 
     public void NextButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>();
+        UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoin(GameManager.Instance.TotalCoin);
         LevelManager.Instance.OnInitNextLevel();
     }
 }

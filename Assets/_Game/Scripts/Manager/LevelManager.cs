@@ -5,14 +5,16 @@ using UnityEngine;
 public class LevelManager : Singleton<LevelManager>
 {
     [SerializeField] List<Level> levels;
-    [SerializeField] Player player;
+    [SerializeField] Player playerPrefab;
+
+    private Player player;
 
     public int initLevel;
 
     private Level curLevel;
 
-    public Level CurLevel { get { return curLevel; } }
-    public Player Player { get { return player; } }
+    public Level CurLevel => curLevel;
+    public Player Player => player;
 
     void Start()
     {
@@ -21,18 +23,30 @@ public class LevelManager : Singleton<LevelManager>
 
     public void OnInit(int level)
     {
+        SimplePool.ReleaseAll();
+        InitPlayer();
         LoadLevel(level);
-        player.OnInit();
         GameManager.Instance.OnInit();
         EnemyManager.Instance.OnInit();
     }
 
     public void OnInitNextLevel()
     {
+        SimplePool.ReleaseAll();
+        InitPlayer();
         LoadLevel(curLevel.Index + 1);
-        player.OnInit();
         GameManager.Instance.OnInit();
         EnemyManager.Instance.OnInit();
+    }
+
+    public void InitPlayer()
+    {
+        if (player)
+        {
+            Destroy(player.gameObject);
+        }
+        player = Instantiate(playerPrefab);
+        player.OnInit();
     }
 
     public void OnDespawn()

@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
-using static Character;
 
 public enum GameState { MainMenu, GamePlay, Finish, Revive, Setting }
 
@@ -11,14 +7,10 @@ public class GameManager : Singleton<GameManager>
     private static GameState gameState;
 
     private int curAliveNum;
-    public int CurAliveNum { get { return curAliveNum; } }
+    public int CurAliveNum => curAliveNum;
 
-    public static void ChangeState(GameState state)
-    {
-        gameState = state;
-    }
-
-    public static bool IsState(GameState state) => gameState == state;
+    private int totalCoin;
+    public int TotalCoin => totalCoin;
 
     private void Awake()
     {
@@ -36,8 +28,9 @@ public class GameManager : Singleton<GameManager>
 
     void Start()
     {
-        UIManager.Instance.OpenUI<CanvasMainMenu>();
-        UIManager.Instance.GetUI<CanvasGamePlay>().CloseDirectly();
+        //TODO: get from player data later
+        totalCoin = 0;
+        UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoin(totalCoin);
         OnInit();
     }
 
@@ -52,14 +45,14 @@ public class GameManager : Singleton<GameManager>
     public void OnInit()
     {
         ChangeState(GameState.MainMenu);
-        curAliveNum = LevelManager.Instance.CurLevel.totalNum + 1;
+        curAliveNum = LevelManager.Instance.CurLevel.TotalEnemies + 1;
         CameraFollower.Instance.OnInit();
     }
 
-    public void UpdateAliveNumText()
-    {
-        UIManager.Instance.OpenUI<CanvasGamePlay>().UpdateAliveNumText(--curAliveNum);
-    }
+    public void UpdateTotalCoin(int coin) => totalCoin += Mathf.Max(coin, 0);
+    public static void ChangeState(GameState state) => gameState = state;
+    public static bool IsState(GameState state) => gameState == state;
+    public void UpdateAliveNumText() => UIManager.Instance.OpenUI<CanvasGamePlay>().UpdateAliveNumText(--curAliveNum);
 
     private void CheckWinCondition()
     {

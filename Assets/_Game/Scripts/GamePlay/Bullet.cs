@@ -1,24 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using static Character;
 
-public class Bullet : MonoBehaviour
+public class Bullet : GameUnit
 {
+    [SerializeField] ParticleSystem dropPartical;
+
     //------------------- Transform specs -------------------------
     private float speed;
     private float spinSpeed;
     private Vector3 rotateAxis;
 
     private Vector3 targetPos;
-    private WeaponHolder weapon;
-    public WeaponHolder Weapon => weapon;
+    private WeaponHolder weaponHolder;
+    public WeaponHolder WeaponHolder => weaponHolder;
 
     private Weapon weaponPrefab;
-    private bool IsDestination => Vector3.Distance(TF.position + Vector3.up * (TF.position.y - targetPos.y), targetPos) < 0.1f;
 
-    public Transform TF;
+    private bool IsDestination => Vector3.Distance(TF.position + Vector3.up * (TF.position.y - targetPos.y), targetPos) < 0.1f;
 
     //------------------- For Weapon returning back ---------------
     private bool isReturning = false;
@@ -31,35 +28,46 @@ public class Bullet : MonoBehaviour
 
     void Update()
     {
-        ProcessBehavior();
+        ProcessBehaviours();
     }
 
-    public void OnInit(WeaponHolder weapon, Vector3 targetPos)
+    public void OnInit(WeaponHolder weaponHolder, Vector3 targetPos)
     {
-        this.weapon = weapon;
+        this.weaponHolder = weaponHolder;
         this.targetPos = targetPos;
 
         InitSize();
         InitStats();
-        CreateWeaponPrefab();
+        InitSpecialStats();
+        SpawnWeapon();
     }
 
     private void InitSize()
     {
-        TF.localScale = Vector3.one * weapon.TF.localScale.x;
+        TF.localScale = Vector3.one * weaponHolder.TF.localScale.x;
     }
 
     private void InitStats()
     {
-        speed = weapon.Speed;
-        spinSpeed = weapon.SpinSpeed;
-        rotateAxis = weapon.RotateAxis;
-        isGrab = weapon.IsGrab;
+        speed = weaponHolder.Speed;
+        spinSpeed = weaponHolder.SpinSpeed;
+        rotateAxis = weaponHolder.RotateAxis;
+        isGrab = weaponHolder.IsGrab;
     }
 
-    private void CreateWeaponPrefab()
+    private void InitSpecialStats()
     {
-        weaponPrefab = Instantiate(weapon.WeaponPrefab, TF);
+        isDropped = false;
+        isReturning = false;
+        grabTimer = 0;
+    }
+
+    private void SpawnWeapon()
+    {
+        //weaponPrefab = Instantiate(weapon.WeaponPrefab, TF);
+        weaponPrefab = WeaponPool.Spawn<Weapon>(WeaponHolder.Owner.WeaponType, TF.position, Quaternion.identity);
+        weaponPrefab.TF.SetParent(TF, false);
+        weaponPrefab.OnInit();
 
         TF.LookAt(targetPos);
 
@@ -67,34 +75,34 @@ public class Bullet : MonoBehaviour
         TF.eulerAngles += new Vector3(90f, 0f, 0f);
 
         //scale to current size
-        TF.localScale += Vector3.one * (weapon.Owner.CurSize - 1f) * 0.5f;
+        TF.localScale += Vector3.one * (weaponHolder.Owner.CurSize - 1f) * 0.5f;
     }
 
-    private void ProcessBehavior()
+    private void ProcessBehaviours()
     {
         MovingToTarget();
         if (IsDestination)
         {
-            if(!ProcessForSpecicalCases())
+            if(!ProcessForSpecificBehaviours())
             {
                 OnDespawn();
             }
         }
     }
 
-    private bool ProcessForSpecicalCases()
+    private bool ProcessForSpecificBehaviours()
     {
-        bool isSpecial = false;
-        isSpecial |= ProcessReturnWeapon();
-        isSpecial |= ProcessGrabWeapon();
-        return isSpecial;
+        bool isTriggered = false;
+        isTriggered |= ProcessReturnWeapon();
+        isTriggered |= ProcessGrabWeapon();
+        return isTriggered;
     }
 
     private bool ProcessReturnWeapon()
     {
-        if (weapon && weapon.IsReturn && !isReturning)
+        if (weaponHolder && weaponHolder.IsReturn && !isReturning)
         {
-            SetTargetPos(weapon.Owner.TF.position);
+            SetTargetPos(weaponHolder.Owner.TF.position);
             isReturning = true;
             return true;
         }
@@ -107,6 +115,7 @@ public class Bullet : MonoBehaviour
         {
             if (grabTimer == 0)
             {
+                dropPartical.Play();
                 isDropped = true;
                 StopMoving();
                 SetDroppedShape();
@@ -114,8 +123,9 @@ public class Bullet : MonoBehaviour
 
             grabTimer += Time.deltaTime;
 
-            if (!weapon || weapon && (Vector3.Distance(weapon.Owner.TF.position, TF.position) <= 1.5f) || grabTimer >= 5f)
+            if (!weaponHolder || weaponHolder && (Vector3.Distance(weaponHolder.Owner.TF.position, TF.position) <= 1.5f) || grabTimer >= 5f)
             {
+                dropPartical.Stop();
                 OnDespawn();
             }
             return true;
@@ -126,16 +136,23 @@ public class Bullet : MonoBehaviour
     private void MovingToTarget()
     {
         TF.position = Vector3.MoveTowards(TF.position, targetPos, speed * Time.deltaTime);
-        weaponPrefab.transform.Rotate(rotateAxis, spinSpeed * Time.deltaTime * 100f);
+        weaponPrefab.TF.Rotate(rotateAxis, spinSpeed * Time.deltaTime * 100f);
     }
 
     public void OnDespawn()
     {
-        if(weapon)
+        if(weaponHolder)
         {
-            weapon.Reload(Const.WEAPON_BASE_BULLET_AMOUNT);
+            weaponHolder.Reload(Const.WEAPON_BASE_BULLET_AMOUNT);
         }
-        Destroy(gameObject);
+
+        //Destroy(weaponPrefab.gameObject);
+        weaponPrefab.TF.SetParent(PoolControl.Instance.WeaponPoolTF);
+        weaponPrefab.TF.localScale = Vector3.one;
+        WeaponPool.Despawn(weaponPrefab);
+
+        //Destroy(gameObject);
+        SimplePool.Despawn(this);
     }
 
     public void StopMoving()
@@ -146,8 +163,8 @@ public class Bullet : MonoBehaviour
 
     private void SetDroppedShape()
     {
-        weaponPrefab.transform.localPosition = new Vector3(0, 0, 1);
-        weaponPrefab.transform.localEulerAngles = new Vector3(-50, 180, 0);
+        weaponPrefab.TF.localPosition = new Vector3(0, 0, 1);
+        weaponPrefab.TF.localEulerAngles = new Vector3(-50, 180, 0);
     }
 
     private void SetTargetPos(Vector3 pos)
@@ -158,7 +175,7 @@ public class Bullet : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Character character = Cache.GetChar(other);
-        if (character && character == weapon.Owner)
+        if (character && character == weaponHolder.Owner)
         {
             return;
         }

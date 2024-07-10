@@ -1,5 +1,9 @@
+using TMPro;
+using UnityEngine;
+
 public class CanvasMainMenu : UICanvas
 {
+    [SerializeField] private TextMeshProUGUI coinText;
     public void PlayButton()
     {
         Close(0);
@@ -19,5 +23,10 @@ public class CanvasMainMenu : UICanvas
     {
         Close(0);
         UIManager.Instance.OpenUI<CanvasWeaponShop>();
+    }
+
+    public void SetCoin(int coin)
+    {
+        coinText.text = coin.ToString();
     }
 }

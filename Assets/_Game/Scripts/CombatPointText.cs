@@ -3,9 +3,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 
-public class CombatPointText : MonoBehaviour
+public class CombatPointText : GameUnit
 {
-    [SerializeField] Transform TF;
     [SerializeField] TextMeshProUGUI point;
     [SerializeField] float speed;
 
@@ -18,7 +17,7 @@ public class CombatPointText : MonoBehaviour
 
         if(count >= 3f)
         {
-            Destroy(TF.gameObject);
+            OnDespawn();
         }
 
         TF.Translate(Vector3.up * speed * Time.deltaTime);
@@ -28,5 +27,12 @@ public class CombatPointText : MonoBehaviour
     {
         point.fontSize = size;
         point.text = "+ " + gainPoint.ToString();
+    }
+
+    private void OnDespawn()
+    {
+        //Destroy(TF.gameObject);
+        count = 0f;
+        SimplePool.Despawn(this);
     }
 }

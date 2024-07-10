@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public enum StatusType { Normal, Attacking, Dead }
 
-public class Character : MonoBehaviour
+public class Character : GameUnit
 {
     //------------------ Movement props ---------------------
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator animator;
     [SerializeField] protected float speed;
     private string curAnim = Const.ANIM_NAME_IDLE;
-    public Transform TF;
+    //public Transform TF;
 
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
 
@@ -49,8 +51,9 @@ public class Character : MonoBehaviour
 
     //------------------ Navigation props --------------------
     [SerializeField] protected Image targetIndicatorImage;
-    [SerializeField] Indicator indicatorPrefab;
+    //[SerializeField] Indicator indicatorPrefab;
     protected Indicator indicator;
+    public Indicator Indicator => indicator;
 
     protected List<Character> targetsInRange = new List<Character>();
     protected Character curTargetChar = null;
@@ -72,11 +75,28 @@ public class Character : MonoBehaviour
     {
         if (GameManager.IsState(GameState.GamePlay))
         {
-            if(IsStatus(StatusType.Normal))
+            if (IsStatus(StatusType.Normal))
             {
                 DetectNearestTarget();
             }
+
+            if (!IsStatus(StatusType.Dead))
+            {
+                if (indicator == null)
+                {
+                    InitIndicator();
+                }
+            }
+
             UpdateAnimation();
+        }
+
+        if (GameManager.IsState(GameState.Setting))
+        {
+            if (!IsStatus(StatusType.Dead))
+            {
+                StopMoving();
+            }
         }
     }
 
@@ -96,7 +116,6 @@ public class Character : MonoBehaviour
     {
         SetupSizeByInitCombatPoint(CombatPoint);
         InitWeapon();
-        InitIndicator();
         ChangeColor(ColorType);
     }
 
@@ -109,7 +128,8 @@ public class Character : MonoBehaviour
 
     protected virtual void InitIndicator()
     {
-        indicator = Instantiate(indicatorPrefab, UIManager.Instance.GetUI<CanvasGamePlay>().transform);
+        //indicator = Instantiate(indicatorPrefab, UIManager.Instance.GetUI<CanvasGamePlay>().transform);
+        indicator = SimplePool.Spawn<Indicator>(PoolType.Indicator, Vector3.zero, Quaternion.identity);
         indicator.OnInit(this);
     }
 
@@ -156,7 +176,7 @@ public class Character : MonoBehaviour
 
     public virtual void OnDespawn()
     {
-        if(gameObject)
+        if (gameObject)
         {
             Destroy(gameObject);
         }
@@ -199,8 +219,9 @@ public class Character : MonoBehaviour
     {
         float nearestDist = 0;
         curTargetChar = null;
+
         foreach (Character enemy in targetsInRange) {
-            if (enemy.IsStatus(StatusType.Dead))
+            if (enemy.IsStatus(StatusType.Dead) || Vector3.Distance(enemy.TF.position, TF.position) > CurAttackRange)
             {
                 continue;
             }
@@ -270,7 +291,7 @@ public class Character : MonoBehaviour
         TF.LookAt(targetDir);
     }
 
-    private void ProcessDie()
+    protected virtual void ProcessDie()
     {
         Invoke(nameof(OnDespawn), 2f);
         ChangeStatus(StatusType.Dead);
@@ -278,6 +299,7 @@ public class Character : MonoBehaviour
         ToggleTargetIndicator(false);
         StopMoving();
         bulletPartical.Play();
+        indicator = null;
         GameManager.Instance.UpdateAliveNumText();
     }
 
@@ -335,14 +357,22 @@ public class Character : MonoBehaviour
         }
         
         Bullet bullet = Cache.GetBullet(other);
-        if(bullet && this != bullet.Weapon.Owner && !bullet.IsDropped && !IsStatus(StatusType.Dead))
+        if(bullet && this != bullet.WeaponHolder.Owner && !bullet.IsDropped && !IsStatus(StatusType.Dead))
         {
+            bullet.WeaponHolder.Owner.ProcessOnTargetKilled(this);
+            EnemyManager.Instance.SetRecordHighestPoint(bullet.WeaponHolder.Owner.CombatPoint);
             ProcessDie();
-            bullet.Weapon.Owner.RemoveTargetInRange(this);
-            bullet.Weapon.Owner.CheckToScaleSizeUp(CombatPoint);
-            EnemyManager.Instance.SetRecordHighestPoint(bullet.Weapon.Owner.CombatPoint);
         }
+    }
 
+    public virtual void ProcessOnTargetKilled(Character opponent)
+    {
+        RemoveTargetInRange(opponent);
+        CheckToScaleSizeUp(opponent.CombatPoint);
+        if (indicator)
+        {
+            indicator.UpdateCombatPoint(CombatPoint);
+        }
     }
 
     public void OnTriggerExit(Collider other)
@@ -350,8 +380,7 @@ public class Character : MonoBehaviour
         Character character = Cache.GetChar(other);
         if (character)
         {
-            targetsInRange.Remove(character);
-            character.ToggleTargetIndicator(false);
+            RemoveTargetInRange(character);
         }
     }
 
@@ -362,7 +391,6 @@ public class Character : MonoBehaviour
         int gainnedPoint = GetCombatPointInReturn(opponentCombatPoint);
         ShowCombatPointGainned(gainnedPoint);
         CombatPoint += gainnedPoint;
-        indicator.UpdateCombatPoint(CombatPoint);
 
         for (int i = 0; i < upSizeThresholds.Length; i++)
         {
@@ -386,7 +414,7 @@ public class Character : MonoBehaviour
         TF.position += Vector3.up * Const.CHARACTER_UPSCALE_UNIT;
         if (vfxOn)
         {
-            Invoke(nameof(TriggerScaleUpVFX), 0.1f);
+            Invoke(nameof(TriggerScaleUpVFX), 0.15f);
         }
     }
 

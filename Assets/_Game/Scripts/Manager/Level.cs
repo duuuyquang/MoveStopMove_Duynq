@@ -6,8 +6,8 @@ using UnityEngine.AI;
 public class Level : MonoBehaviour
 {
     [SerializeField] NavMeshData NavMeshData;
-    public int totalNum;
-    public Transform TF;
+    [SerializeField] int totalEnemies;
+    public int TotalEnemies => totalEnemies;
 
     private int index;
     public int Index { get { return index; } set { index = value; } }

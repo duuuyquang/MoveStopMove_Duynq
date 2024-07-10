@@ -3,28 +3,31 @@ using UnityEngine;
 
 public class Player : Character
 {
-    [SerializeField] CombatPointText combatPointTextPrefab; 
+    //[SerializeField] CombatPointText combatPointTextPrefab;
+
+    [SerializeField] ParticleSystem winPartical;
+    [SerializeField] ParticleSystem losePartical;
+
+    private ParticleSystem curFinishPartical = null;
+
     protected override void Update()
     {
         base.Update();
-        if (!IsStatus(StatusType.Dead))
+        if (GameManager.IsState(GameState.GamePlay) && !IsStatus(StatusType.Dead))
         {
-            if (GameManager.IsState(GameState.GamePlay))
-            {
-                ListenControllerInput();
-                UpdateAttackStatus();
-            }
+            ListenControllerInput();
+            UpdateAttackStatus();
+        }
 
-            if (GameManager.IsState(GameState.Finish))
-            {
-                OnWinning();
-            }
+        if (GameManager.IsState(GameState.Finish) && !IsStatus(StatusType.Dead))
+        {
+            OnWin();
         }
     }
 
     void FixedUpdate()
     {
-        if (!IsStatus(StatusType.Dead))
+        if (GameManager.IsState(GameState.GamePlay))
         {
             ProcessMoving();
         }
@@ -33,16 +36,8 @@ public class Player : Character
     public override void OnInit()
     {
         base.OnInit();
-        InitTransform();
         PlayerController.Instance.OnInit();
-    }
-
-    private void OnWinning()
-    {
-        TF.eulerAngles = new Vector3(0, 200, 0);
-        ChangeAnim(Const.ANIM_NAME_DANCE);
-        StopMoving();
-        ToggleAtkRangeTF(false);
+        InitTransform();
     }
 
     private void InitTransform()
@@ -51,12 +46,22 @@ public class Player : Character
         TF.eulerAngles = new Vector3(0, 210, 0);
     }
 
+    private void PlayFinishPartical(ParticleSystem partical)
+    {
+        if(curFinishPartical == null)
+        {
+            curFinishPartical = partical;
+            curFinishPartical.gameObject.SetActive(true);
+            curFinishPartical.Play();
+        }
+    }
+
     protected override void InitBasicStats()
     {
         base.InitBasicStats();
         Name = "AbcXz";
         CombatPoint = 0;
-        ColorType = (ColorType) UnityEngine.Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
+        ColorType = (ColorType)UnityEngine.Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
         WeaponType = (WeaponType)UnityEngine.Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length);
     }
 
@@ -64,6 +69,21 @@ public class Player : Character
     {
         GameManager.ChangeState(GameState.Finish);
         UIManager.Instance.OpenUI<CanvasLose>();
+    }
+
+    private void OnWin()
+    {
+        TF.eulerAngles = new Vector3(0, 200, 0);
+        ChangeAnim(Const.ANIM_NAME_DANCE);
+        StopMoving();
+        ToggleAtkRangeTF(false);
+        PlayFinishPartical(winPartical);
+    }
+
+    protected override void ProcessDie()
+    {
+        base.ProcessDie();
+        PlayFinishPartical(losePartical);
     }
 
     protected override void DetectNearestTarget()
@@ -131,8 +151,16 @@ public class Player : Character
 
     protected override void ShowCombatPointGainned(int point)
     {
-        CombatPointText prefab = Instantiate(combatPointTextPrefab, UIManager.Instance.GetUI<CanvasGamePlay>().transform);
-        prefab.transform.position = CameraFollower.Instance.Camera.WorldToScreenPoint(TF.position) + Vector3.up * 200f;
-        prefab.SetPoint(point, Const.COMBAT_POINT_DEFAULT_SIZE * CurSize);
+        //CombatPointText prefab = Instantiate(combatPointTextPrefab, UIManager.Instance.GetUI<CanvasGamePlay>().transform);
+        CombatPointText pointText = SimplePool.Spawn<CombatPointText>(PoolType.PointText, Vector3.zero, Quaternion.identity);
+        pointText.TF.position = CameraFollower.Instance.Camera.WorldToScreenPoint(TF.position) + Vector3.up * 200f;
+        pointText.SetPoint(point, Const.COMBAT_POINT_DEFAULT_SIZE * CurSize);
+    }
+
+    public override void ProcessOnTargetKilled(Character opponent)
+    {
+        base.ProcessOnTargetKilled(opponent);
+        int gainnedCoin = 1 + opponent.CombatPoint / 3;
+        GameManager.Instance.UpdateTotalCoin(gainnedCoin);
     }
 }

@@ -1,4 +1,3 @@
-using Palmmedia.ReportGenerator.Core.Reporting.Builders;
 using UnityEngine;
 
 public enum WeaponType
@@ -6,7 +5,7 @@ public enum WeaponType
     None = 0,
     Axe = 1,
     Hammer = 2,
-    Bloom = 3,
+    Broom = 3,
     Boomerang = 4,
     Mace = 5,
     Umbrella = 6,

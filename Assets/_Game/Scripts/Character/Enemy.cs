@@ -61,8 +61,10 @@ public class Enemy : Character
 
     public override void OnDespawn()
     {
+        Name = "";
+        curTargetChar = null;
         EnemyManager.Instance.Despawn(this);
-        base.OnDespawn();
+        //base.OnDespawn();
     }
 
     public void SetRandomDestination(float distance)
