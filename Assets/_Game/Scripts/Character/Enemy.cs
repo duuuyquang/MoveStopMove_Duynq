@@ -35,23 +35,39 @@ public class Enemy : Character
     public override void OnInit()
     {
         base.OnInit();
+        ChangeWeapon((WeaponType)Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length));
+        ChangeHead((ItemType)Random.Range(0, 11));
+        ChangePants((ItemType)Random.Range(100, 110));
+        ChangeShield((ItemType)Random.Range(200, 203));
+        ChangeColor((ColorType)Random.Range(1, Enum.GetNames(typeof(ColorType)).Length));
         SetState(new IdleState());
         ChangeTargetIndicatorColor(ColorType);
         ToggleTargetIndicator(false);
     }
 
+    public override void ChangePants(ItemType type)
+    {
+        base.ChangePants(type);
+        agent.speed += agent.speed * curPants.BonusMoveSpeed * 0.01f;
+    }
+
     private void ChangeTargetIndicatorColor(ColorType type)
     {
-        targetIndicatorImage.color = colorDataSO.GetColor(type);
+        //targetIndicatorImage.color = colorDataSO.GetColor(type);
+        targetIndicatorImage.color = Color.black;
     }
 
     protected override void InitBasicStats()
     {
         base.InitBasicStats();
-        Name = GetRandomName();
         CombatPoint = Random.Range(0, EnemyManager.Instance.RecordHighestPoint + 1);
-        ColorType = (ColorType)Random.Range(1, Enum.GetNames(typeof(ColorType)).Length);
-        WeaponType = (WeaponType)Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length);
+        Name = GetRandomName();
+    }
+
+    protected override void SetAttackRangeTF(float atkRange)
+    {
+        base.SetAttackRangeTF(atkRange);
+        atkRangeTF.gameObject.SetActive(true);
     }
 
     private string GetRandomName()

@@ -53,7 +53,7 @@ public class WeaponHolder : MonoBehaviour
         isGrab = curHoldingWeapon.IsGrab;
     }
 
-    private void ChangeWeapon(WeaponType type)
+    public void ChangeWeapon(WeaponType type)
     {
         if (curType != type)
         {

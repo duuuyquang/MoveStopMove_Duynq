@@ -97,13 +97,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8afba5c99da336b4eb66f3ec938a4809, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WeaponType: 2
-  bonusAttackRange: 1
+  WeaponType: 10
+  bonusAttackRange: 2
   bonusSpeed: 2
   spinSpeed: 15
   isReturn: 0
   isGrab: 0
-  tf: {fileID: 8732467391033327907}
+  price: 1500
   initPosition: {x: 0, y: 0, z: 0}
   initEulerAngles: {x: 0, y: 0, z: 0}
   rotateAxis: {x: 0, y: 1, z: 0}

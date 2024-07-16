@@ -25,7 +25,7 @@ public class PoolControl : Singleton<PoolControl>
             SimplePool.Preload(poolAmounts[i].prefab, poolAmounts[i].amount, poolAmounts[i].parent);
         }
 
-        for (int i = 1; i < Enum.GetNames(typeof(ColorType)).Length; i++)
+        for (int i = 1; i < Enum.GetNames(typeof(WeaponType)).Length; i++)
         {
             WeaponPool.Preload(itemDataSO.GetWeapon((WeaponType) i), eachWeaponPoolingNum, WeaponPoolTF);
         }

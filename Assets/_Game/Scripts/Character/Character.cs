@@ -1,21 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
+using static Unity.VisualScripting.Dependencies.Sqlite.SQLite3;
+using static UnityEditor.Progress;
+using static UnityEngine.UI.GridLayoutGroup;
 
-public enum StatusType { Normal, Attacking, Dead }
+public enum StatusType { Normal, Attacking, Dead, Win }
 
 public class Character : GameUnit
 {
     //------------------ Movement props ---------------------
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator animator;
-    [SerializeField] protected float speed;
+    [SerializeField] protected float baseMoveSpeed;
+    protected float bonusMoveSpeed;
     private string curAnim = Const.ANIM_NAME_IDLE;
     //public Transform TF;
 
+    public float MoveSpeed => baseMoveSpeed + bonusMoveSpeed;
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
 
     //------------------ Basic props -------------------------
@@ -34,20 +41,30 @@ public class Character : GameUnit
 
     private IEnumerator attackCoroutine;
 
-    [SerializeField] protected WeaponHolder curWeapon;
-    [SerializeField] protected WeaponType weaponType;
+    [SerializeField] protected WeaponHolder weaponHolder;
+    [SerializeField] protected Transform headHolder;
+    [SerializeField] protected Transform shieldHolder;
+    [SerializeField] protected Renderer pantsHolder;
+    protected Item curHead;
+    protected Item curPants;
+    protected Item curShield;
+    public WeaponHolder WeaponHolder => weaponHolder;
+    public Item CurHead => curHead;
+    public Item CurPants => curPants;
+    public Item CurShield  => curShield;
+
+    protected WeaponType weaponType;
+    public  WeaponType WeaponType => weaponType;
+
     [SerializeField] protected Transform atkRangeTF;
     [SerializeField] protected float baseAtkRange;
     [SerializeField] protected float baseAtkSpeed;
     protected float curSize;
     protected float bonusAtkRange;
-
-    public WeaponHolder CurWeapon => curWeapon;
     public float CurSize => curSize;
     public float CurAttackRange => (baseAtkRange + bonusAtkRange) * curSize;
     public float BaseAttackSpeed => baseAtkSpeed;
-    public float BonusAttackRange { get { return bonusAtkRange; } set { bonusAtkRange = Mathf.Max(value,0); } }
-    public WeaponType WeaponType { get { return weaponType; } set { weaponType = value; } }
+    public float BonusAttackRange { get { return bonusAtkRange; } set { bonusAtkRange = Mathf.Max(value, 0); } }
 
     //------------------ Navigation props --------------------
     [SerializeField] protected Image targetIndicatorImage;
@@ -115,15 +132,12 @@ public class Character : GameUnit
     private void InitDependentFactors()
     {
         SetupSizeByInitCombatPoint(CombatPoint);
-        InitWeapon();
-        ChangeColor(ColorType);
     }
 
     private void InitIndependentFactors()
     {
         InitStatus();
         ClearTargets();
-        ChangeAnim(Const.ANIM_NAME_IDLE);
     }
 
     protected virtual void InitIndicator()
@@ -133,11 +147,40 @@ public class Character : GameUnit
         indicator.OnInit(this);
     }
 
-    protected virtual void InitWeapon()
+    public void ChangeWeapon(WeaponType type)
     {
-        curWeapon.OnInit(this);
+        weaponType = type;
+        weaponHolder.OnInit(this);
         ToggleWeapon(true);
         SetAttackRangeTF(baseAtkRange + bonusAtkRange);
+    }
+
+    public void ChangeHead(ItemType type)
+    {
+        if(curHead != null)
+        {
+            Destroy(curHead.gameObject);
+        }
+        curHead = Instantiate(itemDataSO.GetHead(type), headHolder.transform);
+        bonusAtkRange += baseAtkRange * curHead.BonusAttackRange * 0.01f;
+        SetAttackRangeTF(baseAtkRange + bonusAtkRange);
+    }
+
+    public virtual void ChangePants(ItemType type)
+    {
+        curPants = itemDataSO.GetPants(type);
+        pantsHolder.material = curPants.GetComponent<Renderer>().sharedMaterial;
+        bonusMoveSpeed = baseMoveSpeed * curPants.BonusMoveSpeed * 0.01f;
+    }
+
+    public void ChangeShield(ItemType type)
+    {
+        if (curShield != null)
+        {
+            Destroy(curShield.gameObject);
+        }
+        curShield = Instantiate(itemDataSO.GetShield(type), shieldHolder.transform);
+        curShield.gameObject.SetActive(true);
     }
 
     private void InitSize()
@@ -168,10 +211,9 @@ public class Character : GameUnit
         curStatus = StatusType.Normal;
     }
 
-    protected void SetAttackRangeTF(float atkRange)
+    protected virtual void SetAttackRangeTF(float atkRange)
     {
         atkRangeTF.localScale = new Vector3(atkRange * 2f, 0.1f, atkRange * 2f);
-        atkRangeTF.gameObject.SetActive(true);
     }
 
     public virtual void OnDespawn()
@@ -184,6 +226,7 @@ public class Character : GameUnit
 
     protected void ChangeColor(ColorType type)
     {
+        ColorType = type;
         charRenderer.material = colorDataSO.GetMat(type);
     }
 
@@ -248,7 +291,7 @@ public class Character : GameUnit
 
     public void CheckAndProcessAttack()
     {
-        if (curWeapon.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking))
+        if (weaponHolder.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking))
         {
             ProcessAttack();
         }
@@ -277,7 +320,7 @@ public class Character : GameUnit
         yield return new WaitForSeconds(0.3f);
         if(!IsStatus(StatusType.Dead))
         {
-            curWeapon.OnShoot(targetPos);
+            weaponHolder.OnShoot(targetPos);
             ToggleWeapon(false);
             yield return new WaitForSeconds(1f);
             ChangeStatus(StatusType.Normal);
@@ -291,7 +334,7 @@ public class Character : GameUnit
         TF.LookAt(targetDir);
     }
 
-    protected virtual void ProcessDie()
+    protected virtual void OnDead()
     {
         Invoke(nameof(OnDespawn), 2f);
         ChangeStatus(StatusType.Dead);
@@ -339,9 +382,9 @@ public class Character : GameUnit
 
     public void ToggleWeapon(bool value)
     {
-        if(curWeapon)
+        if(weaponHolder)
         {
-            curWeapon.gameObject.SetActive(value);
+            weaponHolder.gameObject.SetActive(value);
         }
     }
 
@@ -361,7 +404,7 @@ public class Character : GameUnit
         {
             bullet.WeaponHolder.Owner.ProcessOnTargetKilled(this);
             EnemyManager.Instance.SetRecordHighestPoint(bullet.WeaponHolder.Owner.CombatPoint);
-            ProcessDie();
+            OnDead();
         }
     }
 

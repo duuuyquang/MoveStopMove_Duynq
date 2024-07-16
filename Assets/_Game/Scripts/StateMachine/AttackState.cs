@@ -22,11 +22,11 @@ public class AttackState : IState
                 isAttacked = true;
             }
 
-            if(enemy.CurWeapon.IsGrab)
+            if(enemy.WeaponHolder.IsGrab)
             {
-                if (enemy.CurWeapon.CurBullet && enemy.CurWeapon.CurBullet.IsDropped && enemy.IsStatus(StatusType.Normal))
+                if (enemy.WeaponHolder.CurBullet && enemy.WeaponHolder.CurBullet.IsDropped && enemy.IsStatus(StatusType.Normal))
                 {
-                    Vector3 targetPos = new Vector3(enemy.CurWeapon.CurBullet.TF.position.x, enemy.TF.position.y, enemy.CurWeapon.CurBullet.TF.position.z);
+                    Vector3 targetPos = new Vector3(enemy.WeaponHolder.CurBullet.TF.position.x, enemy.TF.position.y, enemy.WeaponHolder.CurBullet.TF.position.z);
                     enemy.SetState(new RunToDestination(targetPos));
                 }
                 return;

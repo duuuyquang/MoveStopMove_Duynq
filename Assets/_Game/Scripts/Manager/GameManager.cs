@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum GameState { MainMenu, GamePlay, Finish, Revive, Setting }
+public enum GameState { MainMenu, GamePlay, Finish, Setting }
 
 public class GameManager : Singleton<GameManager>
 {
@@ -9,8 +9,8 @@ public class GameManager : Singleton<GameManager>
     private int curAliveNum;
     public int CurAliveNum => curAliveNum;
 
-    private int totalCoin;
-    public int TotalCoin => totalCoin;
+    private float totalCoin;
+    public float TotalCoin => totalCoin;
 
     private void Awake()
     {
@@ -28,9 +28,6 @@ public class GameManager : Singleton<GameManager>
 
     void Start()
     {
-        //TODO: get from player data later
-        totalCoin = 0;
-        UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoin(totalCoin);
         OnInit();
     }
 
@@ -44,12 +41,18 @@ public class GameManager : Singleton<GameManager>
 
     public void OnInit()
     {
-        ChangeState(GameState.MainMenu);
+        //TODO: get from player data later
+        totalCoin = 999;
         curAliveNum = LevelManager.Instance.CurLevel.TotalEnemies + 1;
+
+        ChangeState(GameState.MainMenu);
+        UIManager.Instance.GetUI<CanvasMainMenu>().SetCoin(totalCoin);
+        UIManager.Instance.GetUI<CanvasMainMenu>().SetName(LevelManager.Instance.Player.Name);
         CameraFollower.Instance.OnInit();
     }
 
-    public void UpdateTotalCoin(int coin) => totalCoin += Mathf.Max(coin, 0);
+    public void UpdateTotalCoin(float coin) => totalCoin += Mathf.Max(coin, 0);
+    public void ReduceTotalCoin(float coin) => totalCoin -= Mathf.Max(coin, 0);
     public static void ChangeState(GameState state) => gameState = state;
     public static bool IsState(GameState state) => gameState == state;
     public void UpdateAliveNumText() => UIManager.Instance.OpenUI<CanvasGamePlay>().UpdateAliveNumText(--curAliveNum);

@@ -10,6 +10,9 @@ public class Weapon : WeaponUnit
     [SerializeField] bool isReturn = false;
     [SerializeField] bool isGrab = false;
 
+    [Header("Shop")]
+    [SerializeField] int price = 100;
+
     [Header("Inital Transform Stats")]
     [SerializeField] Vector3 initPosition;
     [SerializeField] Vector3 initEulerAngles;
@@ -22,6 +25,7 @@ public class Weapon : WeaponUnit
     public float SpinSpeed => spinSpeed;
     public bool IsReturn => isReturn;
     public bool IsGrab => isGrab;
+    public int Price => price;
 
     public void OnInit()
     {

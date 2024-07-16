@@ -24,6 +24,7 @@ public class LevelManager : Singleton<LevelManager>
     public void OnInit(int level)
     {
         SimplePool.ReleaseAll();
+        WeaponPool.ReleaseAll();
         InitPlayer();
         LoadLevel(level);
         GameManager.Instance.OnInit();
@@ -33,6 +34,7 @@ public class LevelManager : Singleton<LevelManager>
     public void OnInitNextLevel()
     {
         SimplePool.ReleaseAll();
+        WeaponPool.ReleaseAll();
         InitPlayer();
         LoadLevel(curLevel.Index + 1);
         GameManager.Instance.OnInit();
