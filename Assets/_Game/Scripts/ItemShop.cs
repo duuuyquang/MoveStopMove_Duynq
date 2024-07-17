@@ -7,16 +7,20 @@ public class ItemShop : MonoBehaviour
 {
     [SerializeField] Transform equippedTag;
     [SerializeField] Transform lockTag;
+    [SerializeField] Image image;
 
     public ItemDataSO itemDataSO;
 
     private Item item;
     public Item Item => item;
 
+    public Transform TF;
+    public RectTransform RectTF;
 
     public void OnInit(Item item)
     {
         this.item = item;
+        image.sprite = item.Sprite;
     }
 
     public void ToggleEquippedTag(bool value)
@@ -31,23 +35,19 @@ public class ItemShop : MonoBehaviour
 
     public void SetPropsByItemType(TabType tab, ItemType type)
     {
-        Item item;
         switch (tab)
         {
             case TabType.Head:
-                item = itemDataSO.GetHead(type);
-                OnInit(item);
+                OnInit(itemDataSO.GetHead(type));
                 break;
             case TabType.Pants:
-                item = itemDataSO.GetPants(type);
-                OnInit(item);
+                OnInit(itemDataSO.GetPants(type));
                 break;
             case TabType.Shield:
-                item = itemDataSO.GetShield(type);
-                OnInit(item);
+                OnInit(itemDataSO.GetShield(type));
                 break;
             case TabType.Sets:
-                //totalItems = itemDataSO.TotalSets;
+                OnInit(itemDataSO.GetSet(type));
                 break;
         }
     }

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2648016443075149089}
   - component: {fileID: -6315440133220950803}
   m_Layer: 0
-  m_Name: CaptainAmerica
+  m_Name: CaptainAmerican
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -104,4 +104,12 @@ MonoBehaviour:
   bonusAttackRange: 0
   bonusMoveSpeed: 0
   bonusGold: 25
+  sprite: {fileID: 21300000, guid: 0bc5478ac1500ec4196e356d06eba0d6, type: 3}
   price: 500
+  isItemInSet: 0
+  isSetItem: 0
+  headItem: {fileID: 0}
+  shieldItem: {fileID: 0}
+  pantsItem: {fileID: 0}
+  wingItem: {fileID: 0}
+  tailItem: {fileID: 0}

@@ -53,7 +53,8 @@ public class Player : Character
         ChangeHead(ItemType.None);
         ChangePants(ItemType.None);
         ChangeShield(ItemType.None);
-        ChangeColor((ColorType)UnityEngine.Random.Range(1, Enum.GetNames(typeof(ColorType)).Length));
+        ChangeSet(ItemType.None);
+        ChangeColor(ColorType.Yellow);
         PlayerController.Instance.OnInit();
         InitTransform();
     }
@@ -216,7 +217,7 @@ public class Player : Character
         }
     }
 
-    public void UpdateOwnedItem(ItemType type)
+    public void AddOwnedItem(ItemType type)
     {
         if (!IsOwnedItem(type))
         {
@@ -228,12 +229,6 @@ public class Player : Character
     private void RotateAround()
     {
         TF.Rotate(Vector3.up, 60f * Time.deltaTime);
-    }
-
-    public void SetMenuPose()
-    {
-        LevelManager.Instance.Player.InitTransform();
-        LevelManager.Instance.Player.ChangeAnim(Const.ANIM_NAME_IDLE);
     }
 
     public void SetSkinShopPose()

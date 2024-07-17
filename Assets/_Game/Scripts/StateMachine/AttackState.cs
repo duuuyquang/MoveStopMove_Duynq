@@ -22,7 +22,7 @@ public class AttackState : IState
                 isAttacked = true;
             }
 
-            if(enemy.WeaponHolder.IsGrab)
+            if(enemy.WeaponHolder.CurWeapon.IsGrab)
             {
                 if (enemy.WeaponHolder.CurBullet && enemy.WeaponHolder.CurBullet.IsDropped && enemy.IsStatus(StatusType.Normal))
                 {

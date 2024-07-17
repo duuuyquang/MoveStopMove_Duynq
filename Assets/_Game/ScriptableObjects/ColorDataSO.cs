@@ -3,15 +3,16 @@ using UnityEngine;
 
 public enum ColorType
 {
-    White = 0,
-    Blue = 1,
-    Green = 2,
-    Red = 3,
-    Yellow = 4,
-    Purpil = 5,
-    Pink = 6,
-    Orange = 7,
-    Grey = 8
+    None    = 0,
+    White   = 1,
+    Blue    = 2,
+    Green   = 3,
+    Red     = 4,
+    Yellow  = 5,
+    Purpil  = 6,
+    Pink    = 7,
+    Orange  = 8,
+    Grey    = 9
 }
 
 [CreateAssetMenu(menuName = "ColorDataSO")]

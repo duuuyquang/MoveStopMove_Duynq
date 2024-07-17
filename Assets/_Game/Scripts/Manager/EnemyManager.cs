@@ -7,8 +7,6 @@ public class EnemyManager : Singleton<EnemyManager>
 {
     [SerializeField] int MaxEnemiesOnRunTime = 10;
     [SerializeField] Enemy enemyPrefab;
-
-    private Vector3 lastSpawnedPos;
     
     private NavMeshHit navMeshHit;
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEngine.UI.GridLayoutGroup;
 
 public class Bullet : GameUnit
 {
@@ -8,8 +9,8 @@ public class Bullet : GameUnit
     private float speed;
     private float spinSpeed;
     private Vector3 rotateAxis;
-
     private Vector3 targetPos;
+
     private WeaponHolder weaponHolder;
     public WeaponHolder WeaponHolder => weaponHolder;
 
@@ -21,9 +22,9 @@ public class Bullet : GameUnit
     private bool isReturning = false;
 
     //------------------- For Weapon need to grab -----------------
+    private float grabTimer = 0f;
     private bool isGrab = false;
     private bool isDropped = false;
-    private float grabTimer = 0;
     public bool IsDropped => isDropped;
 
     void Update()
@@ -49,17 +50,17 @@ public class Bullet : GameUnit
 
     private void InitStats()
     {
-        speed = weaponHolder.Speed;
-        spinSpeed = weaponHolder.SpinSpeed;
-        rotateAxis = weaponHolder.RotateAxis;
-        isGrab = weaponHolder.IsGrab;
+        speed = weaponHolder.Owner.BaseAttackSpeed + weaponHolder.CurWeapon.BonusSpeed;
+        spinSpeed = weaponHolder.CurWeapon.SpinSpeed;
+        rotateAxis = weaponHolder.CurWeapon.RotateAxis;
+        isGrab = weaponHolder.CurWeapon.IsGrab;
     }
 
     private void InitSpecialStats()
     {
         isDropped = false;
         isReturning = false;
-        grabTimer = 0;
+        grabTimer = 0f;
     }
 
     private void SpawnWeapon()
@@ -100,7 +101,7 @@ public class Bullet : GameUnit
 
     private bool ProcessReturnWeapon()
     {
-        if (weaponHolder && weaponHolder.IsReturn && !isReturning)
+        if (weaponHolder && weaponHolder.CurWeapon.IsReturn && !isReturning)
         {
             SetTargetPos(weaponHolder.Owner.TF.position);
             isReturning = true;

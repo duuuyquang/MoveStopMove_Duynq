@@ -105,7 +105,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   equippedTag: {fileID: 7704992606726287250}
   lockTag: {fileID: 3076722207327311152}
+  image: {fileID: 8988803142604714291}
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
+  TF: {fileID: 713800163428919492}
+  RectTF: {fileID: 713800163428919492}
 --- !u!1 &4583291747904479901
 GameObject:
   m_ObjectHideFlags: 0
@@ -405,7 +408,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7704992606726287250
 RectTransform:
   m_ObjectHideFlags: 0

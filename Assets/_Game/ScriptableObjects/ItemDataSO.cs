@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public enum WeaponType
@@ -74,8 +75,17 @@ public enum ItemType
     Pants_Rainbow           = 107,
     Pants_Skull             = 108,
     Pants_Vantim            = 109,
+    Pants_Devil             = 110,
     Shield_CaptainAmerican  = 201,
     Shield_Normal           = 202,
+    Wing_Devil              = 301,
+    Tail_Devil              = 401,
+    Set_1                   = 1001,
+    Set_2                   = 1002,
+    Set_3                   = 1003,
+    Set_4                   = 1004,
+    Set_5                   = 1005,
+    Set_6                   = 1006    
 }
 
 [CreateAssetMenu(menuName = "ItemDataSO")]
@@ -86,7 +96,9 @@ public class ItemDataSO : ScriptableObject
     [SerializeField] Item[] hats;
     [SerializeField] Item[] pants;
     [SerializeField] Item[] shields;
-    [SerializeField] Material[] pantsMaterials;
+    [SerializeField] Item[] wings;
+    [SerializeField] Item[] tails;
+    [SerializeField] Item[] sets;
 
     public Weapon GetWeapon(WeaponType index)
     {
@@ -96,11 +108,6 @@ public class ItemDataSO : ScriptableObject
     public Item GetHead(ItemType index)
     {
         return hats[(int)index % 100];
-    }
-
-    public Material GetPantsMat(ItemType index)
-    {
-        return pantsMaterials[(int)index % 100];
     }
 
     public Item GetPants(ItemType index)
@@ -113,8 +120,36 @@ public class ItemDataSO : ScriptableObject
         return shields[(int)index % 100];
     }
 
+    public Item GetTail(ItemType index)
+    {
+        return tails[(int)index % 100];
+    }
+
+    public Item GetWing(ItemType index)
+    {
+        return wings[(int)index % 100];
+    }
+
+    public Item GetSet(ItemType index)
+    {
+        return sets[(int)index % 1000];
+    }
+
     public int TotalWeapons => weapons.Length;
-    public int TotalHats => hats.Length;
-    public int TotalPants => pantsMaterials.Length;
-    public int TotalShields => shields.Length;
+    public int TotalHats => GetTotal(hats);
+    public int TotalPants => GetTotal(pants);
+    public int TotalShields => GetTotal(shields);
+    public int TotalSets => GetTotal(sets);
+
+    public int GetTotal(Item[] array)
+    {
+        int count = 0;
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (array[i].ItemInSet) continue;
+            count++;
+        }
+
+        return count;
+    }
 }

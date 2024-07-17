@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 2068527951091175212}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: -0.1, z: 0}
+  m_LocalPosition: {x: -0, y: -0.1, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -97,7 +97,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 10
-  bonusAttackRange: 5
+  bonusAttackRange: 0
   bonusMoveSpeed: 0
   bonusGold: 0
-  price: 500
+  sprite: {fileID: 21300000, guid: 8096ae96eca3be5499deff4ebf19e2ac, type: 3}
+  price: 0
+  isItemInSet: 1
+  isSetItem: 0
+  headItem: {fileID: 0}
+  shieldItem: {fileID: 0}
+  pantsItem: {fileID: 0}
+  wingItem: {fileID: 0}
+  tailItem: {fileID: 0}
+  charColorType: 0

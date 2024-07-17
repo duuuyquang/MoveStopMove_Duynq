@@ -41,6 +41,7 @@ public class CanvasSkinShop : UICanvas
     private Item cachedHead;
     private Item cachedPants;
     private Item cachedShield;
+    private Item cachedSet;
 
     private List<Sprite> headSprites = new List<Sprite>();
     private List<Sprite> pantsSprites = new List<Sprite>();
@@ -48,24 +49,7 @@ public class CanvasSkinShop : UICanvas
 
     public void Start()
     {
-        PreloadItemSprites();
         OnSelectingTab((int)curTab);
-    }
-
-    private void PreloadItemSprites()
-    {
-        for (int i = 0; i <= itemDataSO.TotalHats; i++)
-        {
-            headSprites.Add(Resources.Load<Sprite>("Images/Skin/Head/Head" + i));
-        }
-        for (int i = 0; i <= itemDataSO.TotalPants; i++)
-        {
-            pantsSprites.Add(Resources.Load<Sprite>("Images/Skin/Pants/Pants" + i));
-        }
-        for (int i = 0; i <= itemDataSO.TotalShields; i++)
-        {
-            shieldPrites.Add(Resources.Load<Sprite>("Images/Skin/Shield/Shield" + i));
-        }
     }
 
     public void SetCoin(float coin)
@@ -78,13 +62,21 @@ public class CanvasSkinShop : UICanvas
         cachedHead = LevelManager.Instance.Player.CurHead;
         cachedPants = LevelManager.Instance.Player.CurPants;
         cachedShield = LevelManager.Instance.Player.CurShield;
+        cachedSet = LevelManager.Instance.Player.CurSet;
     }
 
     private void RevertPlayerItems()
     {
-        LevelManager.Instance.Player.ChangeHead(cachedHead.Type);
-        LevelManager.Instance.Player.ChangePants(cachedPants.Type);
-        LevelManager.Instance.Player.ChangeShield(cachedShield.Type);
+        if(cachedSet != null)
+        {
+            LevelManager.Instance.Player.ChangeSet(cachedSet.Type);
+        } 
+        else
+        {
+            LevelManager.Instance.Player.ChangeHead(cachedHead.Type);
+            LevelManager.Instance.Player.ChangePants(cachedPants.Type);
+            LevelManager.Instance.Player.ChangeShield(cachedShield.Type);
+        }
     }
 
     public void MainMenuButton()
@@ -103,7 +95,7 @@ public class CanvasSkinShop : UICanvas
         if(GameManager.Instance.TotalCoin >= choosingItem.Item.Price)
         {
             GameManager.Instance.ReduceTotalCoin(choosingItem.Item.Price);
-            LevelManager.Instance.Player.UpdateOwnedItem(choosingItem.Item.Type);
+            LevelManager.Instance.Player.AddOwnedItem(choosingItem.Item.Type);
             UIManager.Instance.GetUI<CanvasMainMenu>().SetCoin(GameManager.Instance.TotalCoin);
             SetCoin(GameManager.Instance.TotalCoin);
             PrintBuyButtons();
@@ -112,21 +104,7 @@ public class CanvasSkinShop : UICanvas
 
     public void Select()
     {
-        switch (curTab)
-        {
-            case TabType.Head:
-                LevelManager.Instance.Player.ChangeHead(choosingItem.Item.Type);
-                break;
-            case TabType.Pants:
-                LevelManager.Instance.Player.ChangePants(choosingItem.Item.Type);
-                break;
-            case TabType.Shield:
-                LevelManager.Instance.Player.ChangeShield(choosingItem.Item.Type);
-                break;
-            case TabType.Sets:
-                //LevelManager.Instance.Player.ChangeHead(choosingItem.ItemType);
-                break;
-        }
+        ChangePlayerItem(choosingItem.Item.Type);
         CachedPlayerItems();
         PrintBuyButtons();
         choosingItem.ToggleEquippedTag(true);
@@ -134,51 +112,15 @@ public class CanvasSkinShop : UICanvas
 
     public void Unequip()
     {
-        switch (curTab)
-        {
-            case TabType.Head:
-                LevelManager.Instance.Player.ChangeHead(ItemType.None);
-                break;
-            case TabType.Pants:
-                LevelManager.Instance.Player.ChangePants(ItemType.None);
-                break;
-            case TabType.Shield:
-                LevelManager.Instance.Player.ChangeShield(ItemType.None);
-                break;
-            case TabType.Sets:
-                //LevelManager.Instance.Player.ChangeHead(choosingItem.ItemType);
-                break;
-        }
+        ChangePlayerItem(ItemType.None);
         CachedPlayerItems();
         PrintBuyButtons();
         choosingItem.ToggleEquippedTag(false);
     }
 
-    private Sprite GetImageShopSprite(int type)
-    {
-        Sprite sprite = headSprites[0];
-        switch (curTab)
-        {
-            case TabType.Head:
-                sprite = headSprites[type];
-                break;
-            case TabType.Pants:
-                sprite = pantsSprites[type];
-                break;
-            case TabType.Shield:
-                sprite = shieldPrites[type];
-                break;
-            case TabType.Sets:
-                //LevelManager.Instance.Player.ChangeHead(choosingItem.ItemType);
-                break;
-        }
-
-        return sprite;
-    }
-
     public void DisplayData()
     {
-        float totalItems = GetTotalItems();
+        float totalItems = GetTotalPurchasableItems();
         float totalCol   = Mathf.Floor( totalItems / ITEM_NUM_EACH_COL );
 
         float eachItemTotalWidth  = ITEM_SELECT_WIDTH + ITEM_SELECT_PADDING * 2f;
@@ -198,18 +140,32 @@ public class CanvasSkinShop : UICanvas
         {
             ItemShop itemShop = Instantiate(itemShopPrefab, listContent);
             itemShop.SetPropsByItemType(curTab,(ItemType)i);
-            itemShop.GetComponent<Image>().sprite = GetImageShopSprite(i);
+            UpdateItemShopState(itemShop);
 
             posY = i % 2 == 0 ? posY - eachItemTotalHeight : 0f;
             posX = i % 2 == 1 && i != 1 ? posX + eachItemTotalWidth : posX;
-            itemShop.GetComponent<RectTransform>().anchoredPosition = new Vector3(posX, posY);
+            itemShop.RectTF.anchoredPosition = new Vector3(posX, posY);
 
             curItemShopList.Add(itemShop);
         }
         OnChosingItem(curItemShopList.First());
     }
 
-    private int GetTotalItems()
+    private void UpdateItemShopState(ItemShop itemShop)
+    {
+        itemShop.ToggleLockTag(true);
+        itemShop.ToggleEquippedTag(false);
+        if (LevelManager.Instance.Player.IsOwnedItem(itemShop.Item.Type))
+        {
+            itemShop.ToggleLockTag(false);
+            if (CheckSameItem(itemShop.Item.Type))
+            {
+                itemShop.ToggleEquippedTag(true);
+            }
+        }
+    }
+
+    private int GetTotalPurchasableItems()
     {
         switch (curTab)
         {
@@ -220,32 +176,46 @@ public class CanvasSkinShop : UICanvas
             case TabType.Shield:
                 return itemDataSO.TotalShields;
             case TabType.Sets:
-                //totalItems = itemDataSO.TotalSets;
+                return itemDataSO.TotalSets;
+            default:
                 return 0;
         }
-        return 0;
     }
 
     private bool CheckSameItem(ItemType type)
     {
-        bool isSameItem = false;
         switch (curTab)
         {
             case TabType.Head:
-                isSameItem = cachedHead.Type == type;
+                return cachedHead.Type == type;
+            case TabType.Pants:
+                return cachedPants.Type == type;
+            case TabType.Shield:
+                return cachedShield.Type == type;
+            case TabType.Sets:
+                return cachedSet.Type == type;
+            default:
+                return false;
+        }
+    }
+
+    private void ChangePlayerItem(ItemType type)
+    {
+        switch (curTab)
+        {
+            case TabType.Head:
+                LevelManager.Instance.Player.ChangeHead(type);
                 break;
             case TabType.Pants:
-                isSameItem = cachedPants.Type == type;
+                LevelManager.Instance.Player.ChangePants(type);
                 break;
             case TabType.Shield:
-                isSameItem = cachedShield.Type == type;
+                LevelManager.Instance.Player.ChangeShield(type);
                 break;
             case TabType.Sets:
-                isSameItem = false;
+                LevelManager.Instance.Player.ChangeSet(type);
                 break;
         }
-
-        return isSameItem;
     }
 
     private void PrintBuyButtons()
@@ -300,38 +270,19 @@ public class CanvasSkinShop : UICanvas
 
     private void SetChosingItemBG(ItemShop chosenItem)
     {
-        itemSelectBG.SetParent(chosenItem.transform, false);
+        itemSelectBG.SetParent(chosenItem.TF, false);
     }
 
     public void OnChosingItem(ItemShop itemShop)
     {
         choosingItem = itemShop;
-        ChangePlayerItem(itemShop);
+        ChangePlayerItem(itemShop.Item.Type);
         DisplayStatsText();
         PrintBuyButtons();
         SetChosingItemBG(itemShop);
     }
 
-    private void ChangePlayerItem(ItemShop itemShop)
-    {
-        switch (curTab)
-        {
-            case TabType.Head:
-                LevelManager.Instance.Player.ChangeHead(itemShop.Item.Type);
-                break;
-            case TabType.Pants:
-                LevelManager.Instance.Player.ChangePants(itemShop.Item.Type);
-                break;
-            case TabType.Shield:
-                LevelManager.Instance.Player.ChangeShield(itemShop.Item.Type);
-                break;
-            case TabType.Sets:
-                //totalItems = itemDataSO.TotalSets;
-                break;
-        }
-    }
-
-    public void OnSelectingTab(int tab)
+    private void OnSelectingTab(int tab)
     {
         for (int i = 0; i < tabBGs.Length; i++)
         {

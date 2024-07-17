@@ -39,13 +39,19 @@ public class Character : GameUnit
     [SerializeField] protected Transform headHolder;
     [SerializeField] protected Transform shieldHolder;
     [SerializeField] protected Renderer pantsHolder;
+    [SerializeField] protected Transform wingHolder;
+    [SerializeField] protected Transform tailHolder;
     protected Item curHead;
     protected Item curPants;
     protected Item curShield;
+    protected Item curTail;
+    protected Item curWing;
+    protected Item curSet;
     public WeaponHolder WeaponHolder => weaponHolder;
     public Item CurHead => curHead;
     public Item CurPants => curPants;
     public Item CurShield  => curShield;
+    public Item CurSet => curSet;
 
     protected WeaponType weaponType;
     public  WeaponType WeaponType => weaponType;
@@ -54,11 +60,16 @@ public class Character : GameUnit
     [SerializeField] protected float baseAtkRange;
     [SerializeField] protected float baseAtkSpeed;
     protected float curSize;
-    protected float bonusAtkRange;
+
+    protected float itemBonusAtkRange;
+    protected float weaponBonusAtkRange;
+    protected float bonusAtkRange => itemBonusAtkRange + weaponBonusAtkRange;
+    public float WeaponBonusAtkRange { get { return weaponBonusAtkRange; } set { weaponBonusAtkRange = Mathf.Max(0, value); } }
+
     public float CurSize => curSize;
     public float CurAttackRange => (baseAtkRange + bonusAtkRange) * curSize;
     public float BaseAttackSpeed => baseAtkSpeed;
-    public float BonusAttackRange { get { return bonusAtkRange; } set { bonusAtkRange = Mathf.Max(value, 0); } }
+    public float BonusAttackRange { get { return bonusAtkRange; }}
 
     //------------------ Navigation props --------------------
     [SerializeField] protected Image targetIndicatorImage;
@@ -153,12 +164,11 @@ public class Character : GameUnit
     {
         if(curHead != null)
         {
-            bonusAtkRange -= baseAtkRange * curHead.BonusAttackRange * 0.01f;
             Destroy(curHead.gameObject);
         }
         curHead = Instantiate(itemDataSO.GetHead(type), headHolder.transform);
 
-        bonusAtkRange += baseAtkRange * curHead.BonusAttackRange * 0.01f;
+        itemBonusAtkRange = baseAtkRange * curHead.BonusAttackRange * 0.01f;
         SetAttackRangeTF(baseAtkRange + bonusAtkRange);
     }
 
@@ -176,7 +186,36 @@ public class Character : GameUnit
             Destroy(curShield.gameObject);
         }
         curShield = Instantiate(itemDataSO.GetShield(type), shieldHolder.transform);
-        curShield.gameObject.SetActive(true);
+    }
+
+    public void ChangeWing(ItemType type)
+    {
+        if (curWing != null)
+        {
+            Destroy(curWing.gameObject);
+        }
+        curWing = Instantiate(itemDataSO.GetWing(type), wingHolder.transform);
+    }
+
+    public void ChangeTail(ItemType type)
+    {
+        if (curTail != null)
+        {
+            Destroy(curTail.gameObject);
+        }
+        curTail = Instantiate(itemDataSO.GetTail(type), tailHolder.transform);
+    }
+
+    public void ChangeSet(ItemType type)
+    {
+        curSet = itemDataSO.GetSet(type);
+        ChangeHead(curSet.HeadItem.Type);
+        ChangePants(curSet.PantsItem.Type);
+        ChangeShield(curSet.ShieldItem.Type);
+        ChangeWing(curSet.WingItem.Type);
+        ChangeTail(curSet.TailItem.Type);
+        ChangeColorBySetItem(curSet.CharColorType);
+        itemBonusAtkRange = baseAtkRange * curSet.BonusAttackRange * 0.01f;
     }
 
     private void InitSize()
@@ -224,6 +263,18 @@ public class Character : GameUnit
     {
         ColorType = type;
         charRenderer.material = colorDataSO.GetMat(type);
+    }
+
+    protected void ChangeColorBySetItem(ColorType type)
+    {
+        if(type == ColorType.None)
+        {
+            ChangeColor(ColorType);
+        } 
+        else
+        {
+            charRenderer.material = colorDataSO.GetMat(type);
+        }
     }
 
     protected void ChangeColorDeath(ColorType type)

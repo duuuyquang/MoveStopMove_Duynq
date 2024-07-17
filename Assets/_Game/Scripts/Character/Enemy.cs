@@ -39,10 +39,12 @@ public class Enemy : Character
         ChangeHead((ItemType)Random.Range(0, 11));
         ChangePants((ItemType)Random.Range(100, 110));
         ChangeShield((ItemType)Random.Range(200, 203));
+        ChangeSet(ItemType.None);
         ChangeColor((ColorType)Random.Range(1, Enum.GetNames(typeof(ColorType)).Length));
         SetState(new IdleState());
         ChangeTargetIndicatorColor(ColorType);
         ToggleTargetIndicator(false);
+        TF.eulerAngles = new Vector3(0, Random.Range(-180f, 181f), 0);
     }
 
     public override void ChangePants(ItemType type)
