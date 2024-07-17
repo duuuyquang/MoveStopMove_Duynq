@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum GameState { MainMenu, GamePlay, Finish, Setting }
+public enum GameState { MainMenu, SkinShop, GamePlay, Finish, Setting }
 
 public class GameManager : Singleton<GameManager>
 {

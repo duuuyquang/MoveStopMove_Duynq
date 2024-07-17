@@ -1,14 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
-using static Unity.VisualScripting.Dependencies.Sqlite.SQLite3;
-using static UnityEditor.Progress;
-using static UnityEngine.UI.GridLayoutGroup;
 
 public enum StatusType { Normal, Attacking, Dead, Win }
 
@@ -159,9 +153,11 @@ public class Character : GameUnit
     {
         if(curHead != null)
         {
+            bonusAtkRange -= baseAtkRange * curHead.BonusAttackRange * 0.01f;
             Destroy(curHead.gameObject);
         }
         curHead = Instantiate(itemDataSO.GetHead(type), headHolder.transform);
+
         bonusAtkRange += baseAtkRange * curHead.BonusAttackRange * 0.01f;
         SetAttackRangeTF(baseAtkRange + bonusAtkRange);
     }

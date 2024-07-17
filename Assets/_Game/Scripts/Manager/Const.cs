@@ -10,6 +10,7 @@ public static class Const
     public const string ANIM_NAME_DANCE         = "dance";
     public const string ANIM_NAME_ATTACK        = "attack";
     public const string ANIM_NAME_DIE           = "die";
+    public const string ANIM_NAME_SHOP          = "shop";
 
     public const float CHARACTER_UPSCALE_UNIT   = 0.1f;
 

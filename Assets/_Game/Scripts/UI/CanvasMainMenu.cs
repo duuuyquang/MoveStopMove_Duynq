@@ -30,6 +30,7 @@ public class CanvasMainMenu : UICanvas
         if (CameraFollower.Instance.IsState(CameraState.Normal))
         {
             Close(0);
+            UIManager.Instance.GetUI<CanvasWeaponShop>().SetCoin(GameManager.Instance.TotalCoin);
             UIManager.Instance.OpenUI<CanvasWeaponShop>().DisplayData((int)LevelManager.Instance.Player.WeaponType);
             CameraFollower.Instance.SetupWeaponShopMode();
         }
@@ -40,8 +41,9 @@ public class CanvasMainMenu : UICanvas
         if (CameraFollower.Instance.IsState(CameraState.Normal))
         {
             Close(0);
-            UIManager.Instance.OpenUI<CanvasSkinShop>();
-            UIManager.Instance.OpenUI<CanvasSkinShop>().CachedPlayerItems();
+            UIManager.Instance.GetUI<CanvasSkinShop>().CachedPlayerItems();
+            UIManager.Instance.OpenUI<CanvasSkinShop>().SetCoin(GameManager.Instance.TotalCoin);
+            GameManager.ChangeState(GameState.SkinShop);
             CameraFollower.Instance.SetupSkinShopMode();
         }
     }

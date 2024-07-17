@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class ItemShop : MonoBehaviour
 {
     [SerializeField] Transform equippedTag;
+    [SerializeField] Transform lockTag;
 
     public ItemDataSO itemDataSO;
 
@@ -21,6 +22,11 @@ public class ItemShop : MonoBehaviour
     public void ToggleEquippedTag(bool value)
     {
         equippedTag.gameObject.SetActive(value);
+    }
+
+    public void ToggleLockTag(bool value)
+    {
+        lockTag.gameObject.SetActive(value);
     }
 
     public void SetPropsByItemType(TabType tab, ItemType type)

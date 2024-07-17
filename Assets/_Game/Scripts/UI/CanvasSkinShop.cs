@@ -11,9 +11,11 @@ public enum ItemState { IsNotPurchasable, IsPurchasable, IsSelect, IsEquipped };
 
 public class CanvasSkinShop : UICanvas
 {
-    private const float ITEM_SELECT_WIDTH   = 300f;
-    private const float ITEM_SELECT_HEIGHT  = 200f;
-    private const float ITEM_SELECT_PADDING = 15f;
+    private const float SCREEN_DEFAULT_WIDTH  = 720;
+
+    private const float ITEM_SELECT_WIDTH   = SCREEN_DEFAULT_WIDTH/4 + ITEM_SELECT_PADDING*2f;
+    private const float ITEM_SELECT_HEIGHT  = ITEM_SELECT_WIDTH * 0.75f;
+    private const float ITEM_SELECT_PADDING = 10f;
 
     private const int ITEM_NUM_EACH_COL = 2;
 
@@ -29,7 +31,7 @@ public class CanvasSkinShop : UICanvas
     [SerializeField] ItemShop       itemShopPrefab;
     [SerializeField] Transform      itemSelectBG;
 
-    private List<ItemShop> curItemList = new List<ItemShop>();
+    private List<ItemShop> curItemShopList = new List<ItemShop>();
 
     private TabType curTab = TabType.Head;
     private ItemShop    choosingItem;
@@ -90,6 +92,9 @@ public class CanvasSkinShop : UICanvas
         RevertPlayerItems();
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>();
+        GameManager.ChangeState(GameState.MainMenu);
+        LevelManager.Instance.Player.InitTransform();
+        LevelManager.Instance.Player.ChangeAnim(Const.ANIM_NAME_IDLE);
         CameraFollower.Instance.SetupMenuMode();
     }
 
@@ -179,13 +184,13 @@ public class CanvasSkinShop : UICanvas
         float eachItemTotalWidth  = ITEM_SELECT_WIDTH + ITEM_SELECT_PADDING * 2f;
         float eachItemTotalHeight = ITEM_SELECT_HEIGHT + ITEM_SELECT_PADDING * 2f;
 
-        float totalWidth  = Mathf.Max( Screen.width, eachItemTotalWidth * totalCol + ITEM_SELECT_PADDING * 2f );
-        float offsetRight = Mathf.Max( 0f, totalWidth - Screen.width );
+        float totalWidth  = Mathf.Max( SCREEN_DEFAULT_WIDTH, eachItemTotalWidth * totalCol + ITEM_SELECT_PADDING * 2f );
+        float offsetRight = Mathf.Max( 0f, totalWidth - SCREEN_DEFAULT_WIDTH);
         float posX = -totalWidth / 2f + ITEM_SELECT_WIDTH / 2f + ITEM_SELECT_PADDING * 2f;
         float posY = 0f;
 
-        Ultilities.SetRectTFLeft( listContent, 0);
-        Ultilities.SetRectTFRight( listContent, -offsetRight );
+        Ultilities.SetRectTFLeft(listContent, 0);
+        Ultilities.SetRectTFRight(listContent, -offsetRight);
 
         ClearItemList();
 
@@ -199,9 +204,9 @@ public class CanvasSkinShop : UICanvas
             posX = i % 2 == 1 && i != 1 ? posX + eachItemTotalWidth : posX;
             itemShop.GetComponent<RectTransform>().anchoredPosition = new Vector3(posX, posY);
 
-            curItemList.Add(itemShop);
+            curItemShopList.Add(itemShop);
         }
-        OnChosingItem(curItemList.First());
+        OnChosingItem(curItemShopList.First());
     }
 
     private int GetTotalItems()
@@ -257,10 +262,12 @@ public class CanvasSkinShop : UICanvas
         if (CheckSameItem(choosingItem.Item.Type))
         {
             buttons[(int)ItemState.IsEquipped].gameObject.SetActive(true);
+            choosingItem.ToggleLockTag(false);
         }
         else if (LevelManager.Instance.Player.IsOwnedItem(choosingItem.Item.Type))
         {
             buttons[(int)ItemState.IsSelect].gameObject.SetActive(true);
+            choosingItem.ToggleLockTag(false);
         }
         else if (GameManager.Instance.TotalCoin >= choosingItem.Item.Price)
         {
@@ -339,12 +346,12 @@ public class CanvasSkinShop : UICanvas
     private void ClearItemList()
     {
         itemSelectBG.SetParent(listContent, false);
-        while (curItemList.Count > 0)
+        while (curItemShopList.Count > 0)
         {
-            ItemShop item = curItemList[0];
-            curItemList.Remove(item);
+            ItemShop item = curItemShopList[0];
+            curItemShopList.Remove(item);
             Destroy(item.gameObject);
         }
-        curItemList.Clear();
+        curItemShopList.Clear();
     }
 }

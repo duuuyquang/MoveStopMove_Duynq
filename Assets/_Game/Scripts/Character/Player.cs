@@ -29,6 +29,11 @@ public class Player : Character
             ChangeStatus(StatusType.Win);
             OnWin();
         }
+
+        if(GameManager.IsState(GameState.SkinShop))
+        {
+            SetSkinShopPose();
+        }
     }
 
     void FixedUpdate()
@@ -53,7 +58,7 @@ public class Player : Character
         InitTransform();
     }
 
-    private void InitTransform()
+    public void InitTransform()
     {
         TF.position = Vector3.zero;
         TF.eulerAngles = new Vector3(0, 210, 0);
@@ -218,5 +223,22 @@ public class Player : Character
             // TODO: add owned skin later
             ownedItemTypes[type] = 1;
         }
+    }
+
+    private void RotateAround()
+    {
+        TF.Rotate(Vector3.up, 60f * Time.deltaTime);
+    }
+
+    public void SetMenuPose()
+    {
+        LevelManager.Instance.Player.InitTransform();
+        LevelManager.Instance.Player.ChangeAnim(Const.ANIM_NAME_IDLE);
+    }
+
+    public void SetSkinShopPose()
+    {
+        RotateAround();
+        LevelManager.Instance.Player.ChangeAnim(Const.ANIM_NAME_SHOP);
     }
 }
