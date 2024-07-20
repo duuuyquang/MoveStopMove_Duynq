@@ -1,6 +1,7 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
-public enum GameState { MainMenu, SkinShop, GamePlay, Finish, Setting }
+public enum GameState { MainMenu, GamePlay, Finish, Setting }
 
 public class GameManager : Singleton<GameManager>
 {
@@ -41,18 +42,22 @@ public class GameManager : Singleton<GameManager>
 
     public void OnInit()
     {
-        //TODO: get from player data later
-        totalCoin = 999;
+        totalCoin = PlayerData.Instance.totalCoin;
         curAliveNum = LevelManager.Instance.CurLevel.TotalEnemies + 1;
-
-        ChangeState(GameState.MainMenu);
-        UIManager.Instance.GetUI<CanvasMainMenu>().SetCoin(totalCoin);
-        UIManager.Instance.GetUI<CanvasMainMenu>().SetName(LevelManager.Instance.Player.Name);
-        CameraFollower.Instance.OnInit();
+        UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
+        UIManager.Instance.OpenUI<CanvasMainMenu>().SetNameText(LevelManager.Instance.Player.Name);
     }
 
-    public void UpdateTotalCoin(float coin) => totalCoin += Mathf.Max(coin, 0);
-    public void ReduceTotalCoin(float coin) => totalCoin -= Mathf.Max(coin, 0);
+    public void UpdateTotalCoin(float coin) {
+        totalCoin += Mathf.Max(coin, 0);
+        PlayerData.Instance.totalCoin = totalCoin;
+        PlayerData.SaveData();
+    }
+    public void ReduceTotalCoin(float coin) {
+        totalCoin -= Mathf.Max(coin, 0);
+        PlayerData.Instance.totalCoin = totalCoin;
+        PlayerData.SaveData();
+    }
     public static void ChangeState(GameState state) => gameState = state;
     public static bool IsState(GameState state) => gameState == state;
     public void UpdateAliveNumText() => UIManager.Instance.OpenUI<CanvasGamePlay>().UpdateAliveNumText(--curAliveNum);
@@ -63,7 +68,28 @@ public class GameManager : Singleton<GameManager>
         {
             ChangeState(GameState.Finish);
             UIManager.Instance.OpenUI<CanvasWin>();
+            OnWin();
         }
+    }
+
+    public void OnWin()
+    {
+        //TODO: move to other manager class
+        //if (GameManager.IsState(GameState.Finish) && IsStatus(StatusType.Normal))
+        //{
+        //    ChangeStatus(StatusType.Win);
+        //    OnWin();
+        //}
+    }
+
+    public void OnPlay()
+    {
+
+    }
+
+    public void OnLose()
+    {
+        UIManager.Instance.OpenUI<CanvasLose>();
     }
 }
 

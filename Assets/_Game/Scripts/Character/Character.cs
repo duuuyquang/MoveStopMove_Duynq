@@ -8,87 +8,77 @@ public enum StatusType { Normal, Attacking, Dead, Win }
 
 public class Character : GameUnit
 {
-    //------------------ Movement props ---------------------
-    [SerializeField] protected Rigidbody rb;
-    [SerializeField] protected Animator animator;
-    [SerializeField] protected float baseMoveSpeed;
-    protected float bonusMoveSpeed;
-    private string curAnim = Const.ANIM_NAME_IDLE;
-    //public Transform TF;
-
-    public float MoveSpeed => baseMoveSpeed + bonusMoveSpeed;
-    public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
-
-    //------------------ Basic props -------------------------
     private string charName;
     public string Name { get { return charName; } set { if (value.Length < 25) { charName = value; } } }
 
+    #region Skin Related
     [SerializeField] protected Renderer charRenderer;
-    private ColorType colorType;
-    public ColorType ColorType { get { return colorType; } set { colorType = value; } }
-
-    //------------------ Combat props ------------------------
-    protected int[] upSizeThresholds = { 1, 5, 13, 25, 41, 61 }; // kill 4 enemies same scale to up scale: 4, 8, 12, 16, 20
-
-    private int combatPoint;
-    public int CombatPoint { get { return combatPoint; } set { combatPoint = Mathf.Max(0, value); } }
-
-    private IEnumerator attackCoroutine;
-
-    [SerializeField] protected WeaponHolder weaponHolder;
+    [field: SerializeField] public WeaponHolder WeaponHolder { get; protected set; }
     [SerializeField] protected Transform headHolder;
     [SerializeField] protected Transform shieldHolder;
     [SerializeField] protected Renderer pantsHolder;
     [SerializeField] protected Transform wingHolder;
     [SerializeField] protected Transform tailHolder;
-    protected Item curHead;
-    protected Item curPants;
-    protected Item curShield;
-    protected Item curTail;
-    protected Item curWing;
-    protected Item curSet;
-    public WeaponHolder WeaponHolder => weaponHolder;
-    public Item CurHead => curHead;
-    public Item CurPants => curPants;
-    public Item CurShield  => curShield;
-    public Item CurSet => curSet;
+    public Item CurHead { get; protected set; }
+    public Item CurPants { get; protected set; }
+    public Item CurShield { get; protected set; }
+    public Item CurTail { get; protected set; }
+    public Item CurWing { get; protected set; }
+    public Item CurSet { get; protected set; }
+    public ColorType ColorType { get; private set; }
+    #endregion
 
-    protected WeaponType weaponType;
-    public  WeaponType WeaponType => weaponType;
+    #region Movement
+    [SerializeField] protected Rigidbody rb;
+    [SerializeField] protected Animator animator;
+    [SerializeField] protected float baseMoveSpeed;
+    protected float bonusMoveSpeed;
+    private string curAnim = Const.ANIM_NAME_IDLE;
+
+    public float MoveSpeed => baseMoveSpeed + bonusMoveSpeed;
+    public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
+    #endregion
+
+    //------------------ Combat props ------------------------
+    protected int[] upSizeThresholds = { 1, 5, 13, 25, 41, 61 }; // kill 4 enemies same scale to up scale: 4, 8, 12, 16, 20 (combatPoint relatively)
+
+    private int combatPoint;
+    public int CombatPoint { get { return combatPoint; } set { combatPoint = Mathf.Max(0, value); } }
+
+    private Coroutine attackCoroutine;
+
+    public  WeaponType WeaponType { get; protected set; }
 
     [SerializeField] protected Transform atkRangeTF;
     [SerializeField] protected float baseAtkRange;
     [SerializeField] protected float baseAtkSpeed;
-    protected float curSize;
 
-    protected float itemBonusAtkRange;
-    protected float weaponBonusAtkRange;
-    protected float bonusAtkRange => itemBonusAtkRange + weaponBonusAtkRange;
-    public float WeaponBonusAtkRange { get { return weaponBonusAtkRange; } set { weaponBonusAtkRange = Mathf.Max(0, value); } }
-
-    public float CurSize => curSize;
-    public float CurAttackRange => (baseAtkRange + bonusAtkRange) * curSize;
+    private float ItemBonusAtkRange { get; set; }
+    public float WeaponBonusAtkRange { get; set; }
+    protected float BonusAtkRange => ItemBonusAtkRange + WeaponBonusAtkRange;
+    public float CurAttackRange => (baseAtkRange + BonusAtkRange) * CurSize;
+    public float CurSize { get; protected set; }
     public float BaseAttackSpeed => baseAtkSpeed;
-    public float BonusAttackRange { get { return bonusAtkRange; }}
+    public float BonusGoldMultiplier { get; private set; }
 
-    //------------------ Navigation props --------------------
+    #region Navigation
+    private Indicator Indicator;
     [SerializeField] protected Image targetIndicatorImage;
-    //[SerializeField] Indicator indicatorPrefab;
-    protected Indicator indicator;
-    public Indicator Indicator => indicator;
-
     protected List<Character> targetsInRange = new List<Character>();
     protected Character curTargetChar = null;
     public bool HasTargetInRange => curTargetChar != null;
+    #endregion
 
-    //------------------ Status props ------------------------
+    #region Status
     protected StatusType curStatus;
     public StatusType CurStatus => curStatus;
     public bool IsStatus(StatusType status) => curStatus == status;
+    #endregion
 
-    //------------------ Data props --------------------------
+    #region DataSO
     public ItemDataSO itemDataSO;
     public ColorDataSO colorDataSO;
+    #endregion
 
     [SerializeField] ParticleSystem bulletPartical;
     [SerializeField] ParticleSystem sizeUpPartical;
@@ -104,7 +94,7 @@ public class Character : GameUnit
 
             if (!IsStatus(StatusType.Dead))
             {
-                if (indicator == null)
+                if (Indicator == null)
                 {
                     InitIndicator();
                 }
@@ -122,105 +112,23 @@ public class Character : GameUnit
         }
     }
 
+    #region Init
     public virtual void OnInit()
     {
-        InitBasicStats();
-        InitDependentFactors();
-        InitIndependentFactors();
-    }
-
-    protected virtual void InitBasicStats()
-    {
         InitSize();
-    }
-
-    private void InitDependentFactors()
-    {
-        SetupSizeByInitCombatPoint(CombatPoint);
-    }
-
-    private void InitIndependentFactors()
-    {
         InitStatus();
         ClearTargets();
     }
 
     protected virtual void InitIndicator()
     {
-        //indicator = Instantiate(indicatorPrefab, UIManager.Instance.GetUI<CanvasGamePlay>().transform);
-        indicator = SimplePool.Spawn<Indicator>(PoolType.Indicator, Vector3.zero, Quaternion.identity);
-        indicator.OnInit(this);
-    }
-
-    public void ChangeWeapon(WeaponType type)
-    {
-        weaponType = type;
-        weaponHolder.OnInit(this);
-        ToggleWeapon(true);
-        SetAttackRangeTF(baseAtkRange + bonusAtkRange);
-    }
-
-    public void ChangeHead(ItemType type)
-    {
-        if(curHead != null)
-        {
-            Destroy(curHead.gameObject);
-        }
-        curHead = Instantiate(itemDataSO.GetHead(type), headHolder.transform);
-
-        itemBonusAtkRange = baseAtkRange * curHead.BonusAttackRange * 0.01f;
-        SetAttackRangeTF(baseAtkRange + bonusAtkRange);
-    }
-
-    public virtual void ChangePants(ItemType type)
-    {
-        curPants = itemDataSO.GetPants(type);
-        pantsHolder.material = curPants.GetComponent<Renderer>().sharedMaterial;
-        bonusMoveSpeed = baseMoveSpeed * curPants.BonusMoveSpeed * 0.01f;
-    }
-
-    public void ChangeShield(ItemType type)
-    {
-        if (curShield != null)
-        {
-            Destroy(curShield.gameObject);
-        }
-        curShield = Instantiate(itemDataSO.GetShield(type), shieldHolder.transform);
-    }
-
-    public void ChangeWing(ItemType type)
-    {
-        if (curWing != null)
-        {
-            Destroy(curWing.gameObject);
-        }
-        curWing = Instantiate(itemDataSO.GetWing(type), wingHolder.transform);
-    }
-
-    public void ChangeTail(ItemType type)
-    {
-        if (curTail != null)
-        {
-            Destroy(curTail.gameObject);
-        }
-        curTail = Instantiate(itemDataSO.GetTail(type), tailHolder.transform);
-    }
-
-    public void ChangeSet(ItemType type)
-    {
-        curSet = itemDataSO.GetSet(type);
-        ChangeHead(curSet.HeadItem.Type);
-        ChangePants(curSet.PantsItem.Type);
-        ChangeShield(curSet.ShieldItem.Type);
-        ChangeWing(curSet.WingItem.Type);
-        ChangeTail(curSet.TailItem.Type);
-        ChangeColorBySetItem(curSet.CharColorType);
-        itemBonusAtkRange = baseAtkRange * curSet.BonusAttackRange * 0.01f;
+        Indicator = SimplePool.Spawn<Indicator>(PoolType.Indicator, Vector3.zero, Quaternion.identity);
+        Indicator.OnInit(this);
     }
 
     private void InitSize()
     {
-        curSize = 1f;
+        CurSize = 1f;
         TF.localScale = Vector3.one;
     }
 
@@ -250,13 +158,87 @@ public class Character : GameUnit
     {
         atkRangeTF.localScale = new Vector3(atkRange * 2f, 0.1f, atkRange * 2f);
     }
+    #endregion
 
-    public virtual void OnDespawn()
+    #region Change weapons and skins
+    public void ChangeWeapon(WeaponType type)
     {
-        if (gameObject)
+        WeaponType = type;
+        WeaponHolder.OnInit(this);
+        ToggleWeapon(true);
+        SetAttackRangeTF(baseAtkRange + BonusAtkRange);
+    }
+
+    public void ChangeHead(ItemType type)
+    {
+        if (CurHead != null)
         {
-            Destroy(gameObject);
+            Destroy(CurHead.gameObject);
         }
+        CurHead = Instantiate(itemDataSO.GetHead(type), headHolder);
+        UpdateBonusStatsFromItem(CurHead);
+    }
+
+    public virtual void ChangePants(ItemType type)
+    {
+        CurPants = itemDataSO.GetPants(type);
+        pantsHolder.material = CurPants.GetComponent<Renderer>().sharedMaterial;
+        UpdateBonusStatsFromItem(CurPants);
+    }
+
+    public void ChangeShield(ItemType type)
+    {
+        if (CurShield != null)
+        {
+            Destroy(CurShield.gameObject);
+        }
+        CurShield = Instantiate(itemDataSO.GetShield(type), shieldHolder);
+        UpdateBonusStatsFromItem(CurShield);
+    }
+
+    public void ChangeSet(ItemType type)
+    {
+        CurSet = itemDataSO.GetSet(type);
+        ChangeHead(CurSet.HeadItem.Type);
+        ChangePants(CurSet.PantsItem.Type);
+        ChangeShield(CurSet.ShieldItem.Type);
+        ChangeWing(CurSet.WingItem.Type);
+        ChangeTail(CurSet.TailItem.Type);
+
+        if(type == ItemType.None)
+        {
+            ChangeColor(ColorType);
+        } 
+        else
+        {
+            ChangeColorBySetItem(CurSet.CharColorType);
+        }
+        UpdateBonusStatsFromItem(CurSet);
+    }
+
+    private void ChangeWing(ItemType type)
+    {
+        if (CurWing != null)
+        {
+            Destroy(CurWing.gameObject);
+        }
+        CurWing = Instantiate(itemDataSO.GetWing(type), wingHolder);
+    }
+
+    private void ChangeTail(ItemType type)
+    {
+        if (CurTail != null)
+        {
+            Destroy(CurTail.gameObject);
+        }
+        CurTail = Instantiate(itemDataSO.GetTail(type), tailHolder);
+    }
+
+    protected virtual void UpdateBonusStatsFromItem(Item item)
+    {
+        ItemBonusAtkRange = baseAtkRange * item.BonusAttackRange * 0.01f;
+        BonusGoldMultiplier = item.BonusGold;
+        SetAttackRangeTF(baseAtkRange + BonusAtkRange);
     }
 
     protected void ChangeColor(ColorType type)
@@ -267,10 +249,10 @@ public class Character : GameUnit
 
     protected void ChangeColorBySetItem(ColorType type)
     {
-        if(type == ColorType.None)
+        if (type == ColorType.None)
         {
             ChangeColor(ColorType);
-        } 
+        }
         else
         {
             charRenderer.material = colorDataSO.GetMat(type);
@@ -281,41 +263,22 @@ public class Character : GameUnit
     {
         charRenderer.material = colorDataSO.GetMatDeath(type);
     }
+    #endregion
 
-    public void ChangeAnim(string animName)
-    {
-        if (curAnim != animName)
-        {
-            animator.ResetTrigger(curAnim);
-            curAnim = animName;
-            animator.SetTrigger(animName);
-        }
-    }
-
-    protected void ChangeStatus(StatusType type)
-    {
-        if(curStatus == StatusType.Dead)
-        {
-            return;
-        }
-
-        if (curStatus != type)
-        {
-            curStatus = type;
-        }
-    }
+    #region Target detection
+    private bool IsInvalidTarget(Character enemy) => enemy.IsStatus(StatusType.Dead) || Vector3.Distance(enemy.TF.position, TF.position) > CurAttackRange;
 
     protected virtual void DetectNearestTarget()
     {
         float nearestDist = 0;
         curTargetChar = null;
-
+        float checkingDist;
         foreach (Character enemy in targetsInRange) {
-            if (enemy.IsStatus(StatusType.Dead) || Vector3.Distance(enemy.TF.position, TF.position) > CurAttackRange)
+            if (IsInvalidTarget(enemy))
             {
                 continue;
             }
-            float checkingDist = Vector3.Distance(enemy.TF.position, TF.position);
+            checkingDist = Vector3.Distance(enemy.TF.position, TF.position);
             if (nearestDist == 0)
             {
                 nearestDist = checkingDist;
@@ -335,12 +298,23 @@ public class Character : GameUnit
         character.ToggleTargetIndicator(false);
         targetsInRange.Remove(character);
     }
+    #endregion
 
-    public void CheckAndProcessAttack()
+    #region Attack
+    private bool CheckAttackableConditions => WeaponHolder.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking) && !IsStatus(StatusType.Dead);
+
+    public void CheckToProcessAttack()
     {
-        if (weaponHolder.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking))
+        if(IsStanding)
         {
-            ProcessAttack();
+            if (CheckAttackableConditions)
+            {
+                ProcessAttack();
+            }
+        }
+        else
+        {
+            StopAttack();
         }
     }
 
@@ -348,8 +322,8 @@ public class Character : GameUnit
     {
         ChangeStatus(StatusType.Attacking);
         ChangeAnim(Const.ANIM_NAME_ATTACK);
-        attackCoroutine = IEAttack();
-        StartCoroutine(attackCoroutine);
+
+        attackCoroutine = StartCoroutine(IEAttack());
     }
 
     protected void StopAttack()
@@ -363,11 +337,12 @@ public class Character : GameUnit
 
     IEnumerator IEAttack()
     {
+        //TODO: cache
         Vector3 targetPos = TF.position + (curTargetChar.TF.position - TF.position).normalized * CurAttackRange;
         yield return new WaitForSeconds(0.3f);
         if(!IsStatus(StatusType.Dead))
         {
-            weaponHolder.OnShoot(targetPos);
+            WeaponHolder.OnShoot(targetPos);
             ToggleWeapon(false);
             yield return new WaitForSeconds(1f);
             ChangeStatus(StatusType.Normal);
@@ -377,49 +352,8 @@ public class Character : GameUnit
     protected void LookAtTarget(Vector3 targetPos)
     {
         // we don't want character looks down when its size scales bigger
-        Vector3 targetDir = new Vector3(targetPos.x, TF.position.y, targetPos.z);
-        TF.LookAt(targetDir);
-    }
-
-    protected virtual void OnDead()
-    {
-        Invoke(nameof(OnDespawn), 2f);
-        ChangeStatus(StatusType.Dead);
-        ChangeColorDeath(ColorType);
-        ToggleTargetIndicator(false);
-        StopMoving();
-        bulletPartical.Play();
-        indicator = null;
-        GameManager.Instance.UpdateAliveNumText();
-    }
-
-    protected virtual void UpdateAnimation()
-    {
-        if (IsStatus(StatusType.Dead))
-        {
-            ChangeAnim(Const.ANIM_NAME_DIE);
-        }
-
-        if(IsStatus(StatusType.Normal))
-        {
-            if (IsStanding)
-            {
-                ChangeAnim(Const.ANIM_NAME_IDLE);
-            } 
-            else
-            {
-                ChangeAnim(Const.ANIM_NAME_RUN);
-            }
-        }
-
-        if (IsStatus(StatusType.Attacking))
-        {
-            ChangeAnim(Const.ANIM_NAME_ATTACK);
-            if (curTargetChar)
-            {
-                LookAtTarget(curTargetChar.TF.position);
-            }
-        }
+        targetPos.y = TF.position.y;
+        TF.LookAt(targetPos);
     }
 
     protected void ToggleAtkRangeTF(bool value)
@@ -429,29 +363,9 @@ public class Character : GameUnit
 
     public void ToggleWeapon(bool value)
     {
-        if(weaponHolder)
+        if (WeaponHolder)
         {
-            weaponHolder.gameObject.SetActive(value);
-        }
-    }
-
-    protected virtual void OnTriggerEnter(Collider other)
-    {
-        Character character = Cache.GetChar(other);
-        if (character)
-        {
-            if(!character.IsStatus(StatusType.Dead))
-            {
-                targetsInRange.Add(character);
-            }
-        }
-        
-        Bullet bullet = Cache.GetBullet(other);
-        if(bullet && this != bullet.WeaponHolder.Owner && !bullet.IsDropped && !IsStatus(StatusType.Dead))
-        {
-            bullet.WeaponHolder.Owner.ProcessOnTargetKilled(this);
-            EnemyManager.Instance.SetRecordHighestPoint(bullet.WeaponHolder.Owner.CombatPoint);
-            OnDead();
+            WeaponHolder.gameObject.SetActive(value);
         }
     }
 
@@ -459,24 +373,16 @@ public class Character : GameUnit
     {
         RemoveTargetInRange(opponent);
         CheckToScaleSizeUp(opponent.CombatPoint);
-        if (indicator)
+        if (Indicator)
         {
-            indicator.UpdateCombatPoint(CombatPoint);
+            Indicator.UpdateCombatPoint(CombatPoint);
         }
     }
+    #endregion
 
-    public void OnTriggerExit(Collider other)
-    {
-        Character character = Cache.GetChar(other);
-        if (character)
-        {
-            RemoveTargetInRange(character);
-        }
-    }
-
+    #region Scale
     public void CheckToScaleSizeUp(int opponentCombatPoint)
     {
-        bool onPointToScale = false;
         int oldCombatPoint = CombatPoint;
         int gainnedPoint = GetCombatPointInReturn(opponentCombatPoint);
         ShowCombatPointGainned(gainnedPoint);
@@ -486,21 +392,16 @@ public class Character : GameUnit
         {
             if (oldCombatPoint < upSizeThresholds[i] && CombatPoint >= upSizeThresholds[i])
             {
-                onPointToScale = true;
-                break;
+                ProcessScaleSizeUp();
+                return;
             }
-        }
-
-        if (onPointToScale)
-        {
-            ProcessScaleSizeUp();
         }
     }
 
     protected void ProcessScaleSizeUp(bool vfxOn = true)
     {
-        curSize += Const.CHARACTER_UPSCALE_UNIT;
-        TF.localScale = Vector3.one * curSize;
+        CurSize += Const.CHARACTER_UPSCALE_UNIT;
+        TF.localScale = Vector3.one * CurSize;
         TF.position += Vector3.up * Const.CHARACTER_UPSCALE_UNIT;
         if (vfxOn)
         {
@@ -521,7 +422,7 @@ public class Character : GameUnit
         int returnPoint = upSizeThresholds.Length + 1;
         for (int i = 0; i < upSizeThresholds.Length; i++)
         {
-            if(point <= upSizeThresholds[i])
+            if (point <= upSizeThresholds[i])
             {
                 returnPoint = i + 1;
                 break;
@@ -529,15 +430,107 @@ public class Character : GameUnit
         }
         return returnPoint;
     }
+    #endregion
 
+    public void ChangeAnim(string animName)
+    {
+        if (curAnim != animName)
+        {
+            animator.ResetTrigger(curAnim);
+            curAnim = animName;
+            animator.SetTrigger(animName);
+        }
+    }
+
+    protected void ChangeStatus(StatusType type)
+    {
+        if (curStatus == StatusType.Dead)
+        {
+            return;
+        }
+
+        if (curStatus != type)
+        {
+            curStatus = type;
+        }
+    }
+
+    //TODO: optimize other structure
+    protected virtual void UpdateAnimation()
+    {
+        if (IsStatus(StatusType.Dead))
+        {
+            ChangeAnim(Const.ANIM_NAME_DIE);
+        }
+
+        if (IsStatus(StatusType.Normal))
+        {
+            if (IsStanding)
+            {
+                ChangeAnim(Const.ANIM_NAME_IDLE);
+            }
+            else
+            {
+                ChangeAnim(Const.ANIM_NAME_RUN);
+            }
+        }
+
+        if (IsStatus(StatusType.Attacking))
+        {
+            ChangeAnim(Const.ANIM_NAME_ATTACK);
+            if (curTargetChar)
+            {
+                LookAtTarget(curTargetChar.TF.position);
+            }
+        }
+    }
+
+    public virtual void OnDead()
+    {
+        Invoke(nameof(OnDespawn), 2f);
+        ChangeStatus(StatusType.Dead);
+        ChangeColorDeath(ColorType);
+        ToggleTargetIndicator(false);
+        StopMoving();
+        bulletPartical.Play();
+        Indicator = null;
+        GameManager.Instance.UpdateAliveNumText();
+    }
+
+    protected virtual void OnTriggerEnter(Collider other)
+    {
+        Character character = Cache.GetChar(other);
+        if (character)
+        {
+            if (!character.IsStatus(StatusType.Dead))
+            {
+                //TODO: move to other manager
+                targetsInRange.Add(character);
+            }
+        }
+    }
+
+    public void OnTriggerExit(Collider other)
+    {
+        Character character = Cache.GetChar(other);
+        if (character)
+        {
+            RemoveTargetInRange(character);
+        }
+    }
+
+    #region empty virtual methods
     protected virtual void ShowCombatPointGainned(int point)
     {
     }
     public virtual void ToggleTargetIndicator(bool value)
     {
     }
-
     public virtual void StopMoving()
     {
     }
+    public virtual void OnDespawn()
+    {
+    }
+    #endregion
 }

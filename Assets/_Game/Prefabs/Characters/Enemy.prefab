@@ -603,7 +603,7 @@ MonoBehaviour:
   animator: {fileID: 4276091169662017440}
   baseMoveSpeed: 0
   charRenderer: {fileID: 6886439637682730261}
-  weaponHolder: {fileID: 5579794950706686892}
+  <WeaponHolder>k__BackingField: {fileID: 5579794950706686892}
   headHolder: {fileID: 2394434733343807741}
   shieldHolder: {fileID: 9087372272980061012}
   pantsHolder: {fileID: 6963492565293870512}
@@ -613,6 +613,7 @@ MonoBehaviour:
   baseAtkRange: 4
   baseAtkSpeed: 8
   targetIndicatorImage: {fileID: 2616514746662846724}
+  <Indicator>k__BackingField: {fileID: 0}
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
   colorDataSO: {fileID: 11400000, guid: 9e84c9a472450ba47b7affb38dd01b89, type: 2}
   bulletPartical: {fileID: 1533911038709997858}
@@ -792,7 +793,7 @@ GameObject:
   - component: {fileID: 3150451454818254942}
   - component: {fileID: 5579794950706686892}
   m_Layer: 0
-  m_Name: Weapon
+  m_Name: WeaponHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -825,7 +826,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b87f7daeccf4e7242afdf1ac7fce8b77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 4193671266626322596, guid: d3c7e1734abb5d946b58b2ba1370111d, type: 3}
   TF: {fileID: 3150451454818254942}
 --- !u!1 &6824990854110809392
 GameObject:
@@ -1051,7 +1051,7 @@ GameObject:
   - component: {fileID: 9087372272980061012}
   - component: {fileID: 137062376570194842}
   m_Layer: 0
-  m_Name: Shield
+  m_Name: ShieldHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

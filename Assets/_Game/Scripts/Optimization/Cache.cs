@@ -6,6 +6,7 @@ public static class Cache
 {
     private static Dictionary<Collider, Character> bridgeChars = new Dictionary<Collider, Character>();
     private static Dictionary<Collider, Bullet> bridgeBullets = new Dictionary<Collider, Bullet>();
+    private static Dictionary<float, WaitForSeconds> wait = new Dictionary<float, WaitForSeconds>();
 
     public static Character GetChar(Collider collider)
     {

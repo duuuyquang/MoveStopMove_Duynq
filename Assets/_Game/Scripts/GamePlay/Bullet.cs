@@ -1,5 +1,5 @@
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
+using UnityEngine.TextCore.Text;
 
 public class Bullet : GameUnit
 {
@@ -50,6 +50,7 @@ public class Bullet : GameUnit
 
     private void InitStats()
     {
+        // Weapon send info on shoot
         speed = weaponHolder.Owner.BaseAttackSpeed + weaponHolder.CurWeapon.BonusSpeed;
         spinSpeed = weaponHolder.CurWeapon.SpinSpeed;
         rotateAxis = weaponHolder.CurWeapon.RotateAxis;
@@ -173,6 +174,7 @@ public class Bullet : GameUnit
         targetPos = pos;
     }
 
+    //TODO: tach code
     private void OnTriggerEnter(Collider other)
     {
         Character character = Cache.GetChar(other);
@@ -181,13 +183,30 @@ public class Bullet : GameUnit
             return;
         }
 
+        if(character && !character.IsStatus(StatusType.Dead) && !IsDropped)
+        {
+            OnHitOpponent(character);
+        }
+
         if (isGrab)
         {
-            StopMoving();
-            SetTargetPos(TF.position);
+            SetStayAtCurPos();
             return;
         }
 
         OnDespawn();
+    }
+
+    private void OnHitOpponent(Character opponent)
+    {
+        WeaponHolder.Owner.ProcessOnTargetKilled(opponent);
+        EnemyManager.Instance.SetRecordHighestPoint(WeaponHolder.Owner.CombatPoint);
+        opponent.OnDead();
+    }
+
+    private void SetStayAtCurPos()
+    {
+        StopMoving();
+        SetTargetPos(TF.position);
     }
 }

@@ -19,6 +19,9 @@ public class Indicator : GameUnit
 
     public ColorDataSO colorDataSO;
 
+    private float restrictedX;
+    private float restrictedY;
+
     private void LateUpdate()
     {
         if(targetChar)
@@ -39,8 +42,8 @@ public class Indicator : GameUnit
 
                 Vector3 playerPos = CameraFollower.Instance.Camera.WorldToScreenPoint(LevelManager.Instance.Player.TF.position);
                 Vector3 charPosOutScreen = playerPos + (CameraFollower.Instance.Camera.WorldToScreenPoint(targetChar.TF.position) - playerPos);
-                float restrictedX = Mathf.Max(0 + offsetScreen, Mathf.Min(Screen.width - offsetScreen, charPosOutScreen.x));
-                float restrictedY = Mathf.Max(0 + offsetScreen * 1.1f, Mathf.Min(Screen.height - offsetScreen * 1.1f, charPosOutScreen.y));
+                restrictedX = Mathf.Max(0 + offsetScreen, Mathf.Min(Screen.width - offsetScreen, charPosOutScreen.x));
+                restrictedY = Mathf.Max(0 + offsetScreen * 1.1f, Mathf.Min(Screen.height - offsetScreen * 1.1f, charPosOutScreen.y));
                 charPosOutScreen = new Vector3(restrictedX, restrictedY, 0f);
                 TF.position = charPosOutScreen;
 

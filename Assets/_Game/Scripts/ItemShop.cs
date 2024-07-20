@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ItemShop : MonoBehaviour
+public class ItemShop : GameUnit
 {
     [SerializeField] Transform equippedTag;
     [SerializeField] Transform lockTag;
@@ -14,7 +12,6 @@ public class ItemShop : MonoBehaviour
     private Item item;
     public Item Item => item;
 
-    public Transform TF;
     public RectTransform RectTF;
 
     public void OnInit(Item item)

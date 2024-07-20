@@ -1,3 +1,4 @@
+using OpenCover.Framework.Model;
 using TMPro;
 using UnityEngine;
 
@@ -5,6 +6,16 @@ public class CanvasMainMenu : UICanvas
 {
     [SerializeField] private TextMeshProUGUI coinText;
     [SerializeField] private TMP_InputField nameInputField;
+
+    public void OnOpen()
+    {
+        GameManager.ChangeState(GameState.MainMenu);
+        SetCoinText(GameManager.Instance.TotalCoin);
+        LevelManager.Instance.Player.SetMainMenuPose();
+        LevelManager.Instance.Player.ChangeToSavedItems();
+        LevelManager.Instance.Player.ChangeToSavedWeapon();
+        CameraFollower.Instance.SetupMenuMode();
+    }
 
     public void PlayButton()
     {
@@ -30,8 +41,7 @@ public class CanvasMainMenu : UICanvas
         if (CameraFollower.Instance.IsState(CameraState.Normal))
         {
             Close(0);
-            UIManager.Instance.GetUI<CanvasWeaponShop>().SetCoin(GameManager.Instance.TotalCoin);
-            UIManager.Instance.OpenUI<CanvasWeaponShop>().DisplayData((int)LevelManager.Instance.Player.WeaponType);
+            UIManager.Instance.OpenUI<CanvasWeaponShop>().OnOpen();
             CameraFollower.Instance.SetupWeaponShopMode();
         }
     }
@@ -41,25 +51,20 @@ public class CanvasMainMenu : UICanvas
         if (CameraFollower.Instance.IsState(CameraState.Normal))
         {
             Close(0);
-            UIManager.Instance.GetUI<CanvasSkinShop>().CachedPlayerItems();
-            UIManager.Instance.OpenUI<CanvasSkinShop>().SetCoin(GameManager.Instance.TotalCoin);
-            GameManager.ChangeState(GameState.SkinShop);
-            CameraFollower.Instance.SetupSkinShopMode();
+            UIManager.Instance.OpenUI<CanvasSkinShop>().OnOpen();
         }
     }
 
-    public void SetCoin(float coin)
+    public void SetCoinText(float coin)
     {
         coinText.text = coin.ToString();
     }
 
-    public void SetName(string text)
+    public void SetNameText(string text)
     {
         nameInputField.text = text;
-    }
-
-    public void UpdatePlayerName()
-    {
-        LevelManager.Instance.Player.Name = nameInputField.text;
+        LevelManager.Instance.Player.Name = text;
+        PlayerData.Instance.name = text;
+        PlayerData.SaveData();
     }
 }

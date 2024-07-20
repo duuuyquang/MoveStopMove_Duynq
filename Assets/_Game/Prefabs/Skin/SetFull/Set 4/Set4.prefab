@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5681364026492554570
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6259664883106562447}
+  - component: {fileID: 5943199309636251688}
+  m_Layer: 0
+  m_Name: Set4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6259664883106562447
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5681364026492554570}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5943199309636251688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5681364026492554570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 339fb452ce69a9841b21387bcb10311d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 1004
+  bonusAttackRange: 12
+  bonusMoveSpeed: 0
+  bonusGold: 0
+  sprite: {fileID: 21300000, guid: a7f39cee8d8f70e4ea84a66b2e257ab1, type: 3}
+  price: 5000
+  isItemInSet: 0
+  isSetItem: 1
+  headItem: {fileID: 1223070570188495022, guid: 849162f594f25ad46beda67baf30af84, type: 3}
+  shieldItem: {fileID: 1223070570188495022, guid: 849162f594f25ad46beda67baf30af84, type: 3}
+  pantsItem: {fileID: 5373358150638024990, guid: 63741c27413a8784790abacc6cf50d3c, type: 3}
+  wingItem: {fileID: 7315547317011326625, guid: 11880620fd83ae243bf6b09f93a5e6e9, type: 3}
+  tailItem: {fileID: 1223070570188495022, guid: 849162f594f25ad46beda67baf30af84, type: 3}
+  charColorType: 5

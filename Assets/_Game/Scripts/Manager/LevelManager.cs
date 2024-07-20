@@ -12,7 +12,6 @@ public class LevelManager : Singleton<LevelManager>
     public int initLevel;
 
     private Level curLevel;
-
     public Level CurLevel => curLevel;
     public Player Player => player;
 
@@ -48,6 +47,10 @@ public class LevelManager : Singleton<LevelManager>
             Destroy(player.gameObject);
         }
         player = Instantiate(playerPrefab);
+
+        //if (player == null) {
+        //    player = Instantiate(playerPrefab);
+        //}
         player.OnInit();
     }
 

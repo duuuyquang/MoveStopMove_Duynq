@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using UnityEngine;
 
 public static class CSVReader
 {
@@ -33,11 +29,5 @@ public static class CSVReader
             }
             datas.Add(temp);
         }
-    }
-
-    public static List<Dictionary<string, string>> GetData(string fileName)
-    {
-        Read(fileName);
-        return datas;
     }
 }

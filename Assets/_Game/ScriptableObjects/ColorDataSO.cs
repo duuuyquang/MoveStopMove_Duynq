@@ -1,4 +1,3 @@
-using Palmmedia.ReportGenerator.Core.Reporting.Builders;
 using UnityEngine;
 
 public enum ColorType
@@ -8,11 +7,13 @@ public enum ColorType
     Blue    = 2,
     Green   = 3,
     Red     = 4,
-    Yellow  = 5,
-    Purpil  = 6,
-    Pink    = 7,
-    Orange  = 8,
-    Grey    = 9
+    DarkRed = 5,
+    Yellow  = 6,
+    Purpil  = 7,
+    Pink    = 8,
+    Orange  = 9,
+    Grey    = 10,
+    Skin    = 11,
 }
 
 [CreateAssetMenu(menuName = "ColorDataSO")]

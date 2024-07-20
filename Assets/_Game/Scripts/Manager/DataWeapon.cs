@@ -6,7 +6,7 @@ public static class DataWeapon
 
     public static void Init()
     {
-        datas = CSVReader.GetData("Weapons");
+        //datas = CSVReader.GetData("Weapons");
     }
 
     public static List<Dictionary<string, string>> FetchAll()

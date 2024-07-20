@@ -784,6 +784,7 @@ RectTransform:
   m_Children:
   - {fileID: 412021144}
   - {fileID: 317089507}
+  - {fileID: 1809055202}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -932,7 +933,6 @@ Transform:
   - {fileID: 1361676124}
   - {fileID: 524766079}
   - {fileID: 1191001643}
-  - {fileID: 1743857696}
   - {fileID: 816518209}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -993,10 +993,13 @@ MonoBehaviour:
   - prefab: {fileID: 1901153082581738841, guid: 5c85e598d7fa4f94c805650550805e90, type: 3}
     parent: {fileID: 561257993}
     amount: 0
+  - prefab: {fileID: -2290940726283474919, guid: fcb016b704d59f74d9d11922c4f27367, type: 3}
+    parent: {fileID: 1809055202}
+    amount: 0
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
   eachWeaponPoolingNum: 0
   weaponPoolTF: {fileID: 236538152}
---- !u!1 &1743857695
+--- !u!1 &1809055201
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1004,42 +1007,29 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1743857696}
-  - component: {fileID: 1743857697}
+  - component: {fileID: 1809055202}
   m_Layer: 0
-  m_Name: DataManager
+  m_Name: ItemShopPool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1743857696
+--- !u!4 &1809055202
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1743857695}
+  m_GameObject: {fileID: 1809055201}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.024791, y: -2.4503403, z: -0.5812863}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1464752705}
+  m_Father: {fileID: 1104322087}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1743857697
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1743857695}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d91ac025283bc0249ae21d3933ea272a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

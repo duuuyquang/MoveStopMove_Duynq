@@ -4,35 +4,18 @@ using UnityEngine;
 
 public class Player : Character
 {
-    //[SerializeField] CombatPointText combatPointTextPrefab;
-
     [SerializeField] ParticleSystem winPartical;
     [SerializeField] ParticleSystem losePartical;
 
-    private Dictionary<WeaponType, int> ownedWeaponTypes = new Dictionary<WeaponType, int>();
-
-    private Dictionary<ItemType, int> ownedItemTypes = new Dictionary<ItemType, int>();
-
-    private ParticleSystem curFinishPartical = null;
+    private ParticleSystem curFinishPartical;
 
     protected override void Update()
     {
         base.Update();
-        if (GameManager.IsState(GameState.GamePlay) && !IsStatus(StatusType.Dead))
+        if (GameManager.IsState(GameState.GamePlay))
         {
             ListenControllerInput();
-            UpdateAttackStatus();
-        }
-
-        if (GameManager.IsState(GameState.Finish) && IsStatus(StatusType.Normal))
-        {
-            ChangeStatus(StatusType.Win);
-            OnWin();
-        }
-
-        if(GameManager.IsState(GameState.SkinShop))
-        {
-            SetSkinShopPose();
+            CheckToProcessAttack();
         }
     }
 
@@ -46,17 +29,40 @@ public class Player : Character
 
     public override void OnInit()
     {
-        UpdateOwnedWeapon(WeaponType.Axe);
-        weaponType = WeaponType.Axe;
         base.OnInit();
-        ChangeWeapon(weaponType);
-        ChangeHead(ItemType.None);
-        ChangePants(ItemType.None);
-        ChangeShield(ItemType.None);
-        ChangeSet(ItemType.None);
-        ChangeColor(ColorType.Yellow);
         PlayerController.Instance.OnInit();
         InitTransform();
+
+        CombatPoint = 0;
+        SetupSizeByInitCombatPoint(CombatPoint);
+
+        InitSavedData();
+        LoadSavedDataToPlayer();
+    }
+
+    private void InitSavedData()
+    {
+        PlayerData.GetData();
+
+        if(PlayerData.Instance.weaponsState.Count == 0)
+        {
+            PlayerData.Instance.weaponsState = itemDataSO.InitAllWeaponsState();
+            PlayerData.SaveData();
+        }
+
+        if (PlayerData.Instance.itemsState.Count == 0)
+        {
+            PlayerData.Instance.itemsState = itemDataSO.InitAllItemsState();
+            PlayerData.SaveData();
+        }
+    }
+
+    private void LoadSavedDataToPlayer()
+    {
+        Name = PlayerData.Instance.name;
+        ChangeColor(PlayerData.Instance.colorType);
+        ChangeWeapon(PlayerData.Instance.weaponType);
+        ChangeToSavedItems();
     }
 
     public void InitTransform()
@@ -84,17 +90,20 @@ public class Player : Character
         }
     }
 
-    protected override void InitBasicStats()
+    private void StopFinishPartical()
     {
-        base.InitBasicStats();
-        Name = "AbcXz";
-        CombatPoint = 0;
+        if(curFinishPartical)
+        {
+            curFinishPartical.Stop();
+            curFinishPartical.gameObject.SetActive(false);
+        }
     }
 
     public override void OnDespawn()
     {
+        base.OnDespawn();
         GameManager.ChangeState(GameState.Finish);
-        UIManager.Instance.OpenUI<CanvasLose>();
+        GameManager.Instance.OnLose();
     }
 
     public void OnPlay()
@@ -111,7 +120,7 @@ public class Player : Character
         SetFinishPartical(winPartical, 0.5f);
     }
 
-    protected override void OnDead()
+    public override void OnDead()
     {
         base.OnDead();
         SetFinishPartical(losePartical, 0.5f);
@@ -153,25 +162,12 @@ public class Player : Character
 
     private void ProcessMoving()
     {
-        Debug.Log(MoveSpeed);
         rb.velocity = PlayerController.Instance.CurDir * MoveSpeed * Time.fixedDeltaTime;
     }
 
     private void ListenControllerInput()
     {
         PlayerController.Instance.SetCurDirection();
-    }
-
-    private void UpdateAttackStatus()
-    {
-        if (IsStanding)
-        {
-            CheckAndProcessAttack();
-        }
-        else
-        {
-            StopAttack();
-        }
     }
 
     public override void StopMoving()
@@ -181,11 +177,12 @@ public class Player : Character
         PlayerController.Instance.CurDir = Vector3.zero;
     }
 
+    private Vector3 OffsetAbovePlayerPos => CameraFollower.Instance.Camera.WorldToScreenPoint(TF.position) + Vector3.up * 200f;
+
     protected override void ShowCombatPointGainned(int point)
     {
-        //CombatPointText prefab = Instantiate(combatPointTextPrefab, UIManager.Instance.GetUI<CanvasGamePlay>().transform);
         CombatPointText pointText = SimplePool.Spawn<CombatPointText>(PoolType.PointText, Vector3.zero, Quaternion.identity);
-        pointText.TF.position = CameraFollower.Instance.Camera.WorldToScreenPoint(TF.position) + Vector3.up * 200f;
+        pointText.TF.position = OffsetAbovePlayerPos;
         pointText.SetPoint(point, Const.COMBAT_POINT_DEFAULT_SIZE * CurSize);
     }
 
@@ -193,47 +190,45 @@ public class Player : Character
     {
         base.ProcessOnTargetKilled(opponent);
         float gainnedCoin = 1 + (float)opponent.CombatPoint / 3;
-        //Debug.Log(gainnedCoin);
-        //Debug.Log("Bonus from shield: " + gainnedCoin * curShield.BonusGold * 0.01f);
-        gainnedCoin += gainnedCoin * curShield.BonusGold * 0.01f;
-        gainnedCoin = Mathf.Ceil(gainnedCoin - 0.5f); // round up if greater or equal x.5f
+        gainnedCoin += gainnedCoin * BonusGoldMultiplier * 0.01f;
+        gainnedCoin = Mathf.Ceil(gainnedCoin - 0.49f); // round up if greater or equal x.5f
         GameManager.Instance.UpdateTotalCoin(gainnedCoin);
     }
 
-    public void ChangeWeaponHolderMesh(WeaponType type)
-    {
-        WeaponHolder.ChangeWeapon(type);
-    }
-
-    public bool IsOwnedWeapon(WeaponType type) => ownedWeaponTypes.ContainsKey(type);
-    public bool IsOwnedItem(ItemType type) => ownedItemTypes.ContainsKey(type);
-
-    public void UpdateOwnedWeapon(WeaponType type)
-    {
-        if (!IsOwnedWeapon(type))
-        {
-            // TODO: add owned skin later
-            ownedWeaponTypes[type] = 1;
-        }
-    }
-
-    public void AddOwnedItem(ItemType type)
-    {
-        if (!IsOwnedItem(type))
-        {
-            // TODO: add owned skin later
-            ownedItemTypes[type] = 1;
-        }
-    }
-
-    private void RotateAround()
+    public void RotateAround()
     {
         TF.Rotate(Vector3.up, 60f * Time.deltaTime);
     }
 
-    public void SetSkinShopPose()
+    public void SetMainMenuPose()
     {
-        RotateAround();
-        LevelManager.Instance.Player.ChangeAnim(Const.ANIM_NAME_SHOP);
+        InitTransform();
+        ChangeAnim(Const.ANIM_NAME_IDLE);
+    }
+
+    public void ChangeToSavedItems()
+    {
+        ChangeSet(ItemType.None);
+        if (PlayerData.Instance.setType != ItemType.None) {
+            ChangeSet(PlayerData.Instance.setType);
+        }
+        else
+        {
+            ChangeHead(PlayerData.Instance.headType);
+            ChangePants(PlayerData.Instance.pantsType);
+            ChangeShield(PlayerData.Instance.shieldType);
+            ChangeColor(PlayerData.Instance.colorType);
+        }
+    }
+
+    public void ChangeToSavedWeapon()
+    {
+        ChangeWeapon(PlayerData.Instance.weaponType);
+    }
+
+    protected override void UpdateBonusStatsFromItem(Item item)
+    {
+        base.UpdateBonusStatsFromItem(item);
+        bonusMoveSpeed = baseMoveSpeed * item.BonusMoveSpeed * 0.01f;
     }
 }

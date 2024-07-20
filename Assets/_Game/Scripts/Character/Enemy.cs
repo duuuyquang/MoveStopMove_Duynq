@@ -8,8 +8,6 @@ public class Enemy : Character
 {
     [SerializeField] NavMeshAgent agent;
 
-    private List<string> nameList = new List<string>() {"Dazzle","Crystal","Lina","Clink","Axe","Phantom","Sniper","TrollWarlord","BrewMaster","Hoodwink","Winranger","Traxex","Enchantress","Luna"};
-
     private IState curState;
 
     private Vector3 curDestination;
@@ -17,7 +15,7 @@ public class Enemy : Character
     private NavMeshHit hit;
     public override bool IsStanding => Vector3.Distance(agent.velocity, Vector3.zero) < 0.1f;
 
-    //public bool IsDestination => Vector3.Distance(curDestination, TF.position + (TF.position.y - curDestination.y) * Vector3.up ) < 0.3f;
+    //public bool IsDestination => Vector3.Distance(curDestination, TF.position + (TF.position.y - curDestination.y) * Vector3.up ) < 0.1f;
     public bool IsDestination => agent.remainingDistance <= 0.1f;
 
     protected override void Update()
@@ -35,35 +33,27 @@ public class Enemy : Character
     public override void OnInit()
     {
         base.OnInit();
-        ChangeWeapon((WeaponType)Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length));
-        ChangeHead((ItemType)Random.Range(0, 11));
-        ChangePants((ItemType)Random.Range(100, 110));
-        ChangeShield((ItemType)Random.Range(200, 203));
-        ChangeSet(ItemType.None);
-        ChangeColor((ColorType)Random.Range(1, Enum.GetNames(typeof(ColorType)).Length));
+        GenerateRandomData();
+
         SetState(new IdleState());
-        ChangeTargetIndicatorColor(ColorType);
         ToggleTargetIndicator(false);
-        TF.eulerAngles = new Vector3(0, Random.Range(-180f, 181f), 0);
     }
 
-    public override void ChangePants(ItemType type)
+    private void GenerateRandomData()
     {
-        base.ChangePants(type);
-        agent.speed += agent.speed * curPants.BonusMoveSpeed * 0.01f;
-    }
-
-    private void ChangeTargetIndicatorColor(ColorType type)
-    {
-        //targetIndicatorImage.color = colorDataSO.GetColor(type);
-        targetIndicatorImage.color = Color.black;
-    }
-
-    protected override void InitBasicStats()
-    {
-        base.InitBasicStats();
+        Name = Ultilities.GetRandomName(Const.ENEMY_NAME_LIST);
         CombatPoint = Random.Range(0, EnemyManager.Instance.RecordHighestPoint + 1);
-        Name = GetRandomName();
+        SetupSizeByInitCombatPoint(CombatPoint);
+
+        ChangeWeapon((WeaponType)Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length));
+        ChangeHead((ItemType)Random.Range(0, 14));
+        ChangePants((ItemType)Random.Range(100, 114));
+        ChangeShield((ItemType)Random.Range(200, 205));
+        ChangeColor((ColorType)Random.Range(1, Enum.GetNames(typeof(ColorType)).Length));
+
+        //ChangeSet(ItemType.None);
+
+        TF.eulerAngles = new Vector3(0, Random.Range(-180f, 181f), 0);
     }
 
     protected override void SetAttackRangeTF(float atkRange)
@@ -72,24 +62,16 @@ public class Enemy : Character
         atkRangeTF.gameObject.SetActive(true);
     }
 
-    private string GetRandomName()
-    {
-        return nameList[Random.Range(0, nameList.Count)];
-    }
-
     public override void OnDespawn()
     {
-        Name = "";
+        base.OnDespawn();
         curTargetChar = null;
         EnemyManager.Instance.Despawn(this);
-        //base.OnDespawn();
     }
 
     public void SetRandomDestination(float distance)
     {
-        float randomX = Random.Range(-distance, distance);
-        float randomZ = Random.Range(-distance, distance);
-        SetDestination(TF.position + new Vector3(randomX, 0, randomZ));
+        SetDestination(TF.position + new Vector3(Random.Range(-distance, distance), 0, Random.Range(-distance, distance)));
     }
 
     public void SetDestination(Vector3 destination)
@@ -103,14 +85,17 @@ public class Enemy : Character
 
     public void SetState(IState state)
     {
-        if(curState != state)
-        {
-            if (curState != null) {
-                curState.OnExit(this);
-            }
-            curState = state;
-            curState.OnEnter(this);
-        }
+        //if(curState != state)
+        //{
+        //    if (curState != null) {
+        //        curState.OnExit(this);
+        //    }
+        //    curState = state;
+        //    curState.OnEnter(this);
+        //}
+        curState?.OnExit(this);
+        curState = state;
+        curState?.OnEnter(this);
     }
 
     public override void StopMoving()
@@ -125,5 +110,11 @@ public class Enemy : Character
     public override void ToggleTargetIndicator(bool value)
     {
         targetIndicatorImage.enabled = value;
+    }
+
+    protected override void UpdateBonusStatsFromItem(Item item)
+    {
+        base.UpdateBonusStatsFromItem(item);
+        agent.speed += agent.speed * item.BonusMoveSpeed * 0.01f;
     }
 }

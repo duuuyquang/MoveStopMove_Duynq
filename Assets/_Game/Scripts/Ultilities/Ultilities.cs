@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class Ultilities
@@ -20,5 +21,10 @@ public static class Ultilities
     public static void SetRectTFBottom(RectTransform rt, float bottom)
     {
         rt.offsetMin = new Vector2(rt.offsetMin.x, bottom);
+    }
+
+    public static string GetRandomName(List<string> nameList)
+    {
+        return nameList[Random.Range(0, nameList.Count)];
     }
 }

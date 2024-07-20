@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : Singleton<PlayerController>
@@ -36,7 +34,10 @@ public class PlayerController : Singleton<PlayerController>
             if (Vector3.Distance(mouseStartPoint, mouseEndPoint) >= START_MOVING_DISTANCE_UNIT)
             {
                 curDir = mouseEndPoint - mouseStartPoint;
-                curDir = new Vector3(curDir.x, 0, curDir.y).normalized;
+                curDir.z = curDir.y;
+                curDir.y = 0;
+
+                curDir = curDir.normalized;
             }
         }
 

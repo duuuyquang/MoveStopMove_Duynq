@@ -35,20 +35,14 @@ public class WeaponHolder : MonoBehaviour
         if(curWeapon != null)
         {
             Destroy(curWeapon.gameObject);
-            //curHoldingWeapon.TF.SetParent(PoolControl.Instance.WeaponPoolTF);
-            //WeaponPool.Despawn(curHoldingWeapon);
         }
 
         curWeapon = Instantiate(owner.itemDataSO.GetWeapon(type), TF);
         curWeapon.gameObject.SetActive(true);
-        //curHoldingWeapon = WeaponPool.Spawn<Weapon>(curType, TF.position, Quaternion.identity);
-        //curHoldingWeapon.TF.SetParent(TF, false);
-        //curHoldingWeapon.OnInit();
     }
 
     public void OnShoot(Vector3 targetPos)
     {
-        //curBullet = Instantiate(bulletPrefab, TF.position, Quaternion.identity);
         curBullet = SimplePool.Spawn<Bullet>(PoolType.Bullet, TF.position, Quaternion.identity);
         curBullet.OnInit(this, targetPos);
         bulletCharge--;

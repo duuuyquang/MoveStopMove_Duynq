@@ -18,7 +18,7 @@ public class AttackState : IState
         {
             if(!isAttacked)
             {
-                enemy.CheckAndProcessAttack();
+                enemy.CheckToProcessAttack();
                 isAttacked = true;
             }
 

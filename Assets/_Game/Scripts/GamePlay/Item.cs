@@ -9,7 +9,7 @@ public class Item : MonoBehaviour
     [SerializeField] ItemType type;
 
     [Header("Stats")]
-    [SerializeField] float bonusAttackRange = 0;
+    [SerializeField] float bonusAttackRange = 0f;
     [SerializeField] float bonusMoveSpeed = 0f;
     [SerializeField] float bonusGold = 0f;
 
@@ -51,7 +51,12 @@ public class Item : MonoBehaviour
 
     public void Start()
     {
-        if(isItemInSet)
+        CheckItemInSet();
+    }
+
+    private void CheckItemInSet()
+    {
+        if (isItemInSet)
         {
             bonusAttackRange = 0;
             bonusMoveSpeed = 0;

@@ -70,8 +70,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 4c2ce05856cd94f96bda820d2353988c, type: 3}
-  m_Type: 1
-  m_PreserveAspect: 0
+  m_Type: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -103,11 +103,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb4579f47f204f418db3499f7431839, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PoolType: 4
   equippedTag: {fileID: 7704992606726287250}
   lockTag: {fileID: 3076722207327311152}
   image: {fileID: 8988803142604714291}
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
-  TF: {fileID: 713800163428919492}
   RectTF: {fileID: 713800163428919492}
 --- !u!1 &4583291747904479901
 GameObject:

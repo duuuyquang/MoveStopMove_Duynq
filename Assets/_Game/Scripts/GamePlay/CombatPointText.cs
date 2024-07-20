@@ -7,13 +7,14 @@ public class CombatPointText : GameUnit
     [SerializeField] float speed;
 
     private float count = 0f;
+    private const float DELAY_TIME = 3f;
 
     // Update is called once per frame
     void Update()
     {
         count += Time.deltaTime;
 
-        if(count >= 3f)
+        if(count >= DELAY_TIME)
         {
             OnDespawn();
         }

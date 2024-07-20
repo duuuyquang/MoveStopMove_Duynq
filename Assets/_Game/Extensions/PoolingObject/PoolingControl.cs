@@ -38,7 +38,8 @@ public enum PoolType
     Bullet      = 0,
     Indicator   = 1,
     PointText   = 2,
-    Enemy       = 3
+    Enemy       = 3,
+    ItemShop    = 4
 }
 
 [System.Serializable]

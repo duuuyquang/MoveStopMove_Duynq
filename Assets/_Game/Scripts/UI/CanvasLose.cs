@@ -1,21 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEngine;
-
-public class CanvasLose : UICanvas{
+public class CanvasLose : UICanvas
+{
     public void MainMenuButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoin(GameManager.Instance.TotalCoin);
-        LevelManager.Instance.OnInit(0);
+        UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
+        LevelManager.Instance.OnInit(PlayerData.Instance.curLevel);
     }
 
-    public void RetryButton()
+    //TODO: add revive functionality
+    public void ReviveButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoin(GameManager.Instance.TotalCoin);
-        LevelManager.Instance.OnInit(0);
+        UIManager.Instance.OpenUI<CanvasGamePlay>();
     }
 }

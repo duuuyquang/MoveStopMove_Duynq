@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class IdleState : IState
 {
+    //TODO: move pros to other place
     private float time;
     private float count;
 

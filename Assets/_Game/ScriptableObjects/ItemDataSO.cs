@@ -1,5 +1,8 @@
-using System.Linq;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+
+public enum ItemState { Bought, InShop }
 
 public enum WeaponType
 {
@@ -18,41 +21,6 @@ public enum WeaponType
     PoleAxe     = 12,
 }
 
-//public enum HeadType
-//{
-//    None        = 0,
-//    Arrow       = 1,
-//    Beared      = 2,
-//    Crown       = 3,
-//    Ear         = 4,
-//    NormalHat   = 5,
-//    Cap         = 6,
-//    Yellow      = 7,
-//    Headphone   = 8,
-//    Horn        = 9
-//}
-
-//public enum PantsType
-//{
-//    None = 0,
-//    Batman = 1,
-//    ChamBi = 2,
-//    Comy = 3,
-//    Dabao = 4,
-//    Onion = 5,
-//    Pokemon = 6,
-//    Rainbow = 7,
-//    Skull = 9,
-//    Vantim = 10
-//}
-
-//public enum ShieldType
-//{
-//    None = 0,
-//    CaptainAmerican = 1,
-//    Normal = 2,
-//}
-
 public enum ItemType
 {
     None                    = 0,
@@ -66,6 +34,9 @@ public enum ItemType
     Head_Yellow             = 8,
     Head_Headphone          = 9,
     Head_Horn               = 10,
+    Head_Angel              = 11,
+    Head_Witch              = 12,
+    Head_Thor               = 13,
     Pants_Batman            = 101,
     Pants_ChamBi            = 102,
     Pants_Comy              = 103,
@@ -76,16 +47,23 @@ public enum ItemType
     Pants_Skull             = 108,
     Pants_Vantim            = 109,
     Pants_Devil             = 110,
+    Pants_Angel             = 111,
+    Pants_Deadpool          = 112,
+    Pants_Thor              = 113,
     Shield_CaptainAmerican  = 201,
     Shield_Normal           = 202,
+    Shield_BowAngel         = 203,
+    Shield_BookWitch        = 204,
     Wing_Devil              = 301,
+    Wing_Angel              = 302,
+    Wing_BladeDeadpool      = 303,
     Tail_Devil              = 401,
     Set_1                   = 1001,
     Set_2                   = 1002,
     Set_3                   = 1003,
     Set_4                   = 1004,
     Set_5                   = 1005,
-    Set_6                   = 1006    
+    Set_6                   = 1006
 }
 
 [CreateAssetMenu(menuName = "ItemDataSO")]
@@ -151,5 +129,29 @@ public class ItemDataSO : ScriptableObject
         }
 
         return count;
+    }
+
+    public Dictionary<WeaponType, ItemState> InitAllWeaponsState()
+    {
+        Dictionary<WeaponType, ItemState> weaponsState = new();
+
+        foreach(WeaponType type in Enum.GetValues(typeof(WeaponType)))
+        {
+            weaponsState[type] = ItemState.InShop;
+        }
+
+        return weaponsState;
+    }
+
+    public Dictionary<ItemType, ItemState> InitAllItemsState()
+    {
+        Dictionary<ItemType, ItemState> itemsState = new();
+
+        foreach (ItemType type in Enum.GetValues(typeof(ItemType)))
+        {
+            itemsState[type] = ItemState.InShop;
+        }
+
+        return itemsState;
     }
 }

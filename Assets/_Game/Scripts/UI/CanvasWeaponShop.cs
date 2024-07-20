@@ -13,16 +13,17 @@ public class CanvasWeaponShop : UICanvas
     [SerializeField] TextMeshProUGUI[] priceTexts;
 
     private Weapon curWeapon;
-    private int curID = 1;
+    private int curID;
 
     public ItemDataSO itemDataSO;
 
-    public void Start()
+    public void OnOpen()
     {
-        DisplayData(curID);
+        SetCoinText(GameManager.Instance.TotalCoin);
+        DisplayData((int)LevelManager.Instance.Player.WeaponType);
     }
 
-    public void SetCoin(float coin)
+    public void SetCoinText(float coin)
     {
         coinText.text = coin.ToString();
     }
@@ -30,15 +31,12 @@ public class CanvasWeaponShop : UICanvas
     public void MainMenuButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>();
-        LevelManager.Instance.Player.ChangeWeaponHolderMesh(LevelManager.Instance.Player.WeaponType);
-        CameraFollower.Instance.SetupMenuMode();
-
+        UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
     }
 
     public void NextWeapon()
     {
-        curID = Mathf.Min(++curID, itemDataSO.TotalWeapons-1);
+        curID = Mathf.Min( ++curID, itemDataSO.TotalWeapons - 1);
         DisplayData(curID);
     }
 
@@ -53,9 +51,8 @@ public class CanvasWeaponShop : UICanvas
         if(GameManager.Instance.TotalCoin >= curWeapon.Price)
         {
             GameManager.Instance.ReduceTotalCoin(curWeapon.Price);
-            LevelManager.Instance.Player.UpdateOwnedWeapon(curWeapon.WeaponType);
-            UIManager.Instance.GetUI<CanvasMainMenu>().SetCoin(GameManager.Instance.TotalCoin);
-            SetCoin(GameManager.Instance.TotalCoin);
+            UpdateWeaponBought(curWeapon.WeaponType);
+            SetCoinText(GameManager.Instance.TotalCoin);
             DisplayData(curID);
         }
     }
@@ -63,8 +60,11 @@ public class CanvasWeaponShop : UICanvas
     public void Select()
     {
         LevelManager.Instance.Player.ChangeWeapon(curWeapon.WeaponType);
+        PlayerData.Instance.weaponType = curWeapon.WeaponType;
+        PlayerData.SaveData();
+
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>();
+        UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoinText(GameManager.Instance.TotalCoin);
         CameraFollower.Instance.SetupMenuMode();
     }
 
@@ -79,29 +79,37 @@ public class CanvasWeaponShop : UICanvas
             priceTexts[i].text = "";
         }
 
-        LevelManager.Instance.Player.ChangeWeaponHolderMesh((WeaponType)curID);
+        LevelManager.Instance.Player.WeaponHolder.ChangeWeapon((WeaponType)curID);
 
         curWeapon = itemDataSO.GetWeapon((WeaponType)curID);
         weaponName.text = curWeapon.name;
         DisplayStatsText();
-        if (LevelManager.Instance.Player.WeaponType == curWeapon.WeaponType)
+        if (IsHoldingWeapon(curWeapon.WeaponType))
         {
-            buttons[(int)WeaponState.IsEquipped].gameObject.SetActive(true);
+            buttons[3].gameObject.SetActive(true);
         }
-        else if(LevelManager.Instance.Player.IsOwnedWeapon(curWeapon.WeaponType))
+        else if(IsWeaponBought(curWeapon.WeaponType))
         {
-            buttons[(int)WeaponState.IsSelect].gameObject.SetActive(true);
+            buttons[2].gameObject.SetActive(true);
         }
         else if (GameManager.Instance.TotalCoin >= curWeapon.Price)
         {
-            buttons[(int)WeaponState.IsPurchasable].gameObject.SetActive(true);
-            priceTexts[(int)WeaponState.IsPurchasable].text = curWeapon.Price.ToString();
+            buttons[1].gameObject.SetActive(true);
+            priceTexts[1].text = curWeapon.Price.ToString();
         }
         else
         {
-            buttons[(int)WeaponState.IsNotPurchasable].gameObject.SetActive(true);
-            priceTexts[(int)WeaponState.IsNotPurchasable].text = curWeapon.Price.ToString();
+            buttons[0].gameObject.SetActive(true);
+            priceTexts[0].text = curWeapon.Price.ToString();
         }
+    }
+
+    private bool IsHoldingWeapon(WeaponType type) => PlayerData.Instance.weaponType == type;
+    private bool IsWeaponBought(WeaponType type) => PlayerData.Instance.weaponsState[type] == ItemState.Bought;
+    private void UpdateWeaponBought(WeaponType type)
+    {
+        PlayerData.Instance.weaponsState[type] = ItemState.Bought;
+        PlayerData.SaveData();
     }
 
     private void DisplayStatsText()
