@@ -9,12 +9,8 @@ public class CanvasMainMenu : UICanvas
 
     public void OnOpen()
     {
-        GameManager.ChangeState(GameState.MainMenu);
         SetCoinText(GameManager.Instance.TotalCoin);
-        LevelManager.Instance.Player.SetMainMenuPose();
-        LevelManager.Instance.Player.ChangeToSavedItems();
-        LevelManager.Instance.Player.ChangeToSavedWeapon();
-        CameraFollower.Instance.SetupMenuMode();
+        GameManager.Instance.OnMenu();
     }
 
     public void PlayButton()
@@ -22,18 +18,14 @@ public class CanvasMainMenu : UICanvas
         if (CameraFollower.Instance.IsState(CameraState.Normal))
         {
             Close(0);
-            UIManager.Instance.OpenUI<CanvasGamePlay>().UpdateLevelText(LevelManager.Instance.CurLevel.Index);
-            UIManager.Instance.OpenUI<CanvasGamePlay>().UpdateAliveNumText(GameManager.Instance.CurAliveNum);
-            GameManager.ChangeState(GameState.GamePlay);
-            LevelManager.Instance.Player.OnPlay();
-            CameraFollower.Instance.SetupGamePlayMode();
+            UIManager.Instance.OpenUI<CanvasGamePlay>().OnOpen(this);
         }
     }
 
     public void SettingsButton()
     {
         UIManager.Instance.OpenUI<CanvasSettings>().SetState(this);
-        GameManager.ChangeState(GameState.Setting);
+        GameManager.Instance.OnSetting();
     }
 
     public void WeaponShopButton()
@@ -42,7 +34,6 @@ public class CanvasMainMenu : UICanvas
         {
             Close(0);
             UIManager.Instance.OpenUI<CanvasWeaponShop>().OnOpen();
-            CameraFollower.Instance.SetupWeaponShopMode();
         }
     }
 

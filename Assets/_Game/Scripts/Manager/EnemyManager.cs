@@ -83,6 +83,10 @@ public class EnemyManager : Singleton<EnemyManager>
 
         Enemy enemy = SimplePool.Spawn<Enemy>(PoolType.Enemy, GetValidSpawnPos(), Quaternion.identity);
         enemy.OnInit();
+        if(GameManager.IsState(GameState.GamePlay))
+        {
+            enemy.OnPlay();
+        }
 
         spawnedEnemiesList.Add(enemy);
         enemiesReadyCount--;
@@ -135,6 +139,22 @@ public class EnemyManager : Singleton<EnemyManager>
         if (point > recordHighestPoint)
         {
             recordHighestPoint = point;
+        }
+    }
+
+    public void StopMovingAll()
+    {
+        foreach (Enemy enemy in spawnedEnemiesList)
+        {
+            enemy.StopMoving();
+        }
+    }
+
+    public void OnPlay()
+    {
+        foreach (Enemy enemy in spawnedEnemiesList)
+        {
+            enemy.OnPlay();
         }
     }
 }

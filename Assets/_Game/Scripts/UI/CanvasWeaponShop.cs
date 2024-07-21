@@ -21,6 +21,7 @@ public class CanvasWeaponShop : UICanvas
     {
         SetCoinText(GameManager.Instance.TotalCoin);
         DisplayData((int)LevelManager.Instance.Player.WeaponType);
+        CameraFollower.Instance.SetupWeaponShopMode();
     }
 
     public void SetCoinText(float coin)

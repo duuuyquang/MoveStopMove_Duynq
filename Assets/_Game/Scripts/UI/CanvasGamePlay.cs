@@ -8,9 +8,18 @@ public class CanvasGamePlay : UICanvas
     [SerializeField] TextMeshProUGUI levelText;
     [SerializeField] TextMeshProUGUI aliveNumText;
 
-    public override void Setup()
+    public void OnOpen(UICanvas canvas)
     {
-        base.Setup();
+        UpdateLevelText(LevelManager.Instance.CurLevel.Index);
+        UpdateAliveCountText(GameManager.Instance.AliveCount);
+        if(canvas is CanvasRevive)
+        {
+            GameManager.Instance.OnPlayRevive();
+        } 
+        else
+        {
+            GameManager.Instance.OnPlay();
+        }
     }
 
     public void UpdateLevelText(int level)
@@ -18,7 +27,7 @@ public class CanvasGamePlay : UICanvas
         levelText.text = "Level " + level;
     }
 
-    public void UpdateAliveNumText(int num)
+    public void UpdateAliveCountText(int num)
     {
         aliveNumText.text = "Alive: " + num;
     }
@@ -26,6 +35,6 @@ public class CanvasGamePlay : UICanvas
     public void SettingsButton()
     {
         UIManager.Instance.OpenUI<CanvasSettings>().SetState(this);
-        GameManager.ChangeState(GameState.Setting);
+        GameManager.Instance.OnSetting();
     }
 }

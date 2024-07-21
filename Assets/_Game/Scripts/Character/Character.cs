@@ -34,7 +34,6 @@ public class Character : GameUnit
     [SerializeField] protected float baseMoveSpeed;
     protected float bonusMoveSpeed;
     private string curAnim = Const.ANIM_NAME_IDLE;
-
     public float MoveSpeed => baseMoveSpeed + bonusMoveSpeed;
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
     #endregion
@@ -62,8 +61,8 @@ public class Character : GameUnit
     public float BonusGoldMultiplier { get; private set; }
 
     #region Navigation
-    private Indicator Indicator;
     [SerializeField] protected Image targetIndicatorImage;
+    private Indicator Indicator;
     protected List<Character> targetsInRange = new List<Character>();
     protected Character curTargetChar = null;
     public bool HasTargetInRange => curTargetChar != null;
@@ -87,28 +86,8 @@ public class Character : GameUnit
     {
         if (GameManager.IsState(GameState.GamePlay))
         {
-            if (IsStatus(StatusType.Normal))
-            {
-                DetectNearestTarget();
-            }
-
-            if (!IsStatus(StatusType.Dead))
-            {
-                if (Indicator == null)
-                {
-                    InitIndicator();
-                }
-            }
-
+            DetectNearestTarget();
             UpdateAnimation();
-        }
-
-        if (GameManager.IsState(GameState.Setting))
-        {
-            if (!IsStatus(StatusType.Dead))
-            {
-                StopMoving();
-            }
         }
     }
 
@@ -118,6 +97,12 @@ public class Character : GameUnit
         InitSize();
         InitStatus();
         ClearTargets();
+    }
+
+    public void OnPlay()
+    {
+        InitIndicator();
+        ToggleAtkRangeTF(true);
     }
 
     protected virtual void InitIndicator()
@@ -270,6 +255,10 @@ public class Character : GameUnit
 
     protected virtual void DetectNearestTarget()
     {
+        if(!IsStatus(StatusType.Normal))
+        {
+            return;
+        }
         float nearestDist = 0;
         curTargetChar = null;
         float checkingDist;
@@ -337,14 +326,13 @@ public class Character : GameUnit
 
     IEnumerator IEAttack()
     {
-        //TODO: cache
         Vector3 targetPos = TF.position + (curTargetChar.TF.position - TF.position).normalized * CurAttackRange;
-        yield return new WaitForSeconds(0.3f);
+        yield return Cache.GetWaitSecs(0.3f);
         if(!IsStatus(StatusType.Dead))
         {
             WeaponHolder.OnShoot(targetPos);
             ToggleWeapon(false);
-            yield return new WaitForSeconds(1f);
+            yield return Cache.GetWaitSecs(1f);
             ChangeStatus(StatusType.Normal);
         }
     }
@@ -489,12 +477,14 @@ public class Character : GameUnit
     {
         Invoke(nameof(OnDespawn), 2f);
         ChangeStatus(StatusType.Dead);
-        ChangeColorDeath(ColorType);
-        ToggleTargetIndicator(false);
         StopMoving();
+        ClearTargets();
+
         bulletPartical.Play();
         Indicator = null;
-        GameManager.Instance.UpdateAliveNumText();
+        ChangeColorDeath(ColorType);
+        ToggleTargetIndicator(false);
+        GameManager.Instance.UpdateAliveCountText();
     }
 
     protected virtual void OnTriggerEnter(Collider other)
@@ -519,14 +509,19 @@ public class Character : GameUnit
         }
     }
 
+    public virtual void StopMoving()
+    {
+        if (IsStatus(StatusType.Dead))
+        {
+            return;
+        }
+    }
+
     #region empty virtual methods
     protected virtual void ShowCombatPointGainned(int point)
     {
     }
     public virtual void ToggleTargetIndicator(bool value)
-    {
-    }
-    public virtual void StopMoving()
     {
     }
     public virtual void OnDespawn()

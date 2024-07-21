@@ -42,6 +42,6 @@ public class CanvasSettings : UICanvas
     public void ContinueButton()
     {
         base.CloseDirectly();
-        GameManager.ChangeState(GameState.GamePlay);
+        GameManager.Instance.OnPlay();
     }
 }

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : Character
@@ -8,6 +6,10 @@ public class Player : Character
     [SerializeField] ParticleSystem losePartical;
 
     private ParticleSystem curFinishPartical;
+
+    private Vector3 initPos = Vector3.zero;
+
+    public int ReviveTimes { get; private set; }
 
     protected override void Update()
     {
@@ -31,7 +33,8 @@ public class Player : Character
     {
         base.OnInit();
         PlayerController.Instance.OnInit();
-        InitTransform();
+        InitTransform(initPos);
+        ReviveTimes = 1;
 
         CombatPoint = 0;
         SetupSizeByInitCombatPoint(CombatPoint);
@@ -65,20 +68,17 @@ public class Player : Character
         ChangeToSavedItems();
     }
 
-    public void InitTransform()
+    public void InitTransform(Vector3 pos)
     {
-        TF.position = Vector3.zero;
+        TF.position = pos;
         TF.eulerAngles = new Vector3(0, 210, 0);
     }
 
     private void SetFinishPartical(ParticleSystem partical, float delay)
     {
-        if (curFinishPartical != partical)
-        {
-            if (curFinishPartical) curFinishPartical.Stop();
-            curFinishPartical = partical;
-            Invoke(nameof(PlayFinishPartical), delay);
-        }
+        StopFinishPartical();
+        curFinishPartical = partical;
+        Invoke(nameof(PlayFinishPartical), delay);
     }
 
     private void PlayFinishPartical()
@@ -92,7 +92,7 @@ public class Player : Character
 
     private void StopFinishPartical()
     {
-        if(curFinishPartical)
+        if (curFinishPartical)
         {
             curFinishPartical.Stop();
             curFinishPartical.gameObject.SetActive(false);
@@ -102,18 +102,19 @@ public class Player : Character
     public override void OnDespawn()
     {
         base.OnDespawn();
-        GameManager.ChangeState(GameState.Finish);
-        GameManager.Instance.OnLose();
+        if(ReviveTimes <= 0)
+        {
+            GameManager.Instance.OnLose();
+        } else
+        {
+            ReviveTimes--;
+            GameManager.Instance.OnRevive();
+        }
     }
 
-    public void OnPlay()
+    public void OnWin()
     {
-        atkRangeTF.gameObject.SetActive(true);
-    }
-
-    private void OnWin()
-    {
-        TF.eulerAngles = new Vector3(0, 200, 0);
+        TF.eulerAngles = new Vector3(0, 200f, 0);
         ChangeAnim(Const.ANIM_NAME_DANCE);
         StopMoving();
         ToggleAtkRangeTF(false);
@@ -124,6 +125,17 @@ public class Player : Character
     {
         base.OnDead();
         SetFinishPartical(losePartical, 0.5f);
+    }
+
+    public void OnRevive()
+    {
+        base.OnInit();
+        PlayerController.Instance.OnInit();
+        InitTransform(TF.position);
+        StopFinishPartical();
+        SetupSizeByInitCombatPoint(CombatPoint);
+        LoadSavedDataToPlayer();
+        InitIndicator();
     }
 
     protected override void DetectNearestTarget()
@@ -165,9 +177,14 @@ public class Player : Character
         rb.velocity = PlayerController.Instance.CurDir * MoveSpeed * Time.fixedDeltaTime;
     }
 
+    private bool CheckMovingConditions => !IsStatus(StatusType.Dead) && !IsStatus(StatusType.Win);
+
     private void ListenControllerInput()
     {
-        PlayerController.Instance.SetCurDirection();
+        if (CheckMovingConditions)
+        {
+            PlayerController.Instance.SetCurDirection();
+        }
     }
 
     public override void StopMoving()
@@ -202,7 +219,7 @@ public class Player : Character
 
     public void SetMainMenuPose()
     {
-        InitTransform();
+        InitTransform(initPos);
         ChangeAnim(Const.ANIM_NAME_IDLE);
     }
 

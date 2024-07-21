@@ -23,7 +23,7 @@ public class Enemy : Character
         base.Update();
         if (GameManager.IsState(GameState.GamePlay))
         {
-            if (curState != null && !IsStatus(StatusType.Dead))
+            if (curState != null)
             {
                 curState.OnExecute(this);
             }
@@ -62,10 +62,16 @@ public class Enemy : Character
         atkRangeTF.gameObject.SetActive(true);
     }
 
+    public override void OnDead()
+    {
+        base.OnDead();
+        curState = null;
+        curTargetChar = null;
+    }
+
     public override void OnDespawn()
     {
         base.OnDespawn();
-        curTargetChar = null;
         EnemyManager.Instance.Despawn(this);
     }
 
