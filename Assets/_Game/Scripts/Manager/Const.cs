@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Numerics;
-
 public static class Const
 {
     public const string TAG_NAME_ENEMY      = "Enemy";
@@ -18,6 +15,6 @@ public static class Const
     public const float CHARACTER_UPSCALE_UNIT = 0.15f;
 
     public const int WEAPON_BASE_BULLET_AMOUNT = 1;
-
     public const int COMBAT_TEXT_DEFAULT_SIZE = 80;
+    public const int REVIVE_COUNTDOWN_SECS = 5;
 }

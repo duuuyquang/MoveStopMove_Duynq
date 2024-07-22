@@ -37,11 +37,10 @@ public class Player : Character
         reviveTimes = 1;
         CombatPoint = 0; 
         SetupSizeByInitCombatPoint(CombatPoint);
-        InitSavedData();
         LoadSavedData();
     }
 
-    private void InitSavedData()
+    private void GetSavedData()
     {
         PlayerData.GetData();
 
@@ -61,6 +60,7 @@ public class Player : Character
 
     private void LoadSavedData()
     {
+        GetSavedData();
         Name = PlayerData.Instance.name;
         ChangeColor(PlayerData.Instance.colorType);
         ChangeWeapon(PlayerData.Instance.weaponType);
@@ -119,6 +119,8 @@ public class Player : Character
         StopMoving();
         ToggleAtkRangeTF(false);
         SetFinishPartical(winPartical, 0.5f);
+        PlayerData.Instance.curLevel++;
+        PlayerData.SaveData();
     }
 
     public override void OnDead()

@@ -18,6 +18,10 @@ public class UIManager : Singleton<UIManager>
         {
             canvasPrefabs.Add(prefabs[i].GetType(), prefabs[i]);
         }
+
+        #if UNITY_INCLUDE_TESTS
+        Instantiate(canvasPrefabs[typeof(CanvasDebug)], parent);
+        #endif
     }
 
     public T OpenUI<T>() where T : UICanvas

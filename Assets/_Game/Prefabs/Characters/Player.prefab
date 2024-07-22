@@ -438,8 +438,9 @@ MonoBehaviour:
   animator: {fileID: 5060931399930964762}
   baseMoveSpeed: 120
   atkRangeTF: {fileID: 1250201518470943246}
-  baseAtkRange: 3
+  <BaseAtkRange>k__BackingField: 3
   <BaseAtkSpeed>k__BackingField: 7
+  targetsInRange: []
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
   colorDataSO: {fileID: 11400000, guid: 9e84c9a472450ba47b7affb38dd01b89, type: 2}
   bulletPartical: {fileID: 8345266994116078565}

@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public enum GameState { MainMenu, GamePlay, Finish, Setting, Revive }
@@ -6,12 +5,10 @@ public enum GameState { MainMenu, GamePlay, Finish, Setting, Revive }
 public class GameManager : Singleton<GameManager>
 {
     private static GameState gameState;
-    public int AliveCount { get; private set; }
+    public int AliveCount  { get; private set; }
+    public float TotalCoin { get; private set; }
 
-    private float totalCoin;
-    public float TotalCoin => totalCoin;
-
-    private int reviveTimer = 5;
+    private int reviveCounter = Const.REVIVE_COUNTDOWN_SECS;
 
     private void Awake()
     {
@@ -27,11 +24,6 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-    void Start()
-    {
-        OnInit();
-    }
-
     private void Update()
     {
         if (IsState(GameState.GamePlay))
@@ -42,21 +34,21 @@ public class GameManager : Singleton<GameManager>
 
     public void OnInit()
     {
-        totalCoin = PlayerData.Instance.totalCoin;
+        TotalCoin = PlayerData.Instance.totalCoin;
         AliveCount = LevelManager.Instance.CurLevel.TotalEnemies + 1;
         UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
         UIManager.Instance.OpenUI<CanvasMainMenu>().SetNameText(LevelManager.Instance.Player.Name);
     }
 
     public void UpdateTotalCoin(float coin) {
-        totalCoin += Mathf.Max(coin, 0);
-        PlayerData.Instance.totalCoin = totalCoin;
+        TotalCoin += Mathf.Max(coin, 0);
+        PlayerData.Instance.totalCoin = TotalCoin;
         PlayerData.SaveData();
     }
 
     public void ReduceTotalCoin(float coin) {
-        totalCoin -= Mathf.Max(coin, 0);
-        PlayerData.Instance.totalCoin = totalCoin;
+        TotalCoin -= Mathf.Max(coin, 0);
+        PlayerData.Instance.totalCoin = TotalCoin;
         PlayerData.SaveData();
     }
 
@@ -129,23 +121,23 @@ public class GameManager : Singleton<GameManager>
     public void OnRevive()
     {
         ChangeState(GameState.Revive);
-        UIManager.Instance.OpenUI<CanvasRevive>().SetCounterText(reviveTimer);
+        UIManager.Instance.OpenUI<CanvasRevive>().SetCounterText(reviveCounter);
         InvokeRepeating(nameof(CountReviveTimer), 1, 1);
     }
 
-    public void CountReviveTimer()
+    private void CountReviveTimer()
     {
-        UIManager.Instance.OpenUI<CanvasRevive>().SetCounterText(--reviveTimer);
-        if(reviveTimer <= 0)
+        UIManager.Instance.OpenUI<CanvasRevive>().SetCounterText(--reviveCounter);
+        if(reviveCounter <= 0)
         {
             StopReviveTimer();
             OnLose();
         }
     }
 
-    public void StopReviveTimer()
+    private void StopReviveTimer()
     {
-        reviveTimer = 5;
+        reviveCounter = Const.REVIVE_COUNTDOWN_SECS;
         CancelInvoke(nameof(CountReviveTimer));
         UIManager.Instance.OpenUI<CanvasRevive>().Close(0);
     }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class WeaponHolder : MonoBehaviour
 {
-    public Character Owner { get; private set; }
+    public Character Owner  { get; private set; }
     public Weapon CurWeapon { get; private set; }
     public Bullet CurBullet { get; private set; }
     public int BulletCharge { get; private set; }
@@ -19,7 +19,6 @@ public class WeaponHolder : MonoBehaviour
 
     private void InitStats()
     {
-        Owner.WeaponBonusAtkRange = CurWeapon.BonusAttackRange;
         BulletCharge = Const.WEAPON_BASE_BULLET_AMOUNT;
     }
 

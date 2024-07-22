@@ -60,14 +60,14 @@ public static class TargetDetector
     public static void RemoveTargetInRange(Character character, Character target)
     {
         character.ToggleTargetIndicator(false);
-        character.targetsInRange.Remove(target);
+        character.TargetsInRange.Remove(target);
     }
 
     public static void AddTargetInRange(Character character, Character target)
     {
         if (!character.IsStatus(StatusType.Dead))
         {
-            character.targetsInRange.Add(target);
+            character.TargetsInRange.Add(target);
         }
     }
 }

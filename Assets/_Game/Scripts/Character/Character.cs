@@ -25,33 +25,33 @@ public class Character : GameUnit
     public ColorType ColorType { get; private set; }
     #endregion
     #region Movement ---------------------------------------------
+    protected float bonusMoveSpeed;
+    private string curAnim = Const.ANIM_NAME_IDLE;
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator animator;
     [SerializeField] protected float baseMoveSpeed;
-    protected float bonusMoveSpeed;
-    private string curAnim = Const.ANIM_NAME_IDLE;
     public float MoveSpeed => baseMoveSpeed + bonusMoveSpeed;
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
     #endregion
     #region Combat -----------------------------------------------
-    [SerializeField] protected Transform atkRangeTF;
-    [SerializeField] protected float baseAtkRange;
-    [field: SerializeField] public float BaseAtkSpeed { get; protected set; }
     protected static int[] SCALEUP_THRESHOLD = { 1, 5, 13, 25, 41, 61 }; // kill 4 enemies same scale to upscale: 4, 8, 12, 16, 20 (CombatPoint relatively)
-    public int CombatPoint { get; protected set; }
     private Coroutine attackCoroutine;
-    public  WeaponType WeaponType { get; protected set; }
     private Vector3 atkTargetPos;
-    private float ItemBonusAtkRange { get; set; }
-    private float BonusAtkRange => ItemBonusAtkRange + WeaponBonusAtkRange;
-    public float WeaponBonusAtkRange { get; set; }
-    public float CurAttackRange => (baseAtkRange + BonusAtkRange) * CurSize;
+    [SerializeField] protected Transform atkRangeTF;
+    [field: SerializeField] public float BaseAtkRange { get; protected set; }
+    [field: SerializeField] public float BaseAtkSpeed { get; protected set; }
+    public  WeaponType WeaponType { get; protected set; }
+    public float ItemBonusAtkRange { get; private set; }
     public float CurSize { get; protected set; }
     public float BonusGoldMultiplier { get; private set; }
+    public int CombatPoint { get; protected set; }
+    private float BonusAtkRange => ItemBonusAtkRange + WeaponHolder.CurWeapon.BonusAttackRange;
+    public float CurAttackRange => (BaseAtkRange + BonusAtkRange) * CurSize;
+    private bool CheckAttackableConditions => WeaponHolder.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking) && !IsStatus(StatusType.Dead);
     #endregion
     #region Navigation --------------------------------------------
-    private Indicator Indicator;
-    public List<Character> targetsInRange = new();
+    private Indicator indicator;
+    public List<Character> TargetsInRange { get; private set; } = new();
     public Character CurTargetChar { get; set; }
     public bool HasTargetInRange => CurTargetChar != null;
     #endregion
@@ -68,7 +68,7 @@ public class Character : GameUnit
 
     protected virtual void Update()
     {
-        TargetDetector.DetectNearestTarget(this, targetsInRange);
+        TargetDetector.DetectNearestTarget(this, TargetsInRange);
     }
 
     #region Init
@@ -87,8 +87,8 @@ public class Character : GameUnit
 
     protected virtual void InitIndicator()
     {
-        Indicator = SimplePool.Spawn<Indicator>(PoolType.Indicator, Vector3.zero, Quaternion.identity);
-        Indicator.OnInit(this);
+        indicator = SimplePool.Spawn<Indicator>(PoolType.Indicator, Vector3.zero, Quaternion.identity);
+        indicator.OnInit(this);
     }
 
     private void InitSize()
@@ -99,7 +99,7 @@ public class Character : GameUnit
 
     protected void ClearTargets()
     {
-        targetsInRange.Clear();
+        TargetsInRange.Clear();
         CurTargetChar = null;
     }
 
@@ -119,7 +119,7 @@ public class Character : GameUnit
         WeaponType = type;
         WeaponHolder.OnInit(this);
         ToggleWeapon(true);
-        SetAttackRangeTF(baseAtkRange + BonusAtkRange);
+        SetAttackRangeTF(BaseAtkRange + BonusAtkRange);
     }
 
     public void ChangeHead(ItemType type)
@@ -173,9 +173,9 @@ public class Character : GameUnit
 
     protected virtual void UpdateBonusStatsFromItem(Item item)
     {
-        ItemBonusAtkRange = baseAtkRange * item.BonusAttackRange * 0.01f;
+        ItemBonusAtkRange = BaseAtkRange * item.BonusAttackRange * 0.01f;
         BonusGoldMultiplier = item.BonusGold;
-        SetAttackRangeTF(baseAtkRange + BonusAtkRange);
+        SetAttackRangeTF(BaseAtkRange + BonusAtkRange);
     }
 
     protected void ChangeColor(ColorType type)
@@ -200,8 +200,6 @@ public class Character : GameUnit
     }
     #endregion
     #region Attack
-    private bool CheckAttackableConditions => WeaponHolder.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking) && !IsStatus(StatusType.Dead);
-
     public void CheckToProcessAttack()
     {
         if (IsStanding)
@@ -257,7 +255,7 @@ public class Character : GameUnit
     {
         TargetDetector.RemoveTargetInRange(this, opponent);
         CheckToScaleSizeUp(opponent.CombatPoint);
-        if (Indicator) Indicator.UpdateCombatPoint(CombatPoint);
+        if (indicator) indicator.UpdateCombatPoint(CombatPoint);
     }
     #endregion
     #region Scale
@@ -310,7 +308,7 @@ public class Character : GameUnit
         for (int i = 0; i < SCALEUP_THRESHOLD.Length; i++) if (initPoint >= SCALEUP_THRESHOLD[i]) ProcessScaleSizeUp(false);
     }
     #endregion
-    #region Animation controlling
+    #region Animation Controller
     public void ChangeAnim(string animName)
     {
         if (curAnim != animName)
@@ -359,7 +357,7 @@ public class Character : GameUnit
         StopMoving();
         ClearTargets();
         bulletPartical.Play();
-        Indicator = null;
+        indicator = null;
         ChangeColorDeath(ColorType);
         ToggleTargetIndicator(false);
         GameManager.Instance.UpdateAliveCountText();
