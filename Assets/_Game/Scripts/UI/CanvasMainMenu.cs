@@ -18,7 +18,8 @@ public class CanvasMainMenu : UICanvas
         if (CameraFollower.Instance.IsState(CameraState.Normal))
         {
             Close(0);
-            UIManager.Instance.OpenUI<CanvasGamePlay>().OnOpen(this);
+            UIManager.Instance.OpenUI<CanvasGamePlay>().OnOpen();
+            GameManager.Instance.OnPlay();
         }
     }
 

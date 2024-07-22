@@ -1,7 +1,4 @@
-using System;
-using System.Diagnostics;
-using Unity.VisualScripting;
-using UnityEditor;
+
 using UnityEngine;
 
 public class Item : MonoBehaviour

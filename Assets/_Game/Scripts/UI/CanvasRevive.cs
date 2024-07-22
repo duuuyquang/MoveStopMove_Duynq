@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CanvasRevive : UICanvas
@@ -10,15 +7,15 @@ public class CanvasRevive : UICanvas
     public void ReviveButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasGamePlay>().OnOpen(this);
+        UIManager.Instance.OpenUI<CanvasGamePlay>().OnOpen();
+        GameManager.Instance.OnPlayRevive();
     }
 
     public void CancelButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
-        GameManager.Instance.StopReviveTimer();
-        LevelManager.Instance.OnInitCurLevel();
+        UIManager.Instance.OpenUI<CanvasLose>();
+        GameManager.Instance.OnLoseRevive();
     }
 
     public void SetCounterText(int count)

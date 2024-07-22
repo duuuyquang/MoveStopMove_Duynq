@@ -23,8 +23,8 @@ public static class Ultilities
         rt.offsetMin = new Vector2(rt.offsetMin.x, bottom);
     }
 
-    public static string GetRandomName(List<string> nameList)
+    public static T GetRandomValue<T>(T[] array)
     {
-        return nameList[Random.Range(0, nameList.Count)];
+        return array[Random.Range(0, array.Length)];
     }
 }

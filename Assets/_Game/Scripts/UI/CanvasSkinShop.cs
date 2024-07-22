@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,14 +7,14 @@ public enum TabType { Head, Pants, Shield, Sets };
 
 public class CanvasSkinShop : UICanvas
 {
-    private const float SCREEN_DEFAULT_WIDTH  = 720;
+    private const float SCREEN_DEFAULT_WIDTH  = 720f;
     private const float ITEM_SELECT_PADDING = 10f;
-    private const int ITEM_NUM_EACH_COL = 2;
+    private const int   ITEM_NUM_EACH_COL = 2;
 
-    [SerializeField] TextMeshProUGUI coinText;
+    [SerializeField] TextMeshProUGUI    coinText;
     [SerializeField] TextMeshProUGUI    stats;
     [SerializeField] Transform[]        buttons;
-    [SerializeField] TextMeshProUGUI[] priceTexts;
+    [SerializeField] TextMeshProUGUI[]  priceTexts;
 
     [SerializeField] Image[] tabBGs;
 
@@ -24,10 +22,10 @@ public class CanvasSkinShop : UICanvas
     [SerializeField] ItemShop       itemShopPrefab;
     [SerializeField] Transform      itemSelectBG;
 
-    private List<ItemShop> curItemShopList = new List<ItemShop>();
+    private List<ItemShop> curItemShopList = new();
 
     private TabType curTab;
-    private ItemShop    choosingItem;
+    private ItemShop choosingItem;
 
     public ItemDataSO itemDataSO;
 
@@ -45,16 +43,6 @@ public class CanvasSkinShop : UICanvas
         OnSelectingTab(0);
         LevelManager.Instance.Player.ChangeAnim(Const.ANIM_NAME_SHOP);
         CameraFollower.Instance.SetupSkinShopMode();
-    }
-
-    public void SetCoinText(float coin) => coinText.text = coin.ToString();
-
-    private bool IsItemBought(ItemType type) => PlayerData.Instance.itemsState[type] == ItemState.Bought;
-
-    private void UpdateItemBought(ItemType type)
-    {
-        PlayerData.Instance.itemsState[type] = ItemState.Bought;
-        PlayerData.SaveData();
     }
 
     public void MainMenuButton()
@@ -76,16 +64,26 @@ public class CanvasSkinShop : UICanvas
 
     public void Select()
     {
-        ChangePlayerItem(choosingItem.Item.Type, true);
+        ChangeItem(choosingItem.Item.Type, true);
         PrintBuyButtons();
-        choosingItem.ToggleEquippedTag(true);
+        UpdateAllItemShopState();
     }
 
     public void Unequip()
     {
-        ChangePlayerItem(ItemType.None, true);
+        ChangeItem(ItemType.None, true);
         PrintBuyButtons();
         choosingItem.ToggleEquippedTag(false);
+    }
+
+    public void SetCoinText(float coin) => coinText.text = coin.ToString();
+
+    private bool IsItemBought(ItemType type) => PlayerData.Instance.itemsState[type] == ItemState.Bought;
+
+    private void UpdateItemBought(ItemType type)
+    {
+        PlayerData.Instance.itemsState[type] = ItemState.Bought;
+        PlayerData.SaveData();
     }
 
     public void DisplayData()
@@ -111,7 +109,6 @@ public class CanvasSkinShop : UICanvas
 
         for (int i = 1; i < totalItems; i++)
         {
-            //ItemShop itemShop = Instantiate(itemShopPrefab, listContent);
             ItemShop itemShop = SimplePool.Spawn<ItemShop>(PoolType.ItemShop, Vector3.zero, Quaternion.identity);
             itemShop.TF.SetParent(listContent);
             itemShop.SetPropsByItemType(curTab,(ItemType)i);
@@ -119,11 +116,11 @@ public class CanvasSkinShop : UICanvas
 
             posY = i % 2 == 0 ? posY - eachItemTotalHeight : 0f;
             posX = i % 2 == 1 && i != 1 ? posX + eachItemTotalWidth : posX;
-            itemShop.RectTF.anchoredPosition = new Vector3(posX, posY);
+            itemShop.RectTF.anchoredPosition = Cache.GetVector(posX, posY, 0f);
 
             curItemShopList.Add(itemShop);
         }
-        OnChosingItem(curItemShopList.First());
+        OnChosingItem(curItemShopList[0]);
     }
 
     private void UpdateItemShopState(ItemShop itemShop)
@@ -137,6 +134,14 @@ public class CanvasSkinShop : UICanvas
             {
                 itemShop.ToggleEquippedTag(true);
             }
+        }
+    }
+
+    private void UpdateAllItemShopState()
+    {
+        for (int i = 0; i < curItemShopList.Count; i++)
+        {
+            UpdateItemShopState(curItemShopList[i]);
         }
     }
 
@@ -174,14 +179,14 @@ public class CanvasSkinShop : UICanvas
         }
     }
 
-    private void ChangePlayerItem(ItemType type, bool isPurchased = false)
+    private void ChangeItem(ItemType type, bool saveData = false)
     {
         switch (curTab)
         {
             case TabType.Head:
                 LevelManager.Instance.Player.ChangeSet(ItemType.None);
                 LevelManager.Instance.Player.ChangeHead(type);
-                if(isPurchased)
+                if(saveData)
                 {
                     PlayerData.Instance.setType = ItemType.None;
                     PlayerData.Instance.headType = type;
@@ -191,7 +196,7 @@ public class CanvasSkinShop : UICanvas
             case TabType.Pants:
                 LevelManager.Instance.Player.ChangeSet(ItemType.None);
                 LevelManager.Instance.Player.ChangePants(type);
-                if (isPurchased)
+                if (saveData)
                 {
                     PlayerData.Instance.setType = ItemType.None;
                     PlayerData.Instance.pantsType = type;
@@ -199,9 +204,9 @@ public class CanvasSkinShop : UICanvas
                 }
                 break;
             case TabType.Shield:
-                                LevelManager.Instance.Player.ChangeSet(ItemType.None);
+                LevelManager.Instance.Player.ChangeSet(ItemType.None);
                 LevelManager.Instance.Player.ChangeShield(type);
-                if (isPurchased)
+                if (saveData)
                 {
                     PlayerData.Instance.setType = ItemType.None;
                     PlayerData.Instance.shieldType = type;
@@ -210,7 +215,7 @@ public class CanvasSkinShop : UICanvas
                 break;
             case TabType.Sets:
                 LevelManager.Instance.Player.ChangeSet(type);
-                if (isPurchased)
+                if (saveData)
                 {
                     PlayerData.Instance.setType = type;
                     PlayerData.SaveData();
@@ -277,10 +282,10 @@ public class CanvasSkinShop : UICanvas
     public void OnChosingItem(ItemShop itemShop)
     {
         choosingItem = itemShop;
-        ChangePlayerItem(itemShop.Item.Type);
+        SetChosingItemBG(itemShop);
+        ChangeItem(itemShop.Item.Type);
         DisplayStatsText();
         PrintBuyButtons();
-        SetChosingItemBG(itemShop);
     }
 
     public void OnSelectingTab(int tab)

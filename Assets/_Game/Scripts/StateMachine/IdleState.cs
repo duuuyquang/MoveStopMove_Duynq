@@ -2,20 +2,17 @@ using UnityEngine;
 
 public class IdleState : IState
 {
-    //TODO: move pros to other place
-    private float time;
-    private float count;
-
     public void OnEnter(Enemy enemy)
     {
         enemy.StopMoving();
-        time = Random.Range(0f, 2f);
-        count = 0f;
+        enemy.StateCounter = 0f;
+        enemy.StateDelayTime = Random.Range(0f, 1.5f);
     }
 
     public void OnExecute(Enemy enemy)
     {
-        count += Time.deltaTime;
+        enemy.ChangeAnimByCurStatus();
+        enemy.StateCounter += Time.deltaTime;
 
         if (enemy.HasTargetInRange)
         {
@@ -29,7 +26,7 @@ public class IdleState : IState
             }
         }
 
-        if (count >= time )
+        if (enemy.StateCounter >= enemy.StateDelayTime)
         {
             enemy.SetState(new PatrolState());
         }
@@ -42,6 +39,5 @@ public class IdleState : IState
 
     public void OnExit(Enemy enemy)
     {
-
     }
 }

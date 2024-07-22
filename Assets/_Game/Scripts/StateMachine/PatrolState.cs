@@ -1,25 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PatrolState : IState
 {
-    private float distance = Random.Range(5f, 20f);
-
-    private float delayAttackTimer = Random.Range(0f, 1.5f);
-    private float count = 0f;
-
     public void OnEnter(Enemy enemy)
     {
-        enemy.SetRandomDestination(distance);
+        enemy.StateCounter = 0f;
+        enemy.StateDelayTime = Random.Range(0f, 1.5f);
+        enemy.SetRandomDestination(Random.Range(5f, 20f));
     }
 
     public void OnExecute(Enemy enemy)
     {
+        enemy.ChangeAnimByCurStatus();
         if (enemy.HasTargetInRange)
         {
-            count += Time.deltaTime;
-            if (count >= delayAttackTimer)
+            enemy.StateCounter += Time.deltaTime;
+            if (enemy.StateCounter >= enemy.StateDelayTime)
             {
                 enemy.SetState(new AttackState());
             }

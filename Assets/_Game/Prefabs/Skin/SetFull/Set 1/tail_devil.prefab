@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 339fb452ce69a9841b21387bcb10311d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 401
+  type: 4001
   bonusAttackRange: 0
   bonusMoveSpeed: 0
   bonusGold: 0
@@ -109,3 +109,4 @@ MonoBehaviour:
   pantsItem: {fileID: 0}
   wingItem: {fileID: 0}
   tailItem: {fileID: 0}
+  charColorType: 0

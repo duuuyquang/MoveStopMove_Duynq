@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 
 public class EnemyManager : Singleton<EnemyManager>
 {
+
     [SerializeField] int MaxEnemiesOnRunTime = 10;
     [SerializeField] Enemy enemyPrefab;
     
@@ -21,6 +22,64 @@ public class EnemyManager : Singleton<EnemyManager>
 
     private int recordHighestPoint;
     public int RecordHighestPoint { get { return recordHighestPoint; } }
+
+    public readonly static string[] NAMES = { 
+        "Dazzle", 
+        "Crystal", 
+        "Lina", 
+        "Clink", 
+        "Axe", 
+        "Phantom", 
+        "Sniper", 
+        "TrollWarlord", 
+        "BrewMaster", 
+        "Hoodwink", 
+        "Winranger", 
+        "Traxex", 
+        "Enchantress", 
+        "Luna" 
+    };
+
+
+    public readonly static ItemType[] HEAD_ITEM_TYPES = {
+        ItemType.None,
+        ItemType.Head_Arrow,
+        ItemType.Head_Beared,
+        ItemType.Head_CowBoy,
+        ItemType.Head_Crown,
+        ItemType.Head_Ear,
+        ItemType.Head_NormalHat,
+        ItemType.Head_Cap,
+        ItemType.Head_Yellow,
+        ItemType.Head_Headphone,
+    };
+
+    public readonly static ItemType[] PANTS_ITEM_TYPES = {
+        ItemType.None,
+        ItemType.Pants_Batman,
+        ItemType.Pants_ChamBi,
+        ItemType.Pants_Comy,
+        ItemType.Pants_Dabao,
+        ItemType.Pants_Onion,
+        ItemType.Pants_Pokemon,
+        ItemType.Pants_Rainbow,
+        ItemType.Pants_Skull,
+        ItemType.Pants_Vantim,
+    };
+
+    public readonly static ItemType[] SHIELD_ITEM_TYPES = {
+        ItemType.None,
+        ItemType.Shield_CaptainAmerican,
+        ItemType.Shield_Normal,
+    };
+
+    public readonly static ItemType[] SET_ITEM_TYPES = {
+        ItemType.Set_1,
+        ItemType.Set_2,
+        ItemType.Set_3,
+        ItemType.Set_4,
+        ItemType.Set_5,
+    };
 
     public void Update()
     {

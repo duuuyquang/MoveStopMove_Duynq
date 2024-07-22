@@ -77,6 +77,7 @@ public class GameManager : Singleton<GameManager>
     public void OnWin()
     {
         ChangeState(GameState.Finish);
+        UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasWin>();
         LevelManager.Instance.Player.OnWin();
     }
@@ -84,7 +85,14 @@ public class GameManager : Singleton<GameManager>
     public void OnLose()
     {
         ChangeState(GameState.Finish);
+        UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasLose>();
+    }
+
+    public void OnLoseRevive()
+    {
+        ChangeState(GameState.Finish);
+        StopReviveTimer();
     }
 
     public void OnPlay()
@@ -97,8 +105,8 @@ public class GameManager : Singleton<GameManager>
 
     public void OnPlayRevive()
     {
-        StopReviveTimer();
         ChangeState(GameState.GamePlay);
+        StopReviveTimer();
         LevelManager.Instance.Player.OnRevive();
     }
 

@@ -7,7 +7,6 @@ public class CanvasLose : UICanvas
         LevelManager.Instance.OnInit(PlayerData.Instance.curLevel);
     }
 
-    //TODO: add revive functionality
     public void ReviveButton()
     {
         UIManager.Instance.CloseAll();

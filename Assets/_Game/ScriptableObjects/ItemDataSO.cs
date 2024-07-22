@@ -37,33 +37,37 @@ public enum ItemType
     Head_Angel              = 11,
     Head_Witch              = 12,
     Head_Thor               = 13,
-    Pants_Batman            = 101,
-    Pants_ChamBi            = 102,
-    Pants_Comy              = 103,
-    Pants_Dabao             = 104,
-    Pants_Onion             = 105,
-    Pants_Pokemon           = 106,
-    Pants_Rainbow           = 107,
-    Pants_Skull             = 108,
-    Pants_Vantim            = 109,
-    Pants_Devil             = 110,
-    Pants_Angel             = 111,
-    Pants_Deadpool          = 112,
-    Pants_Thor              = 113,
-    Shield_CaptainAmerican  = 201,
-    Shield_Normal           = 202,
-    Shield_BowAngel         = 203,
-    Shield_BookWitch        = 204,
-    Wing_Devil              = 301,
-    Wing_Angel              = 302,
-    Wing_BladeDeadpool      = 303,
-    Tail_Devil              = 401,
-    Set_1                   = 1001,
-    Set_2                   = 1002,
-    Set_3                   = 1003,
-    Set_4                   = 1004,
-    Set_5                   = 1005,
-    Set_6                   = 1006
+    Pants_None              = 1000,
+    Pants_Batman            = 1001,
+    Pants_ChamBi            = 1002,
+    Pants_Comy              = 1003,
+    Pants_Dabao             = 1004,
+    Pants_Onion             = 1005,
+    Pants_Pokemon           = 1006,
+    Pants_Rainbow           = 1007,
+    Pants_Skull             = 1008,
+    Pants_Vantim            = 1009,
+    Pants_Devil             = 1010,
+    Pants_Angel             = 1011,
+    Pants_Deadpool          = 1012,
+    Pants_Thor              = 1013,
+    Shield_None             = 2000,
+    Shield_CaptainAmerican  = 2001,
+    Shield_Normal           = 2002,
+    Shield_BowAngel         = 2003,
+    Shield_BookWitch        = 2004,
+    Wing_None               = 3000,
+    Wing_Devil              = 3001,
+    Wing_Angel              = 3002,
+    Wing_BladeDeadpool      = 3003,
+    Tail_None               = 4000,
+    Tail_Devil              = 4001,
+    Set_None                = 10000,
+    Set_1                   = 10001,
+    Set_2                   = 10002,
+    Set_3                   = 10003,
+    Set_4                   = 10004,
+    Set_5                   = 10005,
 }
 
 [CreateAssetMenu(menuName = "ItemDataSO")]
@@ -85,32 +89,32 @@ public class ItemDataSO : ScriptableObject
 
     public Item GetHead(ItemType index)
     {
-        return hats[(int)index % 100];
+        return hats[(int)index];
     }
 
     public Item GetPants(ItemType index)
     {
-        return pants[(int)index % 100];
+        return pants[(int)index % (int)ItemType.Pants_None];
     }
 
     public Item GetShield(ItemType index)
     {
-        return shields[(int)index % 100];
-    }
-
-    public Item GetTail(ItemType index)
-    {
-        return tails[(int)index % 100];
+        return shields[(int)index % (int)ItemType.Shield_None];
     }
 
     public Item GetWing(ItemType index)
     {
-        return wings[(int)index % 100];
+        return wings[(int)index % (int)ItemType.Wing_None];
+    }
+
+    public Item GetTail(ItemType index)
+    {
+        return tails[(int)index % (int)ItemType.Tail_None];
     }
 
     public Item GetSet(ItemType index)
     {
-        return sets[(int)index % 1000];
+        return sets[(int)index % (int)ItemType.Set_None];
     }
 
     public int TotalWeapons => weapons.Length;

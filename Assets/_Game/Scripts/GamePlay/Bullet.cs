@@ -1,45 +1,53 @@
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public class Bullet : GameUnit
 {
     [SerializeField] ParticleSystem dropPartical;
 
-    //------------------- Transform specs -------------------------
+    #region Transform
     private float speed;
     private float spinSpeed;
+
     private Vector3 rotateAxis;
     private Vector3 targetPos;
 
     private WeaponHolder weaponHolder;
-    public WeaponHolder WeaponHolder => weaponHolder;
-
     private Weapon weaponPrefab;
 
     private bool IsDestination => Vector3.Distance(TF.position + Vector3.up * (TF.position.y - targetPos.y), targetPos) < 0.1f;
+    #endregion
 
-    //------------------- For Weapon returning back ---------------
+    #region Weapon Return
     private bool isReturning = false;
+    #endregion
 
-    //------------------- For Weapon need to grab -----------------
+    #region Weapon Grab
     private float grabTimer = 0f;
     private bool isGrab = false;
-    private bool isDropped = false;
-    public bool IsDropped => isDropped;
+    public bool IsDropped { get; private set; }
+    #endregion
 
     void Update()
     {
-        ProcessBehaviours();
+        ProcessBehaviour();
     }
 
     public void OnInit(WeaponHolder weaponHolder, Vector3 targetPos)
     {
-        this.weaponHolder = weaponHolder;
         this.targetPos = targetPos;
+        this.weaponHolder = weaponHolder;
+
+        speed       = weaponHolder.Owner.BaseAtkSpeed + weaponHolder.CurWeapon.BonusSpeed;
+        spinSpeed   = weaponHolder.CurWeapon.SpinSpeed;
+        rotateAxis  = weaponHolder.CurWeapon.RotateAxis;
+        isGrab      = weaponHolder.CurWeapon.IsGrab;
+
+        IsDropped = false;
+        isReturning = false;
+        grabTimer = 0f;
 
         InitSize();
-        InitStats();
-        InitSpecialStats();
+
         SpawnWeapon();
     }
 
@@ -48,39 +56,22 @@ public class Bullet : GameUnit
         TF.localScale = Vector3.one * weaponHolder.TF.localScale.x;
     }
 
-    private void InitStats()
-    {
-        // Weapon send info on shoot
-        speed = weaponHolder.Owner.BaseAttackSpeed + weaponHolder.CurWeapon.BonusSpeed;
-        spinSpeed = weaponHolder.CurWeapon.SpinSpeed;
-        rotateAxis = weaponHolder.CurWeapon.RotateAxis;
-        isGrab = weaponHolder.CurWeapon.IsGrab;
-    }
-
-    private void InitSpecialStats()
-    {
-        isDropped = false;
-        isReturning = false;
-        grabTimer = 0f;
-    }
-
     private void SpawnWeapon()
     {
-        //weaponPrefab = Instantiate(weapon.WeaponPrefab, TF);
-        weaponPrefab = WeaponPool.Spawn<Weapon>(WeaponHolder.Owner.WeaponType, TF.position, Quaternion.identity);
+        weaponPrefab = WeaponPool.Spawn<Weapon>(weaponHolder.Owner.WeaponType, TF.position, Quaternion.identity);
         weaponPrefab.TF.SetParent(TF, false);
         weaponPrefab.OnInit();
 
         TF.LookAt(targetPos);
 
         // modify actual direction to the target
-        TF.eulerAngles += new Vector3(90f, 0f, 0f);
+        TF.eulerAngles += Cache.GetVector(90f, 0f, 0f);
 
         //scale to current size
         TF.localScale += Vector3.one * (weaponHolder.Owner.CurSize - 1f) * 0.5f;
     }
 
-    private void ProcessBehaviours()
+    private void ProcessBehaviour()
     {
         MovingToTarget();
         if (IsDestination)
@@ -118,7 +109,7 @@ public class Bullet : GameUnit
             if (grabTimer == 0)
             {
                 dropPartical.Play();
-                isDropped = true;
+                IsDropped = true;
                 StopMoving();
                 SetDroppedShape();
             }
@@ -148,12 +139,9 @@ public class Bullet : GameUnit
             weaponHolder.Reload(Const.WEAPON_BASE_BULLET_AMOUNT);
         }
 
-        //Destroy(weaponPrefab.gameObject);
         weaponPrefab.TF.SetParent(PoolControl.Instance.WeaponPoolTF);
         weaponPrefab.TF.localScale = Vector3.one;
         WeaponPool.Despawn(weaponPrefab);
-
-        //Destroy(gameObject);
         SimplePool.Despawn(this);
     }
 
@@ -165,8 +153,8 @@ public class Bullet : GameUnit
 
     private void SetDroppedShape()
     {
-        weaponPrefab.TF.localPosition = new Vector3(0, 0, 1);
-        weaponPrefab.TF.localEulerAngles = new Vector3(-50, 180, 0);
+        weaponPrefab.TF.localPosition = Cache.GetVector(0f, 0f, 1f);
+        weaponPrefab.TF.localEulerAngles = Cache.GetVector(-50f, 180f, 0f);
     }
 
     private void SetTargetPos(Vector3 pos)
@@ -199,8 +187,8 @@ public class Bullet : GameUnit
 
     private void OnHitOpponent(Character opponent)
     {
-        WeaponHolder.Owner.ProcessOnTargetKilled(opponent);
-        EnemyManager.Instance.SetRecordHighestPoint(WeaponHolder.Owner.CombatPoint);
+        weaponHolder.Owner.OnTargetKilled(opponent);
+        EnemyManager.Instance.SetRecordHighestPoint(weaponHolder.Owner.CombatPoint);
         opponent.OnDead();
     }
 

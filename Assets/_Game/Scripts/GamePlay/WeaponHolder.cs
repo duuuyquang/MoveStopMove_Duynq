@@ -2,55 +2,48 @@ using UnityEngine;
 
 public class WeaponHolder : MonoBehaviour
 {
-    private Character owner;
-    public Character Owner => owner;
-
-    private Weapon curWeapon;
-    public Weapon CurWeapon => curWeapon;
-
-    private Bullet curBullet;
-    public Bullet CurBullet => curBullet;
-
-    private int bulletCharge;
-    public int BulletCharge => bulletCharge;
-    public bool HasBullet => bulletCharge > 0;
+    public Character Owner { get; private set; }
+    public Weapon CurWeapon { get; private set; }
+    public Bullet CurBullet { get; private set; }
+    public int BulletCharge { get; private set; }
+    public bool HasBullet => BulletCharge > 0;
 
     public Transform TF;
 
     public void OnInit(Character owner)
     {
-        this.owner = owner;
+        this.Owner = owner;
         ChangeWeapon(owner.WeaponType);
         InitStats();
     }
 
     private void InitStats()
     {
-        owner.WeaponBonusAtkRange = curWeapon.BonusAttackRange;
-        bulletCharge = Const.WEAPON_BASE_BULLET_AMOUNT;
+        Owner.WeaponBonusAtkRange = CurWeapon.BonusAttackRange;
+        BulletCharge = Const.WEAPON_BASE_BULLET_AMOUNT;
     }
 
     public void ChangeWeapon(WeaponType type)
     {
-        if(curWeapon != null)
+        if(CurWeapon != null)
         {
-            Destroy(curWeapon.gameObject);
+            Destroy(CurWeapon.gameObject);
         }
 
-        curWeapon = Instantiate(owner.itemDataSO.GetWeapon(type), TF);
-        curWeapon.gameObject.SetActive(true);
+        CurWeapon = Instantiate(Owner.itemDataSO.GetWeapon(type), TF);
+        CurWeapon.gameObject.SetActive(true);
     }
 
     public void OnShoot(Vector3 targetPos)
     {
-        curBullet = SimplePool.Spawn<Bullet>(PoolType.Bullet, TF.position, Quaternion.identity);
-        curBullet.OnInit(this, targetPos);
-        bulletCharge--;
+        CurBullet = SimplePool.Spawn<Bullet>(PoolType.Bullet, TF.position, Quaternion.identity);
+        CurBullet.OnInit(this, targetPos);
+        BulletCharge--;
     }
 
     public void Reload(int chargeNum)
     {
-        bulletCharge += chargeNum;
+        BulletCharge += chargeNum;
         Owner.ToggleWeapon(true);
     }
 }

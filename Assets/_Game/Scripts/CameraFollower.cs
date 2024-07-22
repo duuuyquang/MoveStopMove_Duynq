@@ -14,16 +14,15 @@ public class CameraFollower : Singleton<CameraFollower>
     private Vector3 OFFSET_SKIN_SHOP    = new Vector3(0f, 1.5f, -7f);
 
     [SerializeField] private float speed = 1f;
-    [SerializeField] private Camera cam;
-    public Camera Camera => cam;
+    [field:SerializeField] public Camera Camera { get; private set; }
 
     public Transform TF;
 
     public bool IsState(CameraState state) => curState == state;
 
-    private Vector3 gamePlayInitalPos => Vector3.zero + Vector3.down * 3f;
+    private Vector3 playerInitalPos => Player.InitPosition + Vector3.down * 3f;
     private Vector3 playerWeaponPos => LevelManager.Instance.Player.WeaponHolder.TF.position + Vector3.left * 0.3f + Vector3.down * 0.3f;
-    private Vector3 skinShopPos => Vector3.zero + Vector3.down * 1.5f;
+    private Vector3 skinShopPos => Player.InitPosition + Vector3.down * 1.5f;
     private Vector3 gamePlayOffset => new Vector3(0, LevelManager.Instance.Player.CurAttackRange * 3.1f, -LevelManager.Instance.Player.CurAttackRange * 2.5f);
 
     void LateUpdate()
@@ -66,7 +65,7 @@ public class CameraFollower : Singleton<CameraFollower>
 
     public void SetupGamePlayMode()
     {
-        StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_GAME_PLAY, gamePlayInitalPos, 20f));
+        StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_GAME_PLAY, playerInitalPos, 20f));
         //StartCoroutine(IECameraTransition());
     }
 

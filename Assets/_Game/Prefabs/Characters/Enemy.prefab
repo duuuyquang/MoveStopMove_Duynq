@@ -599,9 +599,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PoolType: 3
-  rb: {fileID: 0}
-  animator: {fileID: 4276091169662017440}
-  baseMoveSpeed: 0
   charRenderer: {fileID: 6886439637682730261}
   <WeaponHolder>k__BackingField: {fileID: 5579794950706686892}
   headHolder: {fileID: 2394434733343807741}
@@ -609,15 +606,17 @@ MonoBehaviour:
   pantsHolder: {fileID: 6963492565293870512}
   wingHolder: {fileID: 8102356286531597657}
   tailHolder: {fileID: 1929863699218225393}
+  rb: {fileID: 6676162971634568813}
+  animator: {fileID: 4276091169662017440}
+  baseMoveSpeed: 0
   atkRangeTF: {fileID: 431542723759777090}
   baseAtkRange: 4
-  baseAtkSpeed: 8
-  targetIndicatorImage: {fileID: 2616514746662846724}
-  <Indicator>k__BackingField: {fileID: 0}
+  <BaseAtkSpeed>k__BackingField: 8
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
   colorDataSO: {fileID: 11400000, guid: 9e84c9a472450ba47b7affb38dd01b89, type: 2}
   bulletPartical: {fileID: 1533911038709997858}
   sizeUpPartical: {fileID: 8545612161626915872}
+  targetIndicatorImage: {fileID: 2616514746662846724}
   agent: {fileID: 3189109174281939071}
 --- !u!195 &3189109174281939071
 NavMeshAgent:

@@ -636,7 +636,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 10
-  cam: {fileID: 963194227}
+  <Camera>k__BackingField: {fileID: 963194227}
   TF: {fileID: 963194228}
 --- !u!1 &1033765269
 GameObject:

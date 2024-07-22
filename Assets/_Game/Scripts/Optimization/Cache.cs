@@ -3,9 +3,10 @@ using UnityEngine;
 
 public static class Cache
 {
-    private static Dictionary<Collider, Character>   bridgeChars = new Dictionary<Collider, Character>();
-    private static Dictionary<Collider, Bullet>      bridgeBullets = new Dictionary<Collider, Bullet>();
-    private static Dictionary<float, WaitForSeconds> bridgeWaitSecs = new Dictionary<float, WaitForSeconds>();
+    private static Dictionary<Collider, Character> bridgeChars = new();
+    private static Dictionary<Collider, Bullet> bridgeBullets = new();
+    private static Dictionary<float, WaitForSeconds> bridgeWaitSecs = new();
+    private static Dictionary<string, Vector3> bridgeVectors = new();
 
     public static Character GetChar(Collider collider)
     {
@@ -35,5 +36,16 @@ public static class Cache
         }
 
         return bridgeWaitSecs[secs];
+    }
+
+    public static Vector3 GetVector(float x, float y, float z)
+    {
+
+        if (!bridgeVectors.ContainsKey($"{x}_{y}_{z}"))
+        {
+            bridgeVectors.Add($"{x}_{y}_{z}", new Vector3(x,y,z));
+        }
+
+        return bridgeVectors[$"{x}_{y}_{z}"];
     }
 }

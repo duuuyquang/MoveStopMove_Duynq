@@ -2,24 +2,24 @@ using UnityEngine;
 
 public class AttackState : IState
 {
-    float delayTime = Random.Range(0f, 1.5f);
-    float count = 0f;
-    bool isAttacked = false;
-
     public void OnEnter(Enemy enemy)
     {
         enemy.StopMoving();
+        enemy.StateDelayTime = Random.Range(0f, 1.5f);
+        enemy.StateCounter = 0f;
+        enemy.StateIsAttacked = false;
     }
 
     public void OnExecute(Enemy enemy)
     {
-        count += Time.deltaTime;
-        if (count >= delayTime)
+        enemy.ChangeAnimByCurStatus();
+        enemy.StateCounter += Time.deltaTime;
+        if (enemy.StateCounter >= enemy.StateDelayTime)
         {
-            if(!isAttacked)
+            if(!enemy.StateIsAttacked)
             {
                 enemy.CheckToProcessAttack();
-                isAttacked = true;
+                enemy.StateIsAttacked = true;
             }
 
             if(enemy.WeaponHolder.CurWeapon.IsGrab)
@@ -27,7 +27,8 @@ public class AttackState : IState
                 if (enemy.WeaponHolder.CurBullet && enemy.WeaponHolder.CurBullet.IsDropped && enemy.IsStatus(StatusType.Normal))
                 {
                     Vector3 targetPos = new Vector3(enemy.WeaponHolder.CurBullet.TF.position.x, enemy.TF.position.y, enemy.WeaponHolder.CurBullet.TF.position.z);
-                    enemy.SetState(new RunToDestination(targetPos));
+                    enemy.StateTargetPos = targetPos;
+                    enemy.SetState(new RunToDestination());
                 }
                 return;
             }

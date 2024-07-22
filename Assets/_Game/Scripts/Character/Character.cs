@@ -1,8 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public enum StatusType { Normal, Attacking, Dead, Win }
 
@@ -10,25 +8,23 @@ public class Character : GameUnit
 {
     private string charName;
     public string Name { get { return charName; } set { if (value.Length < 25) { charName = value; } } }
-
-    #region Skin Related
+    #region Skin ------------------------------------------------
     [SerializeField] protected Renderer charRenderer;
     [field: SerializeField] public WeaponHolder WeaponHolder { get; protected set; }
     [SerializeField] protected Transform headHolder;
     [SerializeField] protected Transform shieldHolder;
-    [SerializeField] protected Renderer pantsHolder;
+    [SerializeField] protected Renderer  pantsHolder;
     [SerializeField] protected Transform wingHolder;
     [SerializeField] protected Transform tailHolder;
-    public Item CurHead { get; protected set; }
-    public Item CurPants { get; protected set; }
+    public Item CurHead   { get; protected set; }
+    public Item CurPants  { get; protected set; }
     public Item CurShield { get; protected set; }
-    public Item CurTail { get; protected set; }
-    public Item CurWing { get; protected set; }
-    public Item CurSet { get; protected set; }
+    public Item CurTail   { get; protected set; }
+    public Item CurWing   { get; protected set; }
+    public Item CurSet    { get; protected set; }
     public ColorType ColorType { get; private set; }
     #endregion
-
-    #region Movement
+    #region Movement ---------------------------------------------
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator animator;
     [SerializeField] protected float baseMoveSpeed;
@@ -37,58 +33,42 @@ public class Character : GameUnit
     public float MoveSpeed => baseMoveSpeed + bonusMoveSpeed;
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
     #endregion
-
-    //------------------ Combat props ------------------------
-    protected int[] upSizeThresholds = { 1, 5, 13, 25, 41, 61 }; // kill 4 enemies same scale to up scale: 4, 8, 12, 16, 20 (combatPoint relatively)
-
-    private int combatPoint;
-    public int CombatPoint { get { return combatPoint; } set { combatPoint = Mathf.Max(0, value); } }
-
-    private Coroutine attackCoroutine;
-
-    public  WeaponType WeaponType { get; protected set; }
-
+    #region Combat -----------------------------------------------
     [SerializeField] protected Transform atkRangeTF;
     [SerializeField] protected float baseAtkRange;
-    [SerializeField] protected float baseAtkSpeed;
-
+    [field: SerializeField] public float BaseAtkSpeed { get; protected set; }
+    protected static int[] SCALEUP_THRESHOLD = { 1, 5, 13, 25, 41, 61 }; // kill 4 enemies same scale to upscale: 4, 8, 12, 16, 20 (CombatPoint relatively)
+    public int CombatPoint { get; protected set; }
+    private Coroutine attackCoroutine;
+    public  WeaponType WeaponType { get; protected set; }
+    private Vector3 atkTargetPos;
     private float ItemBonusAtkRange { get; set; }
+    private float BonusAtkRange => ItemBonusAtkRange + WeaponBonusAtkRange;
     public float WeaponBonusAtkRange { get; set; }
-    protected float BonusAtkRange => ItemBonusAtkRange + WeaponBonusAtkRange;
     public float CurAttackRange => (baseAtkRange + BonusAtkRange) * CurSize;
     public float CurSize { get; protected set; }
-    public float BaseAttackSpeed => baseAtkSpeed;
     public float BonusGoldMultiplier { get; private set; }
-
-    #region Navigation
-    [SerializeField] protected Image targetIndicatorImage;
+    #endregion
+    #region Navigation --------------------------------------------
     private Indicator Indicator;
-    protected List<Character> targetsInRange = new List<Character>();
-    protected Character curTargetChar = null;
-    public bool HasTargetInRange => curTargetChar != null;
+    public List<Character> targetsInRange = new();
+    public Character CurTargetChar { get; set; }
+    public bool HasTargetInRange => CurTargetChar != null;
     #endregion
-
-    #region Status
-    protected StatusType curStatus;
-    public StatusType CurStatus => curStatus;
-    public bool IsStatus(StatusType status) => curStatus == status;
+    #region Status ------------------------------------------------
+    public StatusType CurStatus { get; protected set; }
+    public bool IsStatus(StatusType status) => CurStatus == status;
     #endregion
-
-    #region DataSO
+    #region DataSO ------------------------------------------------
     public ItemDataSO itemDataSO;
     public ColorDataSO colorDataSO;
     #endregion
-
     [SerializeField] ParticleSystem bulletPartical;
     [SerializeField] ParticleSystem sizeUpPartical;
 
     protected virtual void Update()
     {
-        if (GameManager.IsState(GameState.GamePlay))
-        {
-            DetectNearestTarget();
-            UpdateAnimation();
-        }
+        TargetDetector.DetectNearestTarget(this, targetsInRange);
     }
 
     #region Init
@@ -117,34 +97,22 @@ public class Character : GameUnit
         TF.localScale = Vector3.one;
     }
 
-    protected void SetupSizeByInitCombatPoint(int initPoint)
-    {
-        for (int i = 0; i < upSizeThresholds.Length; i++)
-        {
-            if (initPoint >= upSizeThresholds[i])
-            {
-                ProcessScaleSizeUp(false);
-            }
-        }
-    }
-
     protected void ClearTargets()
     {
         targetsInRange.Clear();
-        curTargetChar = null;
+        CurTargetChar = null;
     }
 
     protected void InitStatus()
     {
-        curStatus = StatusType.Normal;
+        CurStatus = StatusType.Normal;
     }
 
     protected virtual void SetAttackRangeTF(float atkRange)
     {
-        atkRangeTF.localScale = new Vector3(atkRange * 2f, 0.1f, atkRange * 2f);
+        atkRangeTF.localScale = Cache.GetVector(atkRange * 2f, 0.1f, atkRange * 2f);
     }
     #endregion
-
     #region Change weapons and skins
     public void ChangeWeapon(WeaponType type)
     {
@@ -173,10 +141,7 @@ public class Character : GameUnit
 
     public void ChangeShield(ItemType type)
     {
-        if (CurShield != null)
-        {
-            Destroy(CurShield.gameObject);
-        }
+        if (CurShield != null)Destroy(CurShield.gameObject);
         CurShield = Instantiate(itemDataSO.GetShield(type), shieldHolder);
         UpdateBonusStatsFromItem(CurShield);
     }
@@ -189,33 +154,20 @@ public class Character : GameUnit
         ChangeShield(CurSet.ShieldItem.Type);
         ChangeWing(CurSet.WingItem.Type);
         ChangeTail(CurSet.TailItem.Type);
-
-        if(type == ItemType.None)
-        {
-            ChangeColor(ColorType);
-        } 
-        else
-        {
-            ChangeColorBySetItem(CurSet.CharColorType);
-        }
         UpdateBonusStatsFromItem(CurSet);
+        if (type == ItemType.None) ChangeColor(ColorType);
+        else ChangeColorBySetItem(CurSet.CharColorType);
     }
 
     private void ChangeWing(ItemType type)
     {
-        if (CurWing != null)
-        {
-            Destroy(CurWing.gameObject);
-        }
+        if (CurWing != null) Destroy(CurWing.gameObject);
         CurWing = Instantiate(itemDataSO.GetWing(type), wingHolder);
     }
 
     private void ChangeTail(ItemType type)
     {
-        if (CurTail != null)
-        {
-            Destroy(CurTail.gameObject);
-        }
+        if (CurTail != null) Destroy(CurTail.gameObject);
         CurTail = Instantiate(itemDataSO.GetTail(type), tailHolder);
     }
 
@@ -234,12 +186,10 @@ public class Character : GameUnit
 
     protected void ChangeColorBySetItem(ColorType type)
     {
-        if (type == ColorType.None)
-        {
-            ChangeColor(ColorType);
-        }
+        if (type == ColorType.None) ChangeColor(ColorType);
         else
         {
+            ColorType = type;
             charRenderer.material = colorDataSO.GetMat(type);
         }
     }
@@ -249,91 +199,40 @@ public class Character : GameUnit
         charRenderer.material = colorDataSO.GetMatDeath(type);
     }
     #endregion
-
-    #region Target detection
-    private bool IsInvalidTarget(Character enemy) => enemy.IsStatus(StatusType.Dead) || Vector3.Distance(enemy.TF.position, TF.position) > CurAttackRange;
-
-    protected virtual void DetectNearestTarget()
-    {
-        if(!IsStatus(StatusType.Normal))
-        {
-            return;
-        }
-        float nearestDist = 0;
-        curTargetChar = null;
-        float checkingDist;
-        foreach (Character enemy in targetsInRange) {
-            if (IsInvalidTarget(enemy))
-            {
-                continue;
-            }
-            checkingDist = Vector3.Distance(enemy.TF.position, TF.position);
-            if (nearestDist == 0)
-            {
-                nearestDist = checkingDist;
-                curTargetChar = enemy;
-            }
-
-            if (checkingDist < nearestDist)
-            {
-                nearestDist = checkingDist;
-                curTargetChar = enemy;
-            }
-        }
-    }
-
-    public void RemoveTargetInRange(Character character)
-    {
-        character.ToggleTargetIndicator(false);
-        targetsInRange.Remove(character);
-    }
-    #endregion
-
     #region Attack
     private bool CheckAttackableConditions => WeaponHolder.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking) && !IsStatus(StatusType.Dead);
 
     public void CheckToProcessAttack()
     {
-        if(IsStanding)
+        if (IsStanding)
         {
-            if (CheckAttackableConditions)
-            {
-                ProcessAttack();
-            }
+            if (CheckAttackableConditions) ProcessAttack();
         }
-        else
-        {
-            StopAttack();
-        }
+        else StopAttack();
     }
 
     private void ProcessAttack()
     {
-        ChangeStatus(StatusType.Attacking);
-        ChangeAnim(Const.ANIM_NAME_ATTACK);
-
+        ChangeAnimByStatus(StatusType.Attacking);
         attackCoroutine = StartCoroutine(IEAttack());
     }
 
     protected void StopAttack()
     {
-        ChangeStatus(StatusType.Normal);
-        if (attackCoroutine != null)
-        {
-            StopCoroutine(attackCoroutine);
-        }
+        ChangeAnimByStatus(StatusType.Normal);
+        if (attackCoroutine != null) StopCoroutine(attackCoroutine);
     }
 
     IEnumerator IEAttack()
     {
-        Vector3 targetPos = TF.position + (curTargetChar.TF.position - TF.position).normalized * CurAttackRange;
+        atkTargetPos = TF.position + (CurTargetChar.TF.position - TF.position).normalized * CurAttackRange;
         yield return Cache.GetWaitSecs(0.3f);
         if(!IsStatus(StatusType.Dead))
         {
-            WeaponHolder.OnShoot(targetPos);
+            WeaponHolder.OnShoot(atkTargetPos);
             ToggleWeapon(false);
             yield return Cache.GetWaitSecs(1f);
-            ChangeStatus(StatusType.Normal);
+            ChangeAnimByStatus(StatusType.Normal);
         }
     }
 
@@ -351,23 +250,16 @@ public class Character : GameUnit
 
     public void ToggleWeapon(bool value)
     {
-        if (WeaponHolder)
-        {
-            WeaponHolder.gameObject.SetActive(value);
-        }
+        if (WeaponHolder) WeaponHolder.gameObject.SetActive(value);
     }
 
-    public virtual void ProcessOnTargetKilled(Character opponent)
+    public virtual void OnTargetKilled(Character opponent)
     {
-        RemoveTargetInRange(opponent);
+        TargetDetector.RemoveTargetInRange(this, opponent);
         CheckToScaleSizeUp(opponent.CombatPoint);
-        if (Indicator)
-        {
-            Indicator.UpdateCombatPoint(CombatPoint);
-        }
+        if (Indicator) Indicator.UpdateCombatPoint(CombatPoint);
     }
     #endregion
-
     #region Scale
     public void CheckToScaleSizeUp(int opponentCombatPoint)
     {
@@ -376,9 +268,9 @@ public class Character : GameUnit
         ShowCombatPointGainned(gainnedPoint);
         CombatPoint += gainnedPoint;
 
-        for (int i = 0; i < upSizeThresholds.Length; i++)
+        for (int i = 0; i < SCALEUP_THRESHOLD.Length; i++)
         {
-            if (oldCombatPoint < upSizeThresholds[i] && CombatPoint >= upSizeThresholds[i])
+            if (oldCombatPoint < SCALEUP_THRESHOLD[i] && CombatPoint >= SCALEUP_THRESHOLD[i])
             {
                 ProcessScaleSizeUp();
                 return;
@@ -391,26 +283,20 @@ public class Character : GameUnit
         CurSize += Const.CHARACTER_UPSCALE_UNIT;
         TF.localScale = Vector3.one * CurSize;
         TF.position += Vector3.up * Const.CHARACTER_UPSCALE_UNIT;
-        if (vfxOn)
-        {
-            Invoke(nameof(TriggerScaleUpVFX), 0.15f);
-        }
+        if (vfxOn) Invoke(nameof(TriggerScaleUpVFX), 0.15f);
     }
 
     private void TriggerScaleUpVFX()
     {
-        if (!IsStatus(StatusType.Dead))
-        {
-            sizeUpPartical.Play();
-        }
+        if (!IsStatus(StatusType.Dead)) sizeUpPartical.Play();
     }
 
     public int GetCombatPointInReturn(int point)
     {
-        int returnPoint = upSizeThresholds.Length + 1;
-        for (int i = 0; i < upSizeThresholds.Length; i++)
+        int returnPoint = SCALEUP_THRESHOLD.Length + 1;
+        for (int i = 0; i < SCALEUP_THRESHOLD.Length; i++)
         {
-            if (point <= upSizeThresholds[i])
+            if (point <= SCALEUP_THRESHOLD[i])
             {
                 returnPoint = i + 1;
                 break;
@@ -418,8 +304,13 @@ public class Character : GameUnit
         }
         return returnPoint;
     }
-    #endregion
 
+    protected void SetupSizeByInitCombatPoint(int initPoint)
+    {
+        for (int i = 0; i < SCALEUP_THRESHOLD.Length; i++) if (initPoint >= SCALEUP_THRESHOLD[i]) ProcessScaleSizeUp(false);
+    }
+    #endregion
+    #region Animation controlling
     public void ChangeAnim(string animName)
     {
         if (curAnim != animName)
@@ -432,54 +323,41 @@ public class Character : GameUnit
 
     protected void ChangeStatus(StatusType type)
     {
-        if (curStatus == StatusType.Dead)
-        {
-            return;
-        }
-
-        if (curStatus != type)
-        {
-            curStatus = type;
-        }
+        if (CurStatus == StatusType.Dead) return;
+        if (CurStatus != type) CurStatus = type;
     }
 
-    //TODO: optimize other structure
-    protected virtual void UpdateAnimation()
+    public virtual void ChangeAnimByCurStatus()
     {
-        if (IsStatus(StatusType.Dead))
+        switch(CurStatus)
         {
-            ChangeAnim(Const.ANIM_NAME_DIE);
-        }
-
-        if (IsStatus(StatusType.Normal))
-        {
-            if (IsStanding)
-            {
-                ChangeAnim(Const.ANIM_NAME_IDLE);
-            }
-            else
-            {
-                ChangeAnim(Const.ANIM_NAME_RUN);
-            }
-        }
-
-        if (IsStatus(StatusType.Attacking))
-        {
-            ChangeAnim(Const.ANIM_NAME_ATTACK);
-            if (curTargetChar)
-            {
-                LookAtTarget(curTargetChar.TF.position);
-            }
+            case StatusType.Normal:
+                if (IsStanding) ChangeAnim(Const.ANIM_NAME_IDLE);
+                else ChangeAnim(Const.ANIM_NAME_RUN);
+                break;
+            case StatusType.Attacking:
+                ChangeAnim(Const.ANIM_NAME_ATTACK);
+                LookAtTarget(atkTargetPos);
+                break;
+            case StatusType.Dead:
+                ChangeAnim(Const.ANIM_NAME_DIE);
+                break;
         }
     }
+
+    private void ChangeAnimByStatus(StatusType type)
+    {
+        ChangeStatus(type);
+        ChangeAnimByCurStatus();
+    }
+    #endregion
 
     public virtual void OnDead()
     {
         Invoke(nameof(OnDespawn), 2f);
-        ChangeStatus(StatusType.Dead);
+        ChangeAnimByStatus(StatusType.Dead);
         StopMoving();
         ClearTargets();
-
         bulletPartical.Play();
         Indicator = null;
         ChangeColorDeath(ColorType);
@@ -487,45 +365,22 @@ public class Character : GameUnit
         GameManager.Instance.UpdateAliveCountText();
     }
 
-    protected virtual void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         Character character = Cache.GetChar(other);
-        if (character)
-        {
-            if (!character.IsStatus(StatusType.Dead))
-            {
-                //TODO: move to other manager
-                targetsInRange.Add(character);
-            }
-        }
+        if (character) TargetDetector.AddTargetInRange(this, character);
     }
 
-    public void OnTriggerExit(Collider other)
+    private void OnTriggerExit(Collider other)
     {
         Character character = Cache.GetChar(other);
-        if (character)
-        {
-            RemoveTargetInRange(character);
-        }
-    }
-
-    public virtual void StopMoving()
-    {
-        if (IsStatus(StatusType.Dead))
-        {
-            return;
-        }
+        if (character) TargetDetector.RemoveTargetInRange(this, character);
     }
 
     #region empty virtual methods
-    protected virtual void ShowCombatPointGainned(int point)
-    {
-    }
-    public virtual void ToggleTargetIndicator(bool value)
-    {
-    }
-    public virtual void OnDespawn()
-    {
-    }
+    protected virtual void ShowCombatPointGainned(int point){}
+    public virtual void ToggleTargetIndicator(bool value){}
+    public virtual void OnDespawn(){}
+    public virtual void StopMoving(){}
     #endregion
 }

@@ -1,23 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RunToDestination : IState
 {
-    private Vector3 targetPos;
-
-    public RunToDestination(Vector3 targetPos)
-    {
-        this.targetPos = targetPos;
-    }
-
     public void OnEnter(Enemy enemy)
     {
-        enemy.SetDestination(targetPos);
+        enemy.SetDestination(enemy.StateTargetPos);
     }
 
     public void OnExecute(Enemy enemy)
     {
+        enemy.ChangeAnimByCurStatus();
         if (enemy.IsDestination)
         {
             if (Random.Range(0, 10) < 5)
