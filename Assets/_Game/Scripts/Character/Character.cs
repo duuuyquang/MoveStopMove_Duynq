@@ -42,9 +42,9 @@ public class Character : GameUnit
     [field: SerializeField] public float BaseAtkSpeed { get; protected set; }
     public  WeaponType WeaponType { get; protected set; }
     public float ItemBonusAtkRange { get; private set; }
-    public float CurSize { get; protected set; }
+    public float CurSize { get; set; }
     public float BonusGoldMultiplier { get; private set; }
-    public int CombatPoint { get; protected set; }
+    public int CombatPoint { get; set; }
     private float BonusAtkRange => ItemBonusAtkRange + WeaponHolder.CurWeapon.BonusAttackRange;
     public float CurAttackRange => (BaseAtkRange + BonusAtkRange) * CurSize;
     private bool CheckAttackableConditions => WeaponHolder.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking) && !IsStatus(StatusType.Dead);
@@ -141,7 +141,10 @@ public class Character : GameUnit
 
     public void ChangeShield(ItemType type)
     {
-        if (CurShield != null)Destroy(CurShield.gameObject);
+        if (CurShield != null) 
+        {
+            Destroy(CurShield.gameObject);
+        }
         CurShield = Instantiate(itemDataSO.GetShield(type), shieldHolder);
         UpdateBonusStatsFromItem(CurShield);
     }
@@ -155,19 +158,31 @@ public class Character : GameUnit
         ChangeWing(CurSet.WingItem.Type);
         ChangeTail(CurSet.TailItem.Type);
         UpdateBonusStatsFromItem(CurSet);
-        if (type == ItemType.None) ChangeColor(ColorType);
-        else ChangeColorBySetItem(CurSet.CharColorType);
+        if (type == ItemType.None)
+        {
+            ChangeColor(ColorType);
+        }
+        else
+        {
+            ChangeColorBySetItem(CurSet.CharColorType);
+        }
     }
 
     private void ChangeWing(ItemType type)
     {
-        if (CurWing != null) Destroy(CurWing.gameObject);
+        if (CurWing != null) 
+        {
+            Destroy(CurWing.gameObject);
+        }
         CurWing = Instantiate(itemDataSO.GetWing(type), wingHolder);
     }
 
     private void ChangeTail(ItemType type)
     {
-        if (CurTail != null) Destroy(CurTail.gameObject);
+        if (CurTail != null) 
+        {
+            Destroy(CurTail.gameObject);
+        }
         CurTail = Instantiate(itemDataSO.GetTail(type), tailHolder);
     }
 
@@ -186,7 +201,10 @@ public class Character : GameUnit
 
     protected void ChangeColorBySetItem(ColorType type)
     {
-        if (type == ColorType.None) ChangeColor(ColorType);
+        if (type == ColorType.None) 
+        {
+            ChangeColor(ColorType);
+        }
         else
         {
             ColorType = type;
@@ -204,9 +222,15 @@ public class Character : GameUnit
     {
         if (IsStanding)
         {
-            if (CheckAttackableConditions) ProcessAttack();
+            if (CheckAttackableConditions)
+            {
+                ProcessAttack();
+            }
         }
-        else StopAttack();
+        else 
+        {
+            StopAttack();
+        }
     }
 
     private void ProcessAttack()
@@ -218,7 +242,10 @@ public class Character : GameUnit
     protected void StopAttack()
     {
         ChangeAnimByStatus(StatusType.Normal);
-        if (attackCoroutine != null) StopCoroutine(attackCoroutine);
+        if (attackCoroutine != null) 
+        {
+            StopCoroutine(attackCoroutine);
+        }
     }
 
     IEnumerator IEAttack()
@@ -248,66 +275,23 @@ public class Character : GameUnit
 
     public void ToggleWeapon(bool value)
     {
-        if (WeaponHolder) WeaponHolder.gameObject.SetActive(value);
+        if (WeaponHolder) 
+        {
+            WeaponHolder.gameObject.SetActive(value);
+        }
     }
 
     public virtual void OnTargetKilled(Character opponent)
     {
         TargetDetector.RemoveTargetInRange(this, opponent);
-        CheckToScaleSizeUp(opponent.CombatPoint);
-        if (indicator) indicator.UpdateCombatPoint(CombatPoint);
-    }
-    #endregion
-    #region Scale
-    public void CheckToScaleSizeUp(int opponentCombatPoint)
-    {
-        int oldCombatPoint = CombatPoint;
-        int gainnedPoint = GetCombatPointInReturn(opponentCombatPoint);
-        ShowCombatPointGainned(gainnedPoint);
-        CombatPoint += gainnedPoint;
-
-        for (int i = 0; i < SCALEUP_THRESHOLD.Length; i++)
+        ScaleUp.CheckToProcess(this, opponent.CombatPoint);
+        if (indicator) 
         {
-            if (oldCombatPoint < SCALEUP_THRESHOLD[i] && CombatPoint >= SCALEUP_THRESHOLD[i])
-            {
-                ProcessScaleSizeUp();
-                return;
-            }
+            indicator.UpdateCombatPoint(CombatPoint);
         }
     }
-
-    protected void ProcessScaleSizeUp(bool vfxOn = true)
-    {
-        CurSize += Const.CHARACTER_UPSCALE_UNIT;
-        TF.localScale = Vector3.one * CurSize;
-        TF.position += Vector3.up * Const.CHARACTER_UPSCALE_UNIT;
-        if (vfxOn) Invoke(nameof(TriggerScaleUpVFX), 0.15f);
-    }
-
-    private void TriggerScaleUpVFX()
-    {
-        if (!IsStatus(StatusType.Dead)) sizeUpPartical.Play();
-    }
-
-    public int GetCombatPointInReturn(int point)
-    {
-        int returnPoint = SCALEUP_THRESHOLD.Length + 1;
-        for (int i = 0; i < SCALEUP_THRESHOLD.Length; i++)
-        {
-            if (point <= SCALEUP_THRESHOLD[i])
-            {
-                returnPoint = i + 1;
-                break;
-            }
-        }
-        return returnPoint;
-    }
-
-    protected void SetupSizeByInitCombatPoint(int initPoint)
-    {
-        for (int i = 0; i < SCALEUP_THRESHOLD.Length; i++) if (initPoint >= SCALEUP_THRESHOLD[i]) ProcessScaleSizeUp(false);
-    }
     #endregion
+
     #region Animation Controller
     public void ChangeAnim(string animName)
     {
@@ -330,8 +314,14 @@ public class Character : GameUnit
         switch(CurStatus)
         {
             case StatusType.Normal:
-                if (IsStanding) ChangeAnim(Const.ANIM_NAME_IDLE);
-                else ChangeAnim(Const.ANIM_NAME_RUN);
+                if (IsStanding)
+                {
+                    ChangeAnim(Const.ANIM_NAME_IDLE);
+                }
+                else
+                {
+                    ChangeAnim(Const.ANIM_NAME_RUN);
+                }
                 break;
             case StatusType.Attacking:
                 ChangeAnim(Const.ANIM_NAME_ATTACK);
@@ -363,20 +353,39 @@ public class Character : GameUnit
         GameManager.Instance.UpdateAliveCountText();
     }
 
+    public void TriggerScaleUpVFX(float delay)
+    {
+        Invoke(nameof(TriggerScaleUpVFX), delay);
+    }
+
+    private void TriggerScaleUpVFX()
+    {
+        if (!IsStatus(StatusType.Dead))
+        {
+            sizeUpPartical.Play();
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         Character character = Cache.GetChar(other);
-        if (character) TargetDetector.AddTargetInRange(this, character);
+        if (character)
+        {
+            TargetDetector.AddTargetInRange(this, character);
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
         Character character = Cache.GetChar(other);
-        if (character) TargetDetector.RemoveTargetInRange(this, character);
+        if (character) 
+        {
+            TargetDetector.RemoveTargetInRange(this, character);
+        }
     }
 
     #region empty virtual methods
-    protected virtual void ShowCombatPointGainned(int point){}
+    public virtual void ShowCombatPointGainned(int point){}
     public virtual void ToggleTargetIndicator(bool value){}
     public virtual void OnDespawn(){}
     public virtual void StopMoving(){}

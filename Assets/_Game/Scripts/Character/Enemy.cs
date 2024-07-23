@@ -43,7 +43,7 @@ public class Enemy : Character
         TF.eulerAngles = new Vector3(0, Random.Range(-180f, 181f), 0);
         Name = Ultilities.GetRandomValue(EnemyManager.NAMES);
         CombatPoint = Random.Range(0, EnemyManager.Instance.RecordHighestPoint + 1);
-        SetupSizeByInitCombatPoint(CombatPoint);
+        ScaleUp.ProcessByInitCombatPoint(this,CombatPoint);
 
         ChangeWeapon((WeaponType)Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length));
 

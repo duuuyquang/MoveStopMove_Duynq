@@ -36,7 +36,7 @@ public class Player : Character
         InitTransform(InitPosition);
         reviveTimes = 1;
         CombatPoint = 0; 
-        SetupSizeByInitCombatPoint(CombatPoint);
+        ScaleUp.ProcessByInitCombatPoint(this, CombatPoint);
         LoadSavedData();
     }
 
@@ -135,7 +135,7 @@ public class Player : Character
         PlayerController.Instance.OnInit();
         InitTransform(TF.position);
         StopFinishPartical();
-        SetupSizeByInitCombatPoint(CombatPoint);
+        ScaleUp.ProcessByInitCombatPoint(this, CombatPoint);
         LoadSavedData();
         InitIndicator();
     }
@@ -179,7 +179,7 @@ public class Player : Character
 
     private Vector3 OffsetAbovePlayerPos => CameraFollower.Instance.Camera.WorldToScreenPoint(TF.position) + Vector3.up * 200f;
 
-    protected override void ShowCombatPointGainned(int point)
+    public override void ShowCombatPointGainned(int point)
     {
         CombatPointText pointText = SimplePool.Spawn<CombatPointText>(PoolType.PointText, Vector3.zero, Quaternion.identity);
         pointText.TF.position = OffsetAbovePlayerPos;
