@@ -14,7 +14,7 @@ public class CanvasRevive : UICanvas
     public void CancelButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasLose>();
+        UIManager.Instance.OpenUI<CanvasLose>().OnOpen();
         GameManager.Instance.OnLoseRevive();
     }
 

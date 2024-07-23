@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum CameraState { Normal, Transition }
@@ -20,16 +19,17 @@ public class CameraFollower : Singleton<CameraFollower>
 
     public bool IsState(CameraState state) => curState == state;
 
-    private Vector3 playerInitalPos => Player.InitPosition + Vector3.down * 3f;
-    private Vector3 playerWeaponPos => LevelManager.Instance.Player.WeaponHolder.TF.position + Vector3.left * 0.3f + Vector3.down * 0.3f;
-    private Vector3 skinShopPos => Player.InitPosition + Vector3.down * 1.5f;
-    private Vector3 gamePlayOffset => new Vector3(0, LevelManager.Instance.Player.CurAttackRange * 3.1f, -LevelManager.Instance.Player.CurAttackRange * 2.5f);
+    private Vector3 PlayerInitalPos => Player.InitPosition + Vector3.down * 3f;
+    //private Vector3 PlayerWeaponPos => LevelManager.Instance.Player.WeaponHolder.TF.position + Vector3.left * 0.3f + Vector3.down * 0.3f;
+    private Vector3 PlayerWeaponPos => Player.InitPosition + Vector3.left * 0.6f + Vector3.down * 0.8f;
+    private Vector3 SkinShopPos => Player.InitPosition + Vector3.down * 1.5f;
+    private Vector3 GamePlayOffset => new Vector3(0, LevelManager.Instance.Player.CurAttackRange * 3.1f, -LevelManager.Instance.Player.CurAttackRange * 2.5f);
 
     void LateUpdate()
     {
         if (GameManager.IsState(GameState.GamePlay) && IsState(CameraState.Normal))
         {
-            targetPos = LevelManager.Instance.Player.TF.position + gamePlayOffset;
+            targetPos = LevelManager.Instance.Player.TF.position + GamePlayOffset;
             TF.position = Vector3.MoveTowards(TF.position, targetPos, speed * Time.fixedDeltaTime);
         }
     }
@@ -50,28 +50,28 @@ public class CameraFollower : Singleton<CameraFollower>
     public void InitPosition()
     {
         TF.position = OFFSET_GAME_MENU;
-        TF.LookAt(playerWeaponPos);
+        TF.LookAt(PlayerWeaponPos);
     }
 
     public void SetupMenuMode()
     {
-        StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_GAME_MENU, playerWeaponPos, 15f));
+        StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_GAME_MENU, PlayerWeaponPos, 15f));
     }
 
     public void SetupWeaponShopMode()
     {
-        StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_WEAPON_SHOP, playerWeaponPos, 15f));
+        StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_WEAPON_SHOP, PlayerWeaponPos, 15f));
     }
 
     public void SetupGamePlayMode()
     {
-        StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_GAME_PLAY, playerInitalPos, 20f));
+        StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_GAME_PLAY, PlayerInitalPos, 20f));
         //StartCoroutine(IECameraTransition());
     }
 
     public void SetupSkinShopMode()
     {
-        StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_SKIN_SHOP, skinShopPos, 10f));
+        StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_SKIN_SHOP, SkinShopPos, 10f));
     }
 
     //IEnumerator IECameraTransition()
@@ -91,7 +91,7 @@ public class CameraFollower : Singleton<CameraFollower>
     IEnumerator IEGenericTransitionAndLookAt(Vector3 finalPos, Vector3 lookAtPos, float speed)
     {
         ChangeState(CameraState.Transition);
-        while (Vector3.Distance(TF.position, finalPos) > 0.05f)
+        while (Vector3.Distance(TF.position, finalPos) > 0f)
         {
             TF.position = Vector3.MoveTowards(TF.position, finalPos, speed * Time.deltaTime);
             TF.LookAt(lookAtPos);

@@ -3,9 +3,11 @@ using UnityEngine;
 public class CanvasSettings : UICanvas
 {
     [SerializeField] GameObject[] buttons;
+    [SerializeField] Animator animator;
 
     public void SetState(UICanvas canvas)
     {
+        animator.SetTrigger(Const.ANIM_NAME_CANVAS_SETTING_IN);
         for (int i = 0; i < buttons.Length; i++)
         {
             buttons[i].gameObject.SetActive(false);
@@ -25,13 +27,14 @@ public class CanvasSettings : UICanvas
     public void MainMenuButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>();
-        LevelManager.Instance.OnInit(0);
+        UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
+        LevelManager.Instance.OnInit(PlayerData.Instance.curLevel);
     }
 
     public override void Close(float time)
     {
         base.Close(time);
+        animator.SetTrigger(Const.ANIM_NAME_CANVAS_SETTING_OUT);
     }
 
     public override void CloseDirectly()
@@ -41,7 +44,7 @@ public class CanvasSettings : UICanvas
 
     public void ContinueButton()
     {
-        base.CloseDirectly();
-        GameManager.Instance.OnPlay();
+        Close(1f);
+        GameManager.Instance.OnPlayDelay(1f);
     }
 }

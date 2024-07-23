@@ -3,22 +3,27 @@ using UnityEngine;
 
 public class CanvasMainMenu : UICanvas
 {
-    [SerializeField] private TextMeshProUGUI coinText;
-    [SerializeField] private TMP_InputField nameInputField;
+    [SerializeField] TextMeshProUGUI coinText;
+    [SerializeField] TMP_InputField nameInputField;
+    [SerializeField] Animator animator;
 
     public void OnOpen()
     {
         SetCoinText(GameManager.Instance.TotalCoin);
         GameManager.Instance.OnMenu();
+        CameraFollower.Instance.SetupMenuMode();
+        animator.SetTrigger(Const.ANIM_NAME_CANVAS_MENU_IN);
     }
 
     public void PlayButton()
     {
         if (CameraFollower.Instance.IsState(CameraState.Normal))
         {
-            Close(0);
+            Close(1f);
+            animator.SetTrigger(Const.ANIM_NAME_CANVAS_MENU_OUT);
             UIManager.Instance.OpenUI<CanvasGamePlay>().OnOpen();
-            GameManager.Instance.OnPlay();
+            GameManager.Instance.OnPlayDelay(1f);
+            CameraFollower.Instance.SetupGamePlayMode();
         }
     }
 

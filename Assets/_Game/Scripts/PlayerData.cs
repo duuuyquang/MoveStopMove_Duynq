@@ -78,8 +78,8 @@ public class PlayerData
 
     private static void Write(PlayerData data)
     {
-        streamWrite = new StreamWriter(FileDirectory);
         string json = JsonConvert.SerializeObject(data);
+        streamWrite = new StreamWriter(FileDirectory);
         streamWrite.WriteLine(json);
         streamWrite.Close();
         SetData(data);

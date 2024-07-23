@@ -10,7 +10,15 @@ public static class Const
     public const string ANIM_NAME_DANCE  = "dance";
     public const string ANIM_NAME_ATTACK = "attack";
     public const string ANIM_NAME_DIE    = "die";
-    public const string ANIM_NAME_SHOP   = "shop";
+    public const string ANIM_NAME_SHOP = "shop";
+
+    public const string ANIM_NAME_CANVAS_MENU_IN     = "menuin";
+    public const string ANIM_NAME_CANVAS_MENU_OUT    = "menuout";
+    public const string ANIM_NAME_CANVAS_SETTING_IN  = "settingin";
+    public const string ANIM_NAME_CANVAS_SETTING_OUT = "settingout";
+    public const string ANIM_NAME_CANVAS_WIN         = "win";
+    public const string ANIM_NAME_CANVAS_LOSE        = "lose";
+    public const string ANIM_NAME_CANVAS_GAMEPLAY    = "gameplay";
 
     public const float CHARACTER_UPSCALE_UNIT = 0.15f;
 

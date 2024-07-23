@@ -226,6 +226,7 @@ GameObject:
   - component: {fileID: 7815714282576527346}
   - component: {fileID: 317299768132158773}
   - component: {fileID: 7281308437919780878}
+  - component: {fileID: 7494921082972635551}
   m_Layer: 5
   m_Name: Canvas - Lose
   m_TagString: Untagged
@@ -328,6 +329,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 570703d2b6cb3b24b960f4fb6259b7da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 7494921082972635551}
+--- !u!95 &7494921082972635551
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5200334616670458822}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 85d0423bb0ca84843936e4af6977a644, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5772082209520781338
 GameObject:
   m_ObjectHideFlags: 0
@@ -456,7 +479,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 90.778046, y: 138.98975, z: 81.35303, w: 132.60913}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -927,9 +950,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0daf4da7abc044e2b9b26b6438bee49a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0358e94906c704657ab9ca0a8ce5a588, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1

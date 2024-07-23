@@ -23,8 +23,8 @@ public class LevelManager : Singleton<LevelManager>
         }
         SimplePool.ReleaseAll();
         WeaponPool.ReleaseAll();
-        InitPlayer();
-        LoadLevel(level);
+        OnLoad(level);
+        OnInitPlayer();
         GameManager.Instance.OnInit();
         EnemyManager.Instance.OnInit();
     }
@@ -39,7 +39,7 @@ public class LevelManager : Singleton<LevelManager>
         OnInit(CurLevel.Index);
     }
 
-    public void InitPlayer()
+    public void OnInitPlayer()
     {
         if (Player)
         {
@@ -49,23 +49,17 @@ public class LevelManager : Singleton<LevelManager>
         Player.OnInit();
     }
 
-    public void OnDespawn()
-    {
-
-    }
-
-    void LoadLevel(int level)
+    void OnLoad(int level)
     {
         if(CurLevel != null)
         {
             CurLevel.OnDespawn();
         }
 
-        if (levels[level])
-        {
-            Level newLevel = Instantiate(levels[level], transform);
-            newLevel.Index = level;
-            CurLevel = newLevel;
-        }
+        level = Mathf.Min(levels.Count - 1, level);
+
+        Level newLevel = Instantiate(levels[level], transform);
+        newLevel.Index = level;
+        CurLevel = newLevel;
     }
 }

@@ -70,7 +70,7 @@ public class GameManager : Singleton<GameManager>
     {
         ChangeState(GameState.Finish);
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasWin>();
+        UIManager.Instance.OpenUI<CanvasWin>().OnOpen();
         LevelManager.Instance.Player.OnWin();
     }
 
@@ -78,7 +78,7 @@ public class GameManager : Singleton<GameManager>
     {
         ChangeState(GameState.Finish);
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasLose>();
+        UIManager.Instance.OpenUI<CanvasLose>().OnOpen();
     }
 
     public void OnLoseRevive()
@@ -87,12 +87,16 @@ public class GameManager : Singleton<GameManager>
         StopReviveTimer();
     }
 
-    public void OnPlay()
+    public void OnPlayDelay(float delay, bool cameraMove = false)
+    {
+        Invoke(nameof(OnPlay), delay);
+    }
+
+    private void OnPlay()
     {
         ChangeState(GameState.GamePlay);
         LevelManager.Instance.Player.OnPlay();
         EnemyManager.Instance.OnPlay();
-        CameraFollower.Instance.SetupGamePlayMode();
     }
 
     public void OnPlayRevive()
@@ -115,7 +119,6 @@ public class GameManager : Singleton<GameManager>
         LevelManager.Instance.Player.SetMainMenuPose();
         LevelManager.Instance.Player.ChangeToSavedItems();
         LevelManager.Instance.Player.ChangeToSavedWeapon();
-        CameraFollower.Instance.SetupMenuMode();
     }
 
     public void OnRevive()

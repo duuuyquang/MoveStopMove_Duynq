@@ -226,14 +226,7 @@ public class CanvasSkinShop : UICanvas
 
     private void PrintBuyButtons()
     {
-        for (int i = 0; i < buttons.Length; i++)
-        {
-            buttons[i].gameObject.SetActive(false);
-        }
-        for (int i = 0; i < priceTexts.Length; i++)
-        {
-            priceTexts[i].text = "";
-        }
+        ResetButtonsState();
 
         if (CheckSameItem(choosingItem.Item.Type))
         {
@@ -254,6 +247,18 @@ public class CanvasSkinShop : UICanvas
         {
             buttons[0].gameObject.SetActive(true);
             priceTexts[0].text = choosingItem.Item.Price.ToString();
+        }
+    }
+
+    private void ResetButtonsState()
+    {
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            buttons[i].gameObject.SetActive(false);
+        }
+        for (int i = 0; i < priceTexts.Length; i++)
+        {
+            priceTexts[i].text = "";
         }
     }
 
@@ -306,7 +311,6 @@ public class CanvasSkinShop : UICanvas
         {
             ItemShop item = curItemShopList[0];
             curItemShopList.Remove(item);
-            //Destroy(item.gameObject);
             SimplePool.Despawn(item);
         }
         curItemShopList.Clear();

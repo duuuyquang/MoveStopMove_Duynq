@@ -759,6 +759,7 @@ GameObject:
   - component: {fileID: 565602153990688763}
   - component: {fileID: 3968517475169787248}
   - component: {fileID: 3281246320085299891}
+  - component: {fileID: 1780638170932639075}
   m_Layer: 5
   m_Name: Canvas - GamePlay
   m_TagString: Untagged
@@ -863,6 +864,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelText: {fileID: 4188289307059077369}
   aliveNumText: {fileID: 1030029623738252649}
+  animator: {fileID: 1780638170932639075}
 --- !u!114 &3968517475169787248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -939,3 +941,24 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!95 &1780638170932639075
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8316384287966950184}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 85d0423bb0ca84843936e4af6977a644, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

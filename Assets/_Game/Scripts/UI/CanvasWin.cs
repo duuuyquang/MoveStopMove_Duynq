@@ -1,12 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CanvasWin : UICanvas
 {
     [SerializeField] TextMeshProUGUI scoreText;
+    [SerializeField] Animator animator;
+
+    public void OnOpen()
+    {
+        animator.SetTrigger(Const.ANIM_NAME_CANVAS_WIN);
+    }
 
     public void SetBestScore(int score)
     {
@@ -17,7 +20,7 @@ public class CanvasWin : UICanvas
     {
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoinText(GameManager.Instance.TotalCoin);
-        LevelManager.Instance.OnInit(0);
+        LevelManager.Instance.OnInit(PlayerData.Instance.curLevel);
     }
 
     public void NextButton()

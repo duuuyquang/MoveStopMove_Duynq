@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbfe42784cddb364995adf9f836a111a, type: 3}
   m_Name: ColorDataSO
   m_EditorClassIdentifier: 
+  untouchable: {fileID: 2100000, guid: b0c1139699696864e9a3a213b06ef7d5, type: 2}
   materials:
   - {fileID: 2100000, guid: 98723d2046c9a614d827c7edaaba3f92, type: 2}
   - {fileID: 2100000, guid: 24bad656a942e444ab7ad1883643d736, type: 2}
