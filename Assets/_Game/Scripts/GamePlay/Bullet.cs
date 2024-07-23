@@ -117,7 +117,7 @@ public class Bullet : GameUnit
 
             grabTimer += Time.deltaTime;
 
-            if (!weaponHolder || weaponHolder && (Vector3.Distance(weaponHolder.Owner.TF.position, TF.position) <= 1.5f) || grabTimer >= 5f)
+            if (!weaponHolder || weaponHolder && (Vector3.Distance(weaponHolder.Owner.TF.position, TF.position) <= 1.5f) || grabTimer >= Const.WEAPON_DROP_TIME)
             {
                 dropPartical.Stop();
                 OnDespawn();
@@ -175,13 +175,15 @@ public class Bullet : GameUnit
 
     private bool CheckValidToHit(Character opponent)
     {
-        if (opponent && opponent != weaponHolder.Owner && !opponent.IsStatus(StatusType.Dead) && !IsDropped)
+        if (opponent && opponent != weaponHolder.Owner && CheckValidStatus(opponent) && !IsDropped)
         {
             OnHitOpponent(opponent);
             return true;
         }
         return false;
     }
+
+    private bool CheckValidStatus(Character opponent) => opponent.IsStatus(StatusType.Normal) || opponent.IsStatus(StatusType.Attacking);
 
     private void OnHitOpponent(Character opponent)
     {

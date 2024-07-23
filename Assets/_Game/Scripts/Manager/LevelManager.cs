@@ -6,22 +6,21 @@ public class LevelManager : Singleton<LevelManager>
 {
     [SerializeField] List<Level> levels;
     [SerializeField] Player playerPrefab;
-
-    private Player player;
-
-    public int initLevel;
-
-    private Level curLevel;
-    public Level CurLevel => curLevel;
-    public Player Player => player;
+    public Level CurLevel { get; private set; }
+    public Player Player { get; private set; }
 
     void Start()
     {
-        OnInit(initLevel);
+        OnInit();
     }
 
-    public void OnInit(int level)
+    public void OnInit(int level = 0)
     {
+        PlayerData.LoadData();
+        if (level == 0)
+        {
+            level = PlayerData.Instance.curLevel;
+        }
         SimplePool.ReleaseAll();
         WeaponPool.ReleaseAll();
         InitPlayer();
@@ -32,26 +31,22 @@ public class LevelManager : Singleton<LevelManager>
 
     public void OnInitNextLevel()
     {
-        OnInit(curLevel.Index + 1);
+        OnInit(CurLevel.Index + 1);
     }
 
     public void OnInitCurLevel()
     {
-        OnInit(curLevel.Index);
+        OnInit(CurLevel.Index);
     }
 
     public void InitPlayer()
     {
-        if (player)
+        if (Player)
         {
-            Destroy(player.gameObject);
+            Destroy(Player.gameObject);
         }
-        player = Instantiate(playerPrefab);
-
-        //if (player == null) {
-        //    player = Instantiate(playerPrefab);
-        //}
-        player.OnInit();
+        Player = Instantiate(playerPrefab);
+        Player.OnInit();
     }
 
     public void OnDespawn()
@@ -61,16 +56,16 @@ public class LevelManager : Singleton<LevelManager>
 
     void LoadLevel(int level)
     {
-        if(curLevel != null)
+        if(CurLevel != null)
         {
-            curLevel.OnDespawn();
+            CurLevel.OnDespawn();
         }
 
         if (levels[level])
         {
             Level newLevel = Instantiate(levels[level], transform);
             newLevel.Index = level;
-            curLevel = newLevel;
+            CurLevel = newLevel;
         }
     }
 }

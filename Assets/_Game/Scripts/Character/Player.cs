@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : Character
@@ -10,6 +12,7 @@ public class Player : Character
     public static Vector3 InitPosition = Vector3.zero;
 
     public int reviveTimes;
+    private int untouchCounter;
 
     protected override void Update()
     {
@@ -35,16 +38,14 @@ public class Player : Character
         PlayerController.Instance.OnInit();
         InitTransform(InitPosition);
         reviveTimes = 1;
-        CombatPoint = 0; 
+        CombatPoint = 0;
         ScaleUp.ProcessByInitCombatPoint(this, CombatPoint);
         LoadSavedData();
     }
 
-    private void GetSavedData()
+    private void CheckItemInitalStates()
     {
-        PlayerData.GetData();
-
-        if(PlayerData.Instance.weaponsState.Count == 0)
+        if (PlayerData.Instance.weaponsState.Count == 0)
         {
             PlayerData.Instance.weaponsState = itemDataSO.InitAllWeaponsState();
             PlayerData.Instance.weaponsState[WeaponType.Axe] = ItemState.Bought;
@@ -60,7 +61,7 @@ public class Player : Character
 
     private void LoadSavedData()
     {
-        GetSavedData();
+        CheckItemInitalStates();
         Name = PlayerData.Instance.name;
         ChangeColor(PlayerData.Instance.colorType);
         ChangeWeapon(PlayerData.Instance.weaponType);
@@ -101,7 +102,7 @@ public class Player : Character
     public override void OnDespawn()
     {
         base.OnDespawn();
-        if(reviveTimes <= 0)
+        if (reviveTimes <= 0)
         {
             GameManager.Instance.OnLose();
         }
@@ -138,12 +139,61 @@ public class Player : Character
         ScaleUp.ProcessByInitCombatPoint(this, CombatPoint);
         LoadSavedData();
         InitIndicator();
+        SetUntouchable();
+    }
+
+    private void SetUntouchable()
+    {
+        untouchCounter = Const.UNTOUCHABLE_SECS;
+        ChangeAnimByStatus(StatusType.Untouchable);
+        ChangeColorUntouchable();
+        SetAttackRangeTF(0f);
+        baseMoveSpeed *= 3f;
+        StartCoroutine(nameof(IEColorBlinking));
+        InvokeRepeating(nameof(CountDownUntouchable), 0, 1);
+    }
+
+    private void CountDownUntouchable()
+    {
+        untouchCounter--;
+        if( untouchCounter <= 0 )
+        {
+            ChangeAnimByStatus(StatusType.Normal, true);
+            ChangeColor(ColorType);
+            SetAttackRangeTF(BaseAtkRange + BonusAtkRange);
+            baseMoveSpeed = Const.DEFAULT_MOVE_SPD;
+            StopCoroutine(nameof(IEColorBlinking));
+            CancelInvoke(nameof(CountDownUntouchable));
+        }
+    }
+
+    protected void ChangeColorUntouchable()
+    {
+        charRenderer.material = colorDataSO.GetMatUntouchable();
+    }
+
+    IEnumerator IEColorBlinking()
+    {
+        bool toogle = false;
+        while (true)
+        {
+            if(toogle)
+            {
+                ChangeColorUntouchable();
+            } 
+            else
+            {
+                ChangeColor(ColorType);
+            }
+            toogle = !toogle;
+            yield return Cache.GetWaitSecs(0.2f);
+        }
     }
 
     public override void ChangeAnimByCurStatus()
     {
         base.ChangeAnimByCurStatus();
-        if (IsStatus(StatusType.Normal))
+        if (IsStatus(StatusType.Normal) || IsStatus(StatusType.Untouchable))
         {
             LookAtCurDirection();
         }

@@ -825,7 +825,6 @@ MonoBehaviour:
   - {fileID: 3765962034455248090, guid: aa43e3d3dbe649b4d8f16e083eae5d9f, type: 3}
   - {fileID: 8724707221156484112, guid: 933e9a81f62879a4ebcc430cf68ea4fb, type: 3}
   playerPrefab: {fileID: 4008256916713035965, guid: 908a000e0ca21724c9c8b5cfa7c2b353, type: 3}
-  initLevel: 0
 --- !u!4 &1191001643
 Transform:
   m_ObjectHideFlags: 0

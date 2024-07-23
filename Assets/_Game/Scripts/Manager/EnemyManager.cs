@@ -112,34 +112,12 @@ public class EnemyManager : Singleton<EnemyManager>
     
     private void ClearAllLists()
     {
-        //while (enemiesReadyList.Count > 0)
-        //{
-        //    Enemy enemy = enemiesReadyList[0];
-        //    enemiesReadyList.Remove(enemy);
-        //    Destroy(enemy.gameObject);
-        //}
-        //enemiesReadyList.Clear();
-
-        //while (spawnedEnemiesList.Count > 0)
-        //{
-        //    Enemy enemy = spawnedEnemiesList[0];
-        //    spawnedEnemiesList.Remove(enemy);
-        //    SimplePool.Despawn(enemy);
-        //}
         SimplePool.Collect(PoolType.Enemy);
         spawnedEnemiesList.Clear();
     }
 
     public void Spawn()
     {
-        //    Enemy enemy = enemiesReadyList[enemiesReadyList.Count - 1];
-        //    enemy.OnInit();
-        //    enemy.TF.position = GetValidSpawnPos();
-        //    enemy.gameObject.SetActive(true);
-
-        //    spawnedEnemiesList.Add(enemy);
-        //    enemiesReadyList.Remove(enemy);
-
         Enemy enemy = SimplePool.Spawn<Enemy>(PoolType.Enemy, GetValidSpawnPos(), Quaternion.identity);
         enemy.OnInit();
         if(GameManager.IsState(GameState.GamePlay))
@@ -185,12 +163,6 @@ public class EnemyManager : Singleton<EnemyManager>
     private void PreLoadEnemiesReadyList()
     {
         enemiesReadyCount = LevelManager.Instance.CurLevel.TotalEnemies;
-        //for (int i = 0; i < LevelManager.Instance.CurLevel.TotalEnemies; i++)
-        //{
-        //    Enemy enemy = Instantiate(enemyPrefab, transform);
-        //    enemy.gameObject.SetActive(false);
-        //    enemiesReadyList.Add(enemy);
-        //}
     }
 
     public void SetRecordHighestPoint(int point)

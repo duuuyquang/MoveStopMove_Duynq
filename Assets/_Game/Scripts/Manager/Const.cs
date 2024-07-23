@@ -17,4 +17,7 @@ public static class Const
     public const int WEAPON_BASE_BULLET_AMOUNT = 1;
     public const int COMBAT_TEXT_DEFAULT_SIZE = 80;
     public const int REVIVE_COUNTDOWN_SECS = 5;
+    public const int UNTOUCHABLE_SECS = 5;
+    public const int WEAPON_DROP_TIME = 5;
+    public const int DEFAULT_MOVE_SPD = 120;
 }

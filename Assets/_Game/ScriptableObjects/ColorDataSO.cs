@@ -20,6 +20,7 @@ public enum ColorType
 
 public class ColorDataSO : ScriptableObject
 {
+    [SerializeField] Material untouchable;
     [SerializeField] Material[] materials;
     [SerializeField] Material[] materialGUIs;
     [SerializeField] Material[] materialDeaths;
@@ -38,6 +39,11 @@ public class ColorDataSO : ScriptableObject
     public Material GetMatDeath(ColorType index)
     {
         return materialDeaths[(int)index];
+    }
+
+    public Material GetMatUntouchable()
+    {
+        return untouchable;
     }
 
     public Color GetColor(ColorType index)

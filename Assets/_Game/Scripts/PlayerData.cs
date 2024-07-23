@@ -33,7 +33,7 @@ public class PlayerData
     private static StreamReader streamReader;
     private static StreamWriter streamWrite;
 
-    public static void GetData()
+    public static void LoadData()
     {
         try
         {

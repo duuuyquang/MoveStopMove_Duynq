@@ -3,8 +3,9 @@ using UnityEngine;
 
 public static class TargetDetector
 {
-    private static bool IsInvalidTarget(Character character, Character enemy) => enemy.IsStatus(StatusType.Dead) || Vector3.Distance(enemy.TF.position, character.TF.position) > character.CurAttackRange;
+    private static bool IsInvalidTarget(Character character, Character enemy) => IsInValidStatus(enemy) || Vector3.Distance(enemy.TF.position, character.TF.position) > character.CurAttackRange;
 
+    private static bool IsInValidStatus(Character character) => character.IsStatus(StatusType.Dead) || character.IsStatus(StatusType.Untouchable);
     public static void DetectNearestTarget(Character character, List<Character> targetsInRange)
     {
         if(!GameManager.IsState(GameState.GamePlay))
@@ -26,6 +27,7 @@ public static class TargetDetector
             {
                 continue;
             }
+
             checkingDist = Vector3.Distance(enemy.TF.position, character.TF.position);
             if (nearestDist == 0f)
             {

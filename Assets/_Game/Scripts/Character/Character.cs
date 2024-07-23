@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum StatusType { Normal, Attacking, Dead, Win }
+public enum StatusType { Normal, Attacking, Dead, Win, Untouchable }
 
 public class Character : GameUnit
 {
@@ -29,7 +29,7 @@ public class Character : GameUnit
     private string curAnim = Const.ANIM_NAME_IDLE;
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator animator;
-    [SerializeField] protected float baseMoveSpeed;
+    [SerializeField] protected float baseMoveSpeed = Const.DEFAULT_MOVE_SPD;
     public float MoveSpeed => baseMoveSpeed + bonusMoveSpeed;
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
     #endregion
@@ -46,7 +46,7 @@ public class Character : GameUnit
     public float BonusGoldMultiplier { get; private set; }
     public float CurSize { get {  return curSize; } set { curSize = Mathf.Max(0, value); } }
     public int CombatPoint { get { return combatPoint; } set { combatPoint = Mathf.Max(0, value); } }
-    private float BonusAtkRange => WeaponHolder.CurWeapon.BonusAttackRange;
+    protected float BonusAtkRange => WeaponHolder.CurWeapon.BonusAttackRange;
     public float CurAttackRange => (BaseAtkRange + BonusAtkRange) * ItemBonusAtkRangeMultiplier * CurSize;
     private bool CheckAttackableConditions => WeaponHolder.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking) && !IsStatus(StatusType.Dead);
     #endregion
@@ -217,6 +217,7 @@ public class Character : GameUnit
     {
         charRenderer.material = colorDataSO.GetMatDeath(type);
     }
+
     #endregion
     #region Attack
     public void CheckToProcessAttack()
@@ -304,16 +305,32 @@ public class Character : GameUnit
         }
     }
 
-    protected void ChangeStatus(StatusType type)
+    protected void ChangeStatus(StatusType type, bool forceChange = false)
     {
-        if (CurStatus == StatusType.Dead) return;
-        if (CurStatus != type) CurStatus = type;
+        if(!forceChange)
+        {
+            if (CurStatus == StatusType.Dead)
+            {
+                return;
+            }
+
+            if (CurStatus == StatusType.Untouchable)
+            {
+                return;
+            }
+        }
+
+        if (CurStatus != type)
+        {
+            CurStatus = type;
+        }
     }
 
     public virtual void ChangeAnimByCurStatus()
     {
         switch(CurStatus)
         {
+            case StatusType.Untouchable:
             case StatusType.Normal:
                 if (IsStanding)
                 {
@@ -334,21 +351,21 @@ public class Character : GameUnit
         }
     }
 
-    private void ChangeAnimByStatus(StatusType type)
+    protected void ChangeAnimByStatus(StatusType type, bool forceChange = false)
     {
-        ChangeStatus(type);
+        ChangeStatus(type, forceChange);
         ChangeAnimByCurStatus();
     }
     #endregion
 
     public virtual void OnDead()
     {
+        bulletPartical.Play();
+        indicator = null;
         Invoke(nameof(OnDespawn), 2f);
         ChangeAnimByStatus(StatusType.Dead);
         StopMoving();
         ClearTargets();
-        bulletPartical.Play();
-        indicator = null;
         ChangeColorDeath(ColorType);
         ToggleTargetIndicator(false);
         GameManager.Instance.UpdateAliveCountText();
