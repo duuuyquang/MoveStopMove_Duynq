@@ -10,12 +10,12 @@ public class Character : GameUnit
     public string Name { get { return charName; } set { if (value.Length < 25) { charName = value; } } }
     #region Skin ------------------------------------------------
     [SerializeField] protected Renderer charRenderer;
-    [field: SerializeField] public WeaponHolder WeaponHolder { get; protected set; }
     [SerializeField] protected Transform headHolder;
     [SerializeField] protected Transform shieldHolder;
-    [SerializeField] protected Renderer  pantsHolder;
+    [SerializeField] protected Renderer pantsHolder;
     [SerializeField] protected Transform wingHolder;
     [SerializeField] protected Transform tailHolder;
+    [field: SerializeField] public WeaponHolder WeaponHolder { get; protected set; }
     public Item CurHead   { get; protected set; }
     public Item CurPants  { get; protected set; }
     public Item CurShield { get; protected set; }
@@ -34,19 +34,20 @@ public class Character : GameUnit
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
     #endregion
     #region Combat -----------------------------------------------
-    protected static int[] SCALEUP_THRESHOLD = { 1, 5, 13, 25, 41, 61 }; // kill 4 enemies same scale to upscale: 4, 8, 12, 16, 20 (CombatPoint relatively)
     private Coroutine attackCoroutine;
     private Vector3 atkTargetPos;
+    private float curSize;
+    private int combatPoint;
     [SerializeField] protected Transform atkRangeTF;
     [field: SerializeField] public float BaseAtkRange { get; protected set; }
     [field: SerializeField] public float BaseAtkSpeed { get; protected set; }
     public  WeaponType WeaponType { get; protected set; }
-    public float ItemBonusAtkRange { get; private set; }
-    public float CurSize { get; set; }
+    public float ItemBonusAtkRangeMultiplier { get; private set; }
     public float BonusGoldMultiplier { get; private set; }
-    public int CombatPoint { get; set; }
-    private float BonusAtkRange => ItemBonusAtkRange + WeaponHolder.CurWeapon.BonusAttackRange;
-    public float CurAttackRange => (BaseAtkRange + BonusAtkRange) * CurSize;
+    public float CurSize { get {  return curSize; } set { curSize = Mathf.Max(0, value); } }
+    public int CombatPoint { get { return combatPoint; } set { combatPoint = Mathf.Max(0, value); } }
+    private float BonusAtkRange => WeaponHolder.CurWeapon.BonusAttackRange;
+    public float CurAttackRange => (BaseAtkRange + BonusAtkRange) * ItemBonusAtkRangeMultiplier * CurSize;
     private bool CheckAttackableConditions => WeaponHolder.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking) && !IsStatus(StatusType.Dead);
     #endregion
     #region Navigation --------------------------------------------
@@ -188,7 +189,7 @@ public class Character : GameUnit
 
     protected virtual void UpdateBonusStatsFromItem(Item item)
     {
-        ItemBonusAtkRange = BaseAtkRange * item.BonusAttackRange * 0.01f;
+        ItemBonusAtkRangeMultiplier = 1 + item.BonusAttackRange * 0.01f;
         BonusGoldMultiplier = item.BonusGold;
         SetAttackRangeTF(BaseAtkRange + BonusAtkRange);
     }

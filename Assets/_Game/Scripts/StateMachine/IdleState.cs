@@ -6,7 +6,7 @@ public class IdleState : IState
     {
         enemy.StopMoving();
         enemy.StateCounter = 0f;
-        enemy.StateDelayTime = Random.Range(0f, 1.5f);
+        enemy.StateDelayTime = Random.Range(0f, 1f);
     }
 
     public void OnExecute(Enemy enemy)

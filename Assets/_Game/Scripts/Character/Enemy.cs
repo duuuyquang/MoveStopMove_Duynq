@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using static UnityEngine.EventSystems.EventTrigger;
 using Random = UnityEngine.Random;
 
 public class Enemy : Character
@@ -47,7 +48,11 @@ public class Enemy : Character
 
         ChangeWeapon((WeaponType)Random.Range(1, Enum.GetNames(typeof(WeaponType)).Length));
 
-        if (RollSetItem) ChangeSet(Ultilities.GetRandomValue(EnemyManager.SET_ITEM_TYPES));
+        ChangeSet(ItemType.None);
+        if (RollSetItem)
+        {
+            ChangeSet(Ultilities.GetRandomValue(EnemyManager.SET_ITEM_TYPES));
+        }
         else
         {
             ChangeHead(Ultilities.GetRandomValue(EnemyManager.HEAD_ITEM_TYPES));

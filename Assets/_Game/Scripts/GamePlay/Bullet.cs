@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class Bullet : GameUnit
 {
@@ -23,7 +24,7 @@ public class Bullet : GameUnit
 
     #region Weapon Grab
     private float grabTimer = 0f;
-    private bool isGrab = false;
+    private bool needGrab = false;
     public bool IsDropped { get; private set; }
     #endregion
 
@@ -40,7 +41,7 @@ public class Bullet : GameUnit
         speed       = weaponHolder.Owner.BaseAtkSpeed + weaponHolder.CurWeapon.BonusSpeed;
         spinSpeed   = weaponHolder.CurWeapon.SpinSpeed;
         rotateAxis  = weaponHolder.CurWeapon.RotateAxis;
-        isGrab      = weaponHolder.CurWeapon.IsGrab;
+        needGrab    = weaponHolder.CurWeapon.IsGrab;
 
         IsDropped = false;
         isReturning = false;
@@ -104,7 +105,7 @@ public class Bullet : GameUnit
 
     private bool ProcessGrabWeapon()
     {
-        if (isGrab)
+        if (needGrab)
         {
             if (grabTimer == 0)
             {
@@ -162,27 +163,24 @@ public class Bullet : GameUnit
         targetPos = pos;
     }
 
-    //TODO: tach code
-    private void OnTriggerEnter(Collider other)
+    private bool CheckGrabWeapon()
     {
-        Character character = Cache.GetChar(other);
-        if (character && character == weaponHolder.Owner)
-        {
-            return;
-        }
-
-        if(character && !character.IsStatus(StatusType.Dead) && !IsDropped)
-        {
-            OnHitOpponent(character);
-        }
-
-        if (isGrab)
+        if (needGrab)
         {
             SetStayAtCurPos();
-            return;
+            return true;
         }
+        return false;
+    }
 
-        OnDespawn();
+    private bool CheckValidToHit(Character opponent)
+    {
+        if (opponent && opponent != weaponHolder.Owner && !opponent.IsStatus(StatusType.Dead) && !IsDropped)
+        {
+            OnHitOpponent(opponent);
+            return true;
+        }
+        return false;
     }
 
     private void OnHitOpponent(Character opponent)
@@ -196,5 +194,21 @@ public class Bullet : GameUnit
     {
         StopMoving();
         SetTargetPos(TF.position);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Character opponent = Cache.GetChar(other);
+        if(!CheckValidToHit(opponent))
+        {
+            return;
+        }
+
+        if(CheckGrabWeapon())
+        {
+            return;
+        }
+        
+        OnDespawn();
     }
 }

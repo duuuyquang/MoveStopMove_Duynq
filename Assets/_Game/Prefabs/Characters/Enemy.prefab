@@ -24,13 +24,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 583214643820975243}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.06552883, y: 0.1157039, z: 0.19550483, w: -0.97164625}
-  m_LocalPosition: {x: -0.15793405, y: 0.102377586, z: -0.016001085}
+  m_LocalRotation: {x: 0.0028650174, y: 0.57363486, z: 0.029946499, w: 0.8185586}
+  m_LocalPosition: {x: -0.1, y: 0.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4276091169654796394}
-  m_LocalEulerAnglesHint: {x: 4.709, y: -14.555, z: -23.355}
+  m_LocalEulerAnglesHint: {x: -1.7, y: 70, z: 3}
 --- !u!1 &1909485244989604345
 GameObject:
   m_ObjectHideFlags: 0
@@ -381,13 +381,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4187750252171817601}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.03563636, y: 0.9193452, z: -0.017703267, w: -0.39143473}
-  m_LocalPosition: {x: 0.039386094, y: -0.1602678, z: -0.07259937}
+  m_LocalRotation: {x: -0.08558659, y: -0.050117888, z: 0.12513226, w: 0.9871702}
+  m_LocalPosition: {x: 0, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4276091169654796384}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -9, y: -7, z: 15}
 --- !u!1 &4370071949784488012
 GameObject:
   m_ObjectHideFlags: 0
@@ -600,19 +600,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PoolType: 3
   charRenderer: {fileID: 6886439637682730261}
-  <WeaponHolder>k__BackingField: {fileID: 5579794950706686892}
   headHolder: {fileID: 2394434733343807741}
   shieldHolder: {fileID: 9087372272980061012}
   pantsHolder: {fileID: 6963492565293870512}
   wingHolder: {fileID: 8102356286531597657}
   tailHolder: {fileID: 1929863699218225393}
+  <WeaponHolder>k__BackingField: {fileID: 5579794950706686892}
   rb: {fileID: 6676162971634568813}
   animator: {fileID: 4276091169662017440}
   baseMoveSpeed: 0
   atkRangeTF: {fileID: 431542723759777090}
   <BaseAtkRange>k__BackingField: 4
   <BaseAtkSpeed>k__BackingField: 8
-  targetsInRange: []
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
   colorDataSO: {fileID: 11400000, guid: 9e84c9a472450ba47b7affb38dd01b89, type: 2}
   bulletPartical: {fileID: 1533911038709997858}

@@ -5,7 +5,7 @@ public class PatrolState : IState
     public void OnEnter(Enemy enemy)
     {
         enemy.StateCounter = 0f;
-        enemy.StateDelayTime = Random.Range(0f, 1.5f);
+        enemy.StateDelayTime = Random.Range(0f, 1f);
         enemy.SetRandomDestination(Random.Range(5f, 20f));
     }
 

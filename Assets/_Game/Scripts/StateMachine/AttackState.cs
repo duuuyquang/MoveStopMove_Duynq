@@ -5,14 +5,14 @@ public class AttackState : IState
     public void OnEnter(Enemy enemy)
     {
         enemy.StopMoving();
-        enemy.StateDelayTime = Random.Range(0f, 1.5f);
+        enemy.StateDelayTime = Random.Range(0f, 1f);
         enemy.StateCounter = 0f;
         enemy.StateIsAttacked = false;
     }
 
     public void OnExecute(Enemy enemy)
     {
-        enemy.ChangeAnimByCurStatus();
+       enemy.ChangeAnimByCurStatus();
         enemy.StateCounter += Time.deltaTime;
         if (enemy.StateCounter >= enemy.StateDelayTime)
         {

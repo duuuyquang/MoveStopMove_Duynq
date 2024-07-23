@@ -13,7 +13,7 @@ public class CanvasDebug : UICanvas
     string atkRange;
     string baseAtkRange;
     string wpBonusAtkRange;
-    string itemBonusAtkRange;
+    string itemBonusAtkRangeMulti;
 
     string size;
     string moveSpd;
@@ -27,19 +27,19 @@ public class CanvasDebug : UICanvas
 
     public void SetLogText()
     {
-        moveSpd             = LevelManager.Instance.Player.MoveSpeed.ToString();
-        bonusGoldMulti      = ( LevelManager.Instance.Player.BonusGoldMultiplier * 0.01f ).ToString();
-        size                = LevelManager.Instance.Player.CurSize.ToString();
-        curStatus           = LevelManager.Instance.Player.CurStatus.ToString();
-
-        atkSpd              = (LevelManager.Instance.Player.BaseAtkSpeed + LevelManager.Instance.Player.WeaponHolder.CurWeapon.BonusSpeed).ToString();
-        baseAtkSpd          = LevelManager.Instance.Player.BaseAtkSpeed.ToString();
-        weaponBonusAtkSpd   = LevelManager.Instance.Player.WeaponHolder.CurWeapon.BonusSpeed.ToString();
-
-        atkRange            = LevelManager.Instance.Player.CurAttackRange.ToString();
-        baseAtkRange        = LevelManager.Instance.Player.BaseAtkRange.ToString();
-        wpBonusAtkRange     = LevelManager.Instance.Player.WeaponHolder.CurWeapon.BonusAttackRange.ToString();
-        itemBonusAtkRange   = LevelManager.Instance.Player.ItemBonusAtkRange.ToString();
+        moveSpd                = LevelManager.Instance.Player.MoveSpeed.ToString();
+        bonusGoldMulti         = ( LevelManager.Instance.Player.BonusGoldMultiplier * 0.01f ).ToString();
+        size                   = LevelManager.Instance.Player.CurSize.ToString();
+        curStatus              = LevelManager.Instance.Player.CurStatus.ToString();
+                               
+        atkSpd                 = (LevelManager.Instance.Player.BaseAtkSpeed + LevelManager.Instance.Player.WeaponHolder.CurWeapon.BonusSpeed).ToString();
+        baseAtkSpd             = LevelManager.Instance.Player.BaseAtkSpeed.ToString();
+        weaponBonusAtkSpd      = LevelManager.Instance.Player.WeaponHolder.CurWeapon.BonusSpeed.ToString();
+                               
+        atkRange               = LevelManager.Instance.Player.CurAttackRange.ToString();
+        baseAtkRange           = LevelManager.Instance.Player.BaseAtkRange.ToString();
+        wpBonusAtkRange        = LevelManager.Instance.Player.WeaponHolder.CurWeapon.BonusAttackRange.ToString();
+        itemBonusAtkRangeMulti   = LevelManager.Instance.Player.ItemBonusAtkRangeMultiplier.ToString();
 
         SetContent();
 
@@ -54,6 +54,6 @@ public class CanvasDebug : UICanvas
         content += $"MoveSpd: {moveSpd} \n";
         content += $"BonusGoldMul: {bonusGoldMulti} \n";
         content += $"AtkSpd: {atkSpd} = {baseAtkSpd} + {weaponBonusAtkSpd}(w) \n";
-        content += $"AtkRange: {atkRange} = [ {baseAtkRange} + {itemBonusAtkRange}(i) + {wpBonusAtkRange}(w) ] * Size \n";
+        content += $"AtkRange: {atkRange} = [ {baseAtkRange} + {wpBonusAtkRange}(w) ] * {itemBonusAtkRangeMulti}(i) * Size\n";
     }
 }

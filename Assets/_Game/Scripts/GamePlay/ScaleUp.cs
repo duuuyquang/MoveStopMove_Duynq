@@ -7,7 +7,7 @@ public static class ScaleUp
     public static void CheckToProcess(Character character, int opponentCombatPoint)
     {
         int oldCombatPoint = character.CombatPoint;
-        int gainnedPoint = GetCombatPointInReturn(opponentCombatPoint);
+        int gainnedPoint = GetPointInReturn(opponentCombatPoint);
         character.ShowCombatPointGainned(gainnedPoint);
         character.CombatPoint += gainnedPoint;
 
@@ -32,7 +32,7 @@ public static class ScaleUp
         }
     }
 
-    public static int GetCombatPointInReturn(int point)
+    public static int GetPointInReturn(int point)
     {
         int returnPoint = SCALEUP_THRESHOLD.Length + 1;
         for (int i = 0; i < SCALEUP_THRESHOLD.Length; i++)
