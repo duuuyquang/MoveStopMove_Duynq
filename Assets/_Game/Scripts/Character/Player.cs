@@ -13,6 +13,7 @@ public class Player : Character
 
     public int reviveTimes;
     private int untouchCounter;
+    private float gainnedCoin;
 
     protected override void Update()
     {
@@ -144,7 +145,7 @@ public class Player : Character
 
     private void SetUntouchable()
     {
-        untouchCounter = Const.UNTOUCHABLE_SECS;
+        untouchCounter = Const.CHARACTER_UNTOUCHABLE_SECS;
         ChangeAnimByStatus(StatusType.Untouchable);
         ChangeColorUntouchable();
         SetAttackRangeTF(0f);
@@ -161,7 +162,7 @@ public class Player : Character
             ChangeAnimByStatus(StatusType.Normal, true);
             ChangeColor(ColorType);
             SetAttackRangeTF(BaseAtkRange + BonusAtkRange);
-            baseMoveSpeed = Const.DEFAULT_MOVE_SPD;
+            baseMoveSpeed = Const.CHARACTER_DEFAULT_MOVE_SPD;
             StopCoroutine(nameof(IEColorBlinking));
             CancelInvoke(nameof(CountDownUntouchable));
         }
@@ -239,7 +240,8 @@ public class Player : Character
     public override void OnTargetKilled(Character opponent)
     {
         base.OnTargetKilled(opponent);
-        float gainnedCoin = (1 + (float)opponent.CombatPoint / 3) * BonusGoldMultiplier * 0.01f;
+        gainnedCoin = (1 + (float)opponent.CombatPoint / 3);
+        gainnedCoin += gainnedCoin * BonusGoldMultiplier;
         gainnedCoin = Mathf.Ceil(gainnedCoin - 0.49f); // round up if greater or equal x.5f
         GameManager.Instance.UpdateTotalCoin(gainnedCoin);
     }

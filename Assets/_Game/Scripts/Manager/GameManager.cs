@@ -8,7 +8,7 @@ public class GameManager : Singleton<GameManager>
     public int AliveCount  { get; private set; }
     public float TotalCoin { get; private set; }
 
-    private int reviveCounter = Const.REVIVE_COUNTDOWN_SECS;
+    private int reviveCounter = Const.CHARACTER_REVIVE_COUNTDOWN_SECS;
 
     private void Awake()
     {
@@ -140,7 +140,7 @@ public class GameManager : Singleton<GameManager>
 
     private void StopReviveTimer()
     {
-        reviveCounter = Const.REVIVE_COUNTDOWN_SECS;
+        reviveCounter = Const.CHARACTER_REVIVE_COUNTDOWN_SECS;
         CancelInvoke(nameof(CountReviveTimer));
         UIManager.Instance.OpenUI<CanvasRevive>().Close(0);
     }

@@ -428,19 +428,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PoolType: 3
   charRenderer: {fileID: 8862085105215870351}
-  <WeaponHolder>k__BackingField: {fileID: 7064575296170529720}
   headHolder: {fileID: 4164107202978098651}
   shieldHolder: {fileID: 7287621377858284777}
   pantsHolder: {fileID: 4025989504441862906}
   wingHolder: {fileID: 973043972898833040}
   tailHolder: {fileID: 8534173475341999323}
+  <WeaponHolder>k__BackingField: {fileID: 7064575296170529720}
   rb: {fileID: 5404341522521942641}
   animator: {fileID: 5060931399930964762}
-  baseMoveSpeed: 120
+  baseMoveSpeed: 80
   atkRangeTF: {fileID: 1250201518470943246}
   <BaseAtkRange>k__BackingField: 3
   <BaseAtkSpeed>k__BackingField: 7
-  targetsInRange: []
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
   colorDataSO: {fileID: 11400000, guid: 9e84c9a472450ba47b7affb38dd01b89, type: 2}
   bulletPartical: {fileID: 8345266994116078565}

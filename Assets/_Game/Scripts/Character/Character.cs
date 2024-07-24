@@ -29,7 +29,7 @@ public class Character : GameUnit
     private string curAnim = Const.ANIM_NAME_IDLE;
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator animator;
-    [SerializeField] protected float baseMoveSpeed = Const.DEFAULT_MOVE_SPD;
+    [SerializeField] protected float baseMoveSpeed = Const.CHARACTER_DEFAULT_MOVE_SPD;
     public float MoveSpeed => baseMoveSpeed + bonusMoveSpeed;
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
     #endregion
@@ -190,7 +190,7 @@ public class Character : GameUnit
     protected virtual void UpdateBonusStatsFromItem(Item item)
     {
         ItemBonusAtkRangeMultiplier = 1 + item.BonusAttackRange * 0.01f;
-        BonusGoldMultiplier = item.BonusGold;
+        BonusGoldMultiplier = 1 + item.BonusGold * 0.01f;
         SetAttackRangeTF(BaseAtkRange + BonusAtkRange);
     }
 
