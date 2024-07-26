@@ -100,7 +100,7 @@ MonoBehaviour:
   WeaponType: 5
   bonusAttackRange: 1
   bonusSpeed: 1
-  spinSpeed: 15
+  spinSpeed: 360
   isReturn: 0
   isGrab: 0
   price: 450

@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
-using static UnityEngine.EventSystems.EventTrigger;
 using Random = UnityEngine.Random;
 
 public class Enemy : Character
@@ -13,6 +12,11 @@ public class Enemy : Character
     private IState curState;
     public override bool IsStanding => Vector3.Distance(agent.velocity, Vector3.zero) < 0.1f;
     public bool IsDestination => agent.remainingDistance < 0.1f;
+
+    private float baseAgentMoveSpeed = Const.CHARACTER_DEFAULT_AGENT_MOVE_SPD;
+    private float bonusAgentMoveSpeed = 0f;
+    public float AgentMoveSpeed => (baseAgentMoveSpeed + bonusAgentMoveSpeed) * BoosterSpdMultipler;
+
     //private Vector3 curDestination;
     //public bool IsDestination => Vector3.Distance(curDestination, TF.position + (TF.position.y - curDestination.y) * Vector3.up ) < 0.1f;
 
@@ -32,6 +36,7 @@ public class Enemy : Character
     public override void OnInit()
     {
         base.OnInit();
+        agent.speed = AgentMoveSpeed;
         GenerateRandomData();
         SetState(new IdleState());
         ToggleTargetIndicator(false);
@@ -116,6 +121,14 @@ public class Enemy : Character
     protected override void UpdateBonusStatsFromItem(Item item)
     {
         base.UpdateBonusStatsFromItem(item);
-        agent.speed += agent.speed * item.BonusMoveSpeed * 0.01f;
+        bonusAgentMoveSpeed = baseAgentMoveSpeed * item.BonusMoveSpeed * 0.01f;
+        agent.speed = AgentMoveSpeed;
+    }
+
+    protected override void UpdateBoosterStats(Booster booster)
+    {
+        base.UpdateBoosterStats(booster);
+        BoosterSpdMultipler = booster.MoveSpdMultiplier;
+        agent.speed = AgentMoveSpeed;
     }
 }

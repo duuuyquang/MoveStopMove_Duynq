@@ -24,13 +24,19 @@ public class Character : GameUnit
     public Item CurSet    { get; protected set; }
     public ColorType ColorType { get; private set; }
     #endregion
+    #region Booster
+    public BoosterType BoosterType { get; protected set; } = BoosterType.None;
+    public float BoosterSpdMultipler { get; set; } = 1.0f;
+    public float BoosterAtkRange { get; private set; } = 0f;
+
+    #endregion
     #region Movement ---------------------------------------------
     protected float bonusMoveSpeed;
     private string curAnim = Const.ANIM_NAME_IDLE;
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator animator;
     [SerializeField] protected float baseMoveSpeed = Const.CHARACTER_DEFAULT_MOVE_SPD;
-    public float MoveSpeed => baseMoveSpeed + bonusMoveSpeed;
+    public float MoveSpeed => ( baseMoveSpeed + bonusMoveSpeed ) * BoosterSpdMultipler;
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
     #endregion
     #region Combat -----------------------------------------------
@@ -46,8 +52,9 @@ public class Character : GameUnit
     public float BonusGoldMultiplier { get; private set; }
     public float CurSize { get {  return curSize; } set { curSize = Mathf.Max(0, value); } }
     public int CombatPoint { get { return combatPoint; } set { combatPoint = Mathf.Max(0, value); } }
-    protected float BonusAtkRange => WeaponHolder.CurWeapon.BonusAttackRange;
+    protected float BonusAtkRange => WeaponHolder.CurWeapon.BonusAttackRange + BoosterAtkRange;
     public float CurAttackRange => (BaseAtkRange + BonusAtkRange) * ItemBonusAtkRangeMultiplier * CurSize;
+    public float CurAttackRangeTF => (BaseAtkRange + BonusAtkRange) * ItemBonusAtkRangeMultiplier;
     private bool CheckAttackableConditions => WeaponHolder.HasBullet && HasTargetInRange && !IsStatus(StatusType.Attacking) && !IsStatus(StatusType.Dead);
     #endregion
     #region Navigation --------------------------------------------
@@ -66,6 +73,8 @@ public class Character : GameUnit
     #endregion
     [SerializeField] ParticleSystem bulletPartical;
     [SerializeField] ParticleSystem sizeUpPartical;
+    [SerializeField] ParticleSystem attackBoosterPartical;
+    [SerializeField] ParticleSystem speedBoosterPartical;
 
     protected virtual void Update()
     {
@@ -120,7 +129,7 @@ public class Character : GameUnit
         WeaponType = type;
         WeaponHolder.OnInit(this);
         ToggleWeapon(true);
-        SetAttackRangeTF(BaseAtkRange + BonusAtkRange);
+        SetAttackRangeTF(CurAttackRangeTF);
     }
 
     public void ChangeHead(ItemType type)
@@ -191,7 +200,7 @@ public class Character : GameUnit
     {
         ItemBonusAtkRangeMultiplier = 1 + item.BonusAttackRange * 0.01f;
         BonusGoldMultiplier = 1 + item.BonusGold * 0.01f;
-        SetAttackRangeTF(BaseAtkRange + BonusAtkRange);
+        SetAttackRangeTF(CurAttackRangeTF);
     }
 
     protected void ChangeColor(ColorType type)
@@ -258,9 +267,21 @@ public class Character : GameUnit
         {
             WeaponHolder.OnShoot(atkTargetPos);
             ToggleWeapon(false);
+            if (BoosterType == BoosterType.Attack)
+            {
+                DeactiveAttackBooster();
+            }
             yield return Cache.GetWaitSecs(1f);
             ChangeAnimByStatus(StatusType.Normal);
         }
+    }
+
+    private void DeactiveAttackBooster()
+    {
+        BoosterType = BoosterType.None;
+        BoosterAtkRange = 0f;
+        SetAttackRangeTF(CurAttackRangeTF);
+        attackBoosterPartical.Stop();
     }
 
     protected void LookAtTarget(Vector3 targetPos)
@@ -293,7 +314,6 @@ public class Character : GameUnit
         }
     }
     #endregion
-
     #region Animation Controller
     public void ChangeAnim(string animName)
     {
@@ -357,7 +377,46 @@ public class Character : GameUnit
         ChangeAnimByCurStatus();
     }
     #endregion
+    #region Booster
+    public bool IsBoosterType(BoosterType type) => BoosterType == type;
+    protected virtual void UpdateBoosterStats(Booster booster)
+    {
+        if (IsBoosterType(BoosterType.None) && !IsStatus(StatusType.Untouchable))
+        {
+            BoosterType = booster.Type;
+            switch(BoosterType)
+            {
+                case BoosterType.Attack:
+                    ActiveAtkBooster(booster);
+                    break;
+                case BoosterType.Speed:
+                    ActiveSpeedBooster(booster);
+                    Invoke(nameof(DeactiveSpeedBooster), Booster.SPEED_ACTIVE_SECS);
+                    break;
+            }
+        }
+    }
 
+    private void ActiveAtkBooster(Booster booster)
+    {
+        BoosterAtkRange = booster.AtkRange;
+        attackBoosterPartical.Play();
+        SetAttackRangeTF(CurAttackRangeTF);
+    }
+
+    private void ActiveSpeedBooster(Booster booster)
+    {
+        BoosterSpdMultipler = booster.MoveSpdMultiplier;
+        speedBoosterPartical.Play();
+    }
+
+    private void DeactiveSpeedBooster()
+    {
+        BoosterSpdMultipler = 1f;
+        speedBoosterPartical.Stop();
+        BoosterType = BoosterType.None;
+    }
+    #endregion
     public virtual void OnDead()
     {
         bulletPartical.Play();
@@ -383,13 +442,18 @@ public class Character : GameUnit
             sizeUpPartical.Play();
         }
     }
-
     private void OnTriggerEnter(Collider other)
     {
         Character character = Cache.GetChar(other);
         if (character)
         {
             TargetDetector.AddTargetInRange(this, character);
+        }
+
+        Booster booster = Cache.GetBooster(other);
+        if(booster)
+        {
+            UpdateBoosterStats(booster);
         }
     }
 

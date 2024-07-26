@@ -27,6 +27,7 @@ public class LevelManager : Singleton<LevelManager>
         OnInitPlayer();
         GameManager.Instance.OnInit();
         EnemyManager.Instance.OnInit();
+        BoosterManager.Instance.OnInit();
     }
 
     public void OnInitNextLevel()

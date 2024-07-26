@@ -1,9 +1,20 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CanvasRevive : UICanvas
 {
     [SerializeField] TextMeshProUGUI counterText;
+    [SerializeField] Transform loadingCirle;
+
+    private Vector3 rotateAxis = Vector3.back;
+
+    private float rotateSpd = 360 / Const.CHARACTER_REVIVE_COUNTDOWN_SECS;
+
+    public void Update()
+    {
+        loadingCirle.Rotate(rotateAxis, rotateSpd * Time.deltaTime);
+    }
     public void ReviveButton()
     {
         UIManager.Instance.CloseAll();

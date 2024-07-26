@@ -5,23 +5,13 @@ using Random = UnityEngine.Random;
 
 public class EnemyManager : Singleton<EnemyManager>
 {
-
     [SerializeField] int MaxEnemiesOnRunTime = 10;
-    [SerializeField] Enemy enemyPrefab;
-    
-    private NavMeshHit navMeshHit;
-
-    private List<Enemy> enemiesReadyList = new List<Enemy>();
-    private List<Enemy> spawnedEnemiesList = new List<Enemy>();
-
     private int enemiesReadyCount;
-    //public bool IsAllEnemiesDead => (enemiesReadyList.Count <= 0 && spawnedEnemiesList.Count <= 0);
-    public bool IsAllEnemiesDead => (enemiesReadyCount <= 0 && spawnedEnemiesList.Count <= 0);
-    //public bool IsSpawnable => spawnedEnemiesList.Count < MaxEnemiesOnRunTime && enemiesReadyList.Count > 0;
-    public bool IsSpawnable => spawnedEnemiesList.Count < MaxEnemiesOnRunTime && enemiesReadyCount > 0;
-
-    private int recordHighestPoint;
-    public int RecordHighestPoint { get { return recordHighestPoint; } }
+    private NavMeshHit navMeshHit;
+    public List<Enemy> SpawnedEnemiesList { get; private set; } = new();
+    public bool IsAllEnemiesDead => (enemiesReadyCount <= 0 && SpawnedEnemiesList.Count <= 0);
+    private bool IsSpawnable => SpawnedEnemiesList.Count < MaxEnemiesOnRunTime && enemiesReadyCount > 0;
+    public int RecordHighestPoint { get; private set; }
 
     public readonly static string[] NAMES = { 
         "Dazzle", 
@@ -88,7 +78,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
     public void OnInit()
     {
-        recordHighestPoint = 0;
+        RecordHighestPoint = 0;
         ClearAllLists();
         PreLoadEnemiesReadyList();
         InitSpawn();
@@ -113,7 +103,7 @@ public class EnemyManager : Singleton<EnemyManager>
     private void ClearAllLists()
     {
         SimplePool.Collect(PoolType.Enemy);
-        spawnedEnemiesList.Clear();
+        SpawnedEnemiesList.Clear();
     }
 
     public void Spawn()
@@ -125,7 +115,7 @@ public class EnemyManager : Singleton<EnemyManager>
             enemy.OnPlay();
         }
 
-        spawnedEnemiesList.Add(enemy);
+        SpawnedEnemiesList.Add(enemy);
         enemiesReadyCount--;
     }
 
@@ -142,7 +132,7 @@ public class EnemyManager : Singleton<EnemyManager>
                 return GetValidSpawnPos();
             }
 
-            foreach (Enemy enemy in spawnedEnemiesList)
+            foreach (Enemy enemy in SpawnedEnemiesList)
             {
                 if (Vector3.Distance(navMeshHit.position, enemy.TF.position) < 5f)
                 {
@@ -157,7 +147,7 @@ public class EnemyManager : Singleton<EnemyManager>
     public void Despawn(Enemy enemy)
     {
         SimplePool.Despawn(enemy);
-        spawnedEnemiesList.Remove(enemy);
+        SpawnedEnemiesList.Remove(enemy);
     }
 
     private void PreLoadEnemiesReadyList()
@@ -167,15 +157,15 @@ public class EnemyManager : Singleton<EnemyManager>
 
     public void SetRecordHighestPoint(int point)
     {
-        if (point > recordHighestPoint)
+        if (point > RecordHighestPoint)
         {
-            recordHighestPoint = point;
+            RecordHighestPoint = point;
         }
     }
 
     public void StopMovingAll()
     {
-        foreach (Enemy enemy in spawnedEnemiesList)
+        foreach (Enemy enemy in SpawnedEnemiesList)
         {
             enemy.StopMoving();
         }
@@ -183,7 +173,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
     public void OnPlay()
     {
-        foreach (Enemy enemy in spawnedEnemiesList)
+        foreach (Enemy enemy in SpawnedEnemiesList)
         {
             enemy.OnPlay();
         }

@@ -154,6 +154,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1033765270}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &274497737
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 274497738}
+  - component: {fileID: 274497739}
+  m_Layer: 0
+  m_Name: BoosterManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &274497738
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 274497737}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1464752705}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &274497739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 274497737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6362aee751324ec4eb5ec55f50a8db31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxBoostersOnRunTime: 3
+  prefab: {fileID: 0}
 --- !u!1 &317089506
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,7 +307,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxEnemiesOnRunTime: 10
-  enemyPrefab: {fileID: 1901153082581738841, guid: 5c85e598d7fa4f94c805650550805e90, type: 3}
 --- !u!1 &561257992
 GameObject:
   m_ObjectHideFlags: 0
@@ -671,6 +716,7 @@ Transform:
   - {fileID: 694659354}
   - {fileID: 236538152}
   - {fileID: 561257993}
+  - {fileID: 1872675712}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1104322082
@@ -916,6 +962,7 @@ Transform:
   - {fileID: 963194228}
   - {fileID: 1361676124}
   - {fileID: 524766079}
+  - {fileID: 274497738}
   - {fileID: 1191001643}
   - {fileID: 816518209}
   m_Father: {fileID: 0}
@@ -980,6 +1027,9 @@ MonoBehaviour:
   - prefab: {fileID: -2290940726283474919, guid: fcb016b704d59f74d9d11922c4f27367, type: 3}
     parent: {fileID: 1809055202}
     amount: 0
+  - prefab: {fileID: 6190406244337283835, guid: 534d1efe359580443ad3116f726f35a6, type: 3}
+    parent: {fileID: 1872675712}
+    amount: 0
   itemDataSO: {fileID: 11400000, guid: 325fb7904ad9f024b984614f1c1906e0, type: 2}
   eachWeaponPoolingNum: 0
   weaponPoolTF: {fileID: 236538152}
@@ -1013,6 +1063,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1104322087}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1872675711
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1872675712}
+  m_Layer: 0
+  m_Name: BoosterPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1872675712
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1872675711}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1033765270}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

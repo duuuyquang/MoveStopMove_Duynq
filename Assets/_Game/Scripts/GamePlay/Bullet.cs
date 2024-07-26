@@ -48,13 +48,23 @@ public class Bullet : GameUnit
         grabTimer = 0f;
 
         InitSize();
-
         SpawnWeapon();
+        CheckBooster();
     }
 
     private void InitSize()
     {
         TF.localScale = Vector3.one * weaponHolder.TF.localScale.x;
+    }
+
+    private void CheckBooster()
+    {
+        if(weaponHolder.Owner.IsBoosterType(BoosterType.Attack))
+        {
+            speed = Booster.ATTACK_SPD_INDEX;
+            TF.localScale = Vector3.one * Booster.ATTACK_BULLET_SIZE_INDEX;
+            needGrab = false;
+        }
     }
 
     private void SpawnWeapon()
@@ -130,7 +140,7 @@ public class Bullet : GameUnit
     private void MovingToTarget()
     {
         TF.position = Vector3.MoveTowards(TF.position, targetPos, speed * Time.deltaTime);
-        weaponPrefab.TF.Rotate(rotateAxis, spinSpeed * Time.deltaTime * 100f);
+        weaponPrefab.TF.Rotate(rotateAxis, spinSpeed * Time.deltaTime);
     }
 
     public void OnDespawn()

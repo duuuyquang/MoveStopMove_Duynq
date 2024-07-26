@@ -5,6 +5,7 @@ public static class Cache
 {
     private static Dictionary<Collider, Character> bridgeChars = new();
     private static Dictionary<Collider, Bullet> bridgeBullets = new();
+    private static Dictionary<Collider, Booster> bridgeBoosters = new();
     private static Dictionary<float, WaitForSeconds> bridgeWaitSecs = new();
     private static Dictionary<string, Vector3> bridgeVectors = new();
 
@@ -26,6 +27,16 @@ public static class Cache
         }
 
         return bridgeBullets[collider];
+    }
+
+    public static Booster GetBooster(Collider collider)
+    {
+        if (!bridgeBoosters.ContainsKey(collider))
+        {
+            bridgeBoosters.Add(collider, collider.GetComponent<Booster>());
+        }
+
+        return bridgeBoosters[collider];
     }
 
     public static WaitForSeconds GetWaitSecs(float secs)
