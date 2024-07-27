@@ -26,7 +26,7 @@ public class Character : GameUnit
     #endregion
     #region Booster
     public BoosterType BoosterType { get; protected set; } = BoosterType.None;
-    public float BoosterSpdMultipler { get; set; } = 1.0f;
+    public float BoosterSpdMultipler { get; set; } = 0.0f;
     public float BoosterAtkRange { get; private set; } = 0f;
 
     #endregion
@@ -35,8 +35,8 @@ public class Character : GameUnit
     private string curAnim = Const.ANIM_NAME_IDLE;
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator animator;
-    [SerializeField] protected float baseMoveSpeed = Const.CHARACTER_DEFAULT_MOVE_SPD;
-    public float MoveSpeed => ( baseMoveSpeed + bonusMoveSpeed ) * BoosterSpdMultipler;
+    public float BaseMoveSpeed { get; protected set; } = Const.CHARACTER_DEFAULT_MOVE_SPD;
+    public float MoveSpeed => Mathf.Min(Const.CHARACTER_MOVE_SPEED_MAX, (BaseMoveSpeed + bonusMoveSpeed + BaseMoveSpeed*BoosterSpdMultipler) * CurSize );
     public virtual bool IsStanding => Vector3.Distance(rb.velocity, Vector3.zero) < 0.1f;
     #endregion
     #region Combat -----------------------------------------------
@@ -76,6 +76,7 @@ public class Character : GameUnit
     [SerializeField] ParticleSystem attackBoosterPartical;
     [SerializeField] ParticleSystem speedBoosterPartical;
 
+    public AudioSource audioSource;
     protected virtual void Update()
     {
         TargetDetector.DetectNearestTarget(this, TargetsInRange);
@@ -265,6 +266,7 @@ public class Character : GameUnit
         yield return Cache.GetWaitSecs(0.3f);
         if(!IsStatus(StatusType.Dead))
         {
+            SoundManager.Instance.PlayThrowWeapon(audioSource, WeaponHolder.CurWeapon.IsReturn);
             WeaponHolder.OnShoot(atkTargetPos);
             ToggleWeapon(false);
             if (BoosterType == BoosterType.Attack)
@@ -274,14 +276,6 @@ public class Character : GameUnit
             yield return Cache.GetWaitSecs(1f);
             ChangeAnimByStatus(StatusType.Normal);
         }
-    }
-
-    private void DeactiveAttackBooster()
-    {
-        BoosterType = BoosterType.None;
-        BoosterAtkRange = 0f;
-        SetAttackRangeTF(CurAttackRangeTF);
-        attackBoosterPartical.Stop();
     }
 
     protected void LookAtTarget(Vector3 targetPos)
@@ -402,6 +396,15 @@ public class Character : GameUnit
         BoosterAtkRange = booster.AtkRange;
         attackBoosterPartical.Play();
         SetAttackRangeTF(CurAttackRangeTF);
+        SoundManager.Instance.PlayAtkBoosterEffect(audioSource);
+    }
+
+    private void DeactiveAttackBooster()
+    {
+        BoosterType = BoosterType.None;
+        BoosterAtkRange = 0f;
+        SetAttackRangeTF(CurAttackRangeTF);
+        attackBoosterPartical.Stop();
     }
 
     private void ActiveSpeedBooster(Booster booster)
@@ -410,9 +413,9 @@ public class Character : GameUnit
         speedBoosterPartical.Play();
     }
 
-    private void DeactiveSpeedBooster()
+    protected virtual void DeactiveSpeedBooster()
     {
-        BoosterSpdMultipler = 1f;
+        BoosterSpdMultipler = 0f;
         speedBoosterPartical.Stop();
         BoosterType = BoosterType.None;
     }
@@ -427,7 +430,10 @@ public class Character : GameUnit
         ClearTargets();
         ChangeColorDeath(ColorType);
         ToggleTargetIndicator(false);
+        DeactiveAttackBooster();
+        DeactiveSpeedBooster();
         GameManager.Instance.UpdateAliveCountText();
+        SoundManager.Instance.PlayDead(audioSource);
     }
 
     public void TriggerScaleUpVFX(float delay)
@@ -471,5 +477,6 @@ public class Character : GameUnit
     public virtual void ToggleTargetIndicator(bool value){}
     public virtual void OnDespawn(){}
     public virtual void StopMoving(){}
+    public virtual void InitSpeed() {}
     #endregion
 }

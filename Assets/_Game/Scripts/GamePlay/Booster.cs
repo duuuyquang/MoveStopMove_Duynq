@@ -10,7 +10,7 @@ public class Booster : GameUnit
     public const float ATTACK_BULLET_SIZE_INDEX = 1f;
 
     public const float SPEED_ACTIVE_SECS = 10f;
-    public const float SPEED_INDEX = 2f;
+    public const float SPEED_INDEX = 0.5f;
 
     [SerializeField] Renderer boxRenderer;
     [SerializeField] ColorDataSO colorDataSO;
@@ -94,7 +94,7 @@ public class Booster : GameUnit
                 AtkRange = ATTACK_RANGE_INDEX;
                 break;
             case BoosterType.Speed:
-                MoveSpdMultiplier = 2f;
+                MoveSpdMultiplier = SPEED_INDEX;
                 break;
         }
     }
@@ -104,6 +104,7 @@ public class Booster : GameUnit
         Character character = Cache.GetChar(other);
         if (character && character.IsBoosterType(BoosterType.None) && !character.IsStatus(StatusType.Untouchable))
         {
+            SoundManager.Instance.PlayHitBooster();
             OnDespawn();
         }
     }

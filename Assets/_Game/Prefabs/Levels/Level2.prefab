@@ -225,8 +225,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4338164917770901203}
-  - component: {fileID: 8724707221156484112}
   - component: {fileID: 5352713562601217423}
+  - component: {fileID: 8724707221156484112}
   m_Layer: 0
   m_Name: Level2
   m_TagString: Untagged
@@ -253,20 +253,6 @@ Transform:
   - {fileID: 8072014203214411234}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8724707221156484112
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8490160732139113380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f06912370d69394b91f4ae2006c02e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NavMeshData: {fileID: 23800000, guid: 16278b625b109f34292615dbd2605c11, type: 2}
-  totalEnemies: 99
 --- !u!114 &5352713562601217423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,6 +284,20 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 174aeca286393634da17a474f038b24c, type: 2}
   m_BuildHeightMesh: 0
+--- !u!114 &8724707221156484112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8490160732139113380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f06912370d69394b91f4ae2006c02e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NavMeshData: {fileID: 23800000, guid: 16278b625b109f34292615dbd2605c11, type: 2}
+  totalEnemies: 99
 --- !u!1 &8797050798759326412
 GameObject:
   m_ObjectHideFlags: 0

@@ -149,7 +149,7 @@ public class Player : Character
         ChangeAnimByStatus(StatusType.Untouchable);
         ChangeColorUntouchable();
         SetAttackRangeTF(0f);
-        baseMoveSpeed *= 3f;
+        BaseMoveSpeed = Const.CHARACTER_MOVE_SPEED_MAX;
         StartCoroutine(nameof(IEColorBlinking));
         InvokeRepeating(nameof(CountDownUntouchable), 0, 1);
     }
@@ -162,7 +162,7 @@ public class Player : Character
             ChangeAnimByStatus(StatusType.Normal, true);
             ChangeColor(ColorType);
             SetAttackRangeTF(BaseAtkRange + BonusAtkRange);
-            baseMoveSpeed = Const.CHARACTER_DEFAULT_MOVE_SPD;
+            BaseMoveSpeed = Const.CHARACTER_DEFAULT_MOVE_SPD;
             StopCoroutine(nameof(IEColorBlinking));
             CancelInvoke(nameof(CountDownUntouchable));
         }
@@ -278,6 +278,6 @@ public class Player : Character
     protected override void UpdateBonusStatsFromItem(Item item)
     {
         base.UpdateBonusStatsFromItem(item);
-        bonusMoveSpeed = baseMoveSpeed * item.BonusMoveSpeed * 0.01f;
+        bonusMoveSpeed = BaseMoveSpeed * item.BonusMoveSpeed * 0.01f;
     }
 }

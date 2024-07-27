@@ -49,6 +49,7 @@ public class CanvasSkinShop : UICanvas
     {
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
+        SoundManager.Instance.PlayBtnClick();
     }
 
     public void Purchase()
@@ -59,6 +60,11 @@ public class CanvasSkinShop : UICanvas
             GameManager.Instance.ReduceTotalCoin(choosingItem.Item.Price);
             SetCoinText(GameManager.Instance.TotalCoin);
             PrintBuyButtons();
+            SoundManager.Instance.PlayBtnClick();
+        } 
+        else
+        {
+            SoundManager.Instance.PlayBtnClickError();
         }
     }
 
@@ -67,6 +73,7 @@ public class CanvasSkinShop : UICanvas
         ChangeItem(choosingItem.Item.Type, true);
         PrintBuyButtons();
         UpdateAllItemShopState();
+        SoundManager.Instance.PlayBtnClick();
     }
 
     public void Unequip()
@@ -74,6 +81,7 @@ public class CanvasSkinShop : UICanvas
         ChangeItem(ItemType.None, true);
         PrintBuyButtons();
         choosingItem.ToggleEquippedTag(false);
+        SoundManager.Instance.PlayBtnClick();
     }
 
     public void SetCoinText(float coin) => coinText.text = coin.ToString();
@@ -291,6 +299,7 @@ public class CanvasSkinShop : UICanvas
         ChangeItem(itemShop.Item.Type);
         DisplayStatsText();
         PrintBuyButtons();
+        SoundManager.Instance.PlayBtnClick();
     }
 
     public void OnSelectingTab(int tab)
@@ -303,6 +312,7 @@ public class CanvasSkinShop : UICanvas
         tabBGs[tab].enabled = false;
         LevelManager.Instance.Player.ChangeToSavedItems();
         DisplayData();
+        SoundManager.Instance.PlayBtnClick();
     }
 
     private void ClearItemList()

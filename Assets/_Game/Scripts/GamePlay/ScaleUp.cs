@@ -28,7 +28,16 @@ public static class ScaleUp
         character.TF.position += Vector3.up * Const.CHARACTER_UPSCALE_UNIT;
         if (vfxOn)
         {
-            character.TriggerScaleUpVFX(0.15f);
+            character.TriggerScaleUpVFX(Const.CHARACTER_UPSCALE_VFX_DELAY);
+        }
+        if(character is Enemy)
+        {
+            SoundManager.Instance.PlaySizeUp2(character.audioSource);
+            character.InitSpeed();
+        }
+        else
+        {
+            SoundManager.Instance.PlaySizeUp1(character.audioSource);
         }
     }
 

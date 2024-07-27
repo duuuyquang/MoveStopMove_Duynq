@@ -28,5 +28,6 @@ public class CanvasGamePlay : UICanvas
     {
         UIManager.Instance.OpenUI<CanvasSettings>().SetState(this);
         GameManager.Instance.OnSetting();
+        SoundManager.Instance.PlayBtnClick();
     }
 }

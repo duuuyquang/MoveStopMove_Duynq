@@ -103,7 +103,7 @@ MonoBehaviour:
   bonusAttackRange: 5
   bonusMoveSpeed: 0
   bonusGold: 0
-  sprite: {fileID: 21300000, guid: 04416aad1ad2a044d969a5be1202e02e, type: 3}
+  sprite: {fileID: 21300000, guid: 9669c52496cee084bb7a3296f7dad3fe, type: 3}
   price: 500
   isItemInSet: 0
   isSetItem: 0
@@ -112,3 +112,4 @@ MonoBehaviour:
   pantsItem: {fileID: 0}
   wingItem: {fileID: 0}
   tailItem: {fileID: 0}
+  charColorType: 0

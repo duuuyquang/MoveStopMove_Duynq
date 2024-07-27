@@ -33,18 +33,21 @@ public class CanvasWeaponShop : UICanvas
     {
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
+        SoundManager.Instance.PlayBtnClick();
     }
 
     public void NextWeapon()
     {
         curID = Mathf.Min( ++curID, itemDataSO.TotalWeapons - 1);
         DisplayData(curID);
+        SoundManager.Instance.PlayBtnClick();
     }
 
     public void PreviousWeapon()
     {
         curID = Mathf.Max(--curID, 1);
         DisplayData(curID);
+        SoundManager.Instance.PlayBtnClick();
     }
 
     public void Purchase()
@@ -55,6 +58,11 @@ public class CanvasWeaponShop : UICanvas
             UpdateWeaponBought(curWeapon.WeaponType);
             SetCoinText(GameManager.Instance.TotalCoin);
             DisplayData(curID);
+            SoundManager.Instance.PlayBtnClick();
+        }
+        else
+        {
+            SoundManager.Instance.PlayBtnClickError();
         }
     }
 

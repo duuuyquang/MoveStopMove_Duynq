@@ -7,6 +7,7 @@ public class CanvasLose : UICanvas
     public void OnOpen()
     {
         animator.SetTrigger(Const.ANIM_NAME_CANVAS_LOSE);
+        SoundManager.Instance.PlayLose();
     }
 
     public void MainMenuButton()
@@ -14,11 +15,13 @@ public class CanvasLose : UICanvas
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
         LevelManager.Instance.OnInit(PlayerData.Instance.curLevel);
+        SoundManager.Instance.PlayBtnClick();
     }
 
     public void ReviveButton()
     {
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasGamePlay>();
+        SoundManager.Instance.PlayBtnClick();
     }
 }

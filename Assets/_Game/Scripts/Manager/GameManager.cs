@@ -72,6 +72,7 @@ public class GameManager : Singleton<GameManager>
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasWin>().OnOpen();
         LevelManager.Instance.Player.OnWin();
+        SoundManager.Instance.PlayVictory();
     }
 
     public void OnLose()
@@ -124,17 +125,23 @@ public class GameManager : Singleton<GameManager>
     public void OnRevive()
     {
         ChangeState(GameState.Revive);
-        UIManager.Instance.OpenUI<CanvasRevive>().SetCounterText(reviveCounter);
+        UIManager.Instance.OpenUI<CanvasRevive>().OnOpen(reviveCounter);
+        SoundManager.Instance.PlayCount3();
         InvokeRepeating(nameof(CountReviveTimer), 1, 1);
     }
 
     private void CountReviveTimer()
     {
         UIManager.Instance.OpenUI<CanvasRevive>().SetCounterText(--reviveCounter);
-        if(reviveCounter <= 0)
+        if (reviveCounter <= 0)
         {
+            SoundManager.Instance.PlayCount2();
             StopReviveTimer();
             OnLose();
+        }
+        else
+        {
+            SoundManager.Instance.PlayCount3();
         }
     }
 

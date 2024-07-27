@@ -11,6 +11,12 @@ public class CanvasRevive : UICanvas
 
     private float rotateSpd = 360 / Const.CHARACTER_REVIVE_COUNTDOWN_SECS;
 
+    public void OnOpen(int totalSecs)
+    {
+        loadingCirle.transform.eulerAngles = Vector3.zero;
+        SetCounterText(totalSecs);
+    }
+
     public void Update()
     {
         loadingCirle.Rotate(rotateAxis, rotateSpd * Time.deltaTime);
@@ -18,6 +24,7 @@ public class CanvasRevive : UICanvas
     public void ReviveButton()
     {
         UIManager.Instance.CloseAll();
+        SoundManager.Instance.PlayBtnClick();
         UIManager.Instance.OpenUI<CanvasGamePlay>().OnOpen();
         GameManager.Instance.OnPlayRevive();
     }

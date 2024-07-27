@@ -24,6 +24,7 @@ public class CanvasMainMenu : UICanvas
             UIManager.Instance.OpenUI<CanvasGamePlay>().OnOpen();
             GameManager.Instance.OnPlayDelay(1f);
             CameraFollower.Instance.SetupGamePlayMode();
+            SoundManager.Instance.PlayBtnClick();
         }
     }
 
@@ -31,6 +32,7 @@ public class CanvasMainMenu : UICanvas
     {
         UIManager.Instance.OpenUI<CanvasSettings>().SetState(this);
         GameManager.Instance.OnSetting();
+        SoundManager.Instance.PlayBtnClick();
     }
 
     public void WeaponShopButton()
@@ -39,6 +41,7 @@ public class CanvasMainMenu : UICanvas
         {
             Close(0);
             UIManager.Instance.OpenUI<CanvasWeaponShop>().OnOpen();
+            SoundManager.Instance.PlayBtnClick();
         }
     }
 
@@ -48,6 +51,7 @@ public class CanvasMainMenu : UICanvas
         {
             Close(0);
             UIManager.Instance.OpenUI<CanvasSkinShop>().OnOpen();
+            SoundManager.Instance.PlayBtnClick();
         }
     }
 

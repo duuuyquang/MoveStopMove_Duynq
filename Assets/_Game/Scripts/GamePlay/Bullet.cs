@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public class Bullet : GameUnit
 {
@@ -38,7 +37,7 @@ public class Bullet : GameUnit
         this.targetPos = targetPos;
         this.weaponHolder = weaponHolder;
 
-        speed       = weaponHolder.Owner.BaseAtkSpeed + weaponHolder.CurWeapon.BonusSpeed;
+        speed       = weaponHolder.Speed;
         spinSpeed   = weaponHolder.CurWeapon.SpinSpeed;
         rotateAxis  = weaponHolder.CurWeapon.RotateAxis;
         needGrab    = weaponHolder.CurWeapon.IsGrab;
@@ -197,6 +196,7 @@ public class Bullet : GameUnit
 
     private void OnHitOpponent(Character opponent)
     {
+        SoundManager.Instance.PlayWeaponHit(weaponHolder.Owner.audioSource);
         weaponHolder.Owner.OnTargetKilled(opponent);
         EnemyManager.Instance.SetRecordHighestPoint(weaponHolder.Owner.CombatPoint);
         opponent.OnDead();

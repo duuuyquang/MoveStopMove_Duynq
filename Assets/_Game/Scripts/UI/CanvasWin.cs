@@ -21,6 +21,7 @@ public class CanvasWin : UICanvas
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoinText(GameManager.Instance.TotalCoin);
         LevelManager.Instance.OnInit(PlayerData.Instance.curLevel);
+        SoundManager.Instance.PlayBtnClick();
     }
 
     public void NextButton()
@@ -28,5 +29,6 @@ public class CanvasWin : UICanvas
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoinText(GameManager.Instance.TotalCoin);
         LevelManager.Instance.OnInitNextLevel();
+        SoundManager.Instance.PlayBtnClick();
     }
 }

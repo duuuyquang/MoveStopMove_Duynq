@@ -13,9 +13,9 @@ public class Enemy : Character
     public override bool IsStanding => Vector3.Distance(agent.velocity, Vector3.zero) < 0.1f;
     public bool IsDestination => agent.remainingDistance < 0.1f;
 
-    private float baseAgentMoveSpeed = Const.CHARACTER_DEFAULT_AGENT_MOVE_SPD;
+    private float baseAgentMoveSpeed = Const.CHARACTER_AGENT_MOVE_SPD_DEFAULT;
     private float bonusAgentMoveSpeed = 0f;
-    public float AgentMoveSpeed => (baseAgentMoveSpeed + bonusAgentMoveSpeed) * BoosterSpdMultipler;
+    public float AgentMoveSpeed => Mathf.Min(Const.CHARACTER_AGENT_MOVE_SPD_MAX, (baseAgentMoveSpeed + baseAgentMoveSpeed*BoosterSpdMultipler + bonusAgentMoveSpeed) * CurSize);
 
     //private Vector3 curDestination;
     //public bool IsDestination => Vector3.Distance(curDestination, TF.position + (TF.position.y - curDestination.y) * Vector3.up ) < 0.1f;
@@ -30,13 +30,16 @@ public class Enemy : Character
     protected override void Update()
     {
         base.Update();
-        if (GameManager.IsState(GameState.GamePlay)) curState?.OnExecute(this);
+        if (GameManager.IsState(GameState.GamePlay))
+        {
+            curState?.OnExecute(this);
+        }
     }
 
     public override void OnInit()
     {
         base.OnInit();
-        agent.speed = AgentMoveSpeed;
+        InitSpeed();
         GenerateRandomData();
         SetState(new IdleState());
         ToggleTargetIndicator(false);
@@ -113,6 +116,11 @@ public class Enemy : Character
         agent.ResetPath();
     }
 
+    public override void InitSpeed()
+    {
+        agent.speed = AgentMoveSpeed;
+    }
+
     public override void ToggleTargetIndicator(bool value)
     {
         targetIndicatorImage.enabled = value;
@@ -129,6 +137,12 @@ public class Enemy : Character
     {
         base.UpdateBoosterStats(booster);
         BoosterSpdMultipler = booster.MoveSpdMultiplier;
+        agent.speed = AgentMoveSpeed;
+    }
+
+    protected override void DeactiveSpeedBooster()
+    {
+        base.DeactiveSpeedBooster();
         agent.speed = AgentMoveSpeed;
     }
 }

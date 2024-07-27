@@ -8,6 +8,7 @@ public class CanvasDebug : UICanvas
 
     string atkSpd;
     string baseAtkSpd;
+    string baseMoveSpd;
     string weaponBonusAtkSpd;
 
     string atkRange;
@@ -29,11 +30,12 @@ public class CanvasDebug : UICanvas
     public void SetLogText()
     {
         moveSpd                = LevelManager.Instance.Player.MoveSpeed.ToString();
+        baseMoveSpd            = LevelManager.Instance.Player.BaseMoveSpeed.ToString();
         bonusGoldMulti         = ( LevelManager.Instance.Player.BonusGoldMultiplier).ToString();
         size                   = LevelManager.Instance.Player.CurSize.ToString();
         curStatus              = LevelManager.Instance.Player.CurStatus.ToString();
                                
-        atkSpd                 = (LevelManager.Instance.Player.BaseAtkSpeed + LevelManager.Instance.Player.WeaponHolder.CurWeapon.BonusSpeed).ToString();
+        atkSpd                 = LevelManager.Instance.Player.WeaponHolder.Speed.ToString();
         baseAtkSpd             = LevelManager.Instance.Player.BaseAtkSpeed.ToString();
         weaponBonusAtkSpd      = LevelManager.Instance.Player.WeaponHolder.CurWeapon.BonusSpeed.ToString();
                                
@@ -52,12 +54,12 @@ public class CanvasDebug : UICanvas
     private void SetContent()
     {
         content = "";
-        content += $"Stt: {curStatus},";
-        content += $"Size: {size},";
-        content += $"MoveSpd: {moveSpd} \n";
-        content += $"BoosterType: {boosterType} \n";
-        content += $"BonusGoldMul: {bonusGoldMulti} \n";
-        content += $"AtkSpd: {atkSpd} = {baseAtkSpd} + {weaponBonusAtkSpd}(w) \n";
-        content += $"AtkRange: {atkRange} = [ {baseAtkRange} + {wpBonusAtkRange}(w) ] * {itemBonusAtkRangeMulti}(i) * Size\n";
+        content += $"Stt:{curStatus} - ";
+        content += $"Size:{size} - ";
+        content += $"Booster:{boosterType}\n";
+        content += $"BonusGold:{bonusGoldMulti} \n";
+        content += $"MoveSpd:{moveSpd} = [{baseMoveSpd} + Booster] * Size\n";
+        content += $"AtkSpd:{atkSpd} = [{baseAtkSpd} + {weaponBonusAtkSpd}(w)] * Size\n";
+        content += $"AtkRange:{atkRange} = [ {baseAtkRange} + {wpBonusAtkRange}(w) + booster] * {itemBonusAtkRangeMulti}(i) * Size\n";
     }
 }

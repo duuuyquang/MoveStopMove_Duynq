@@ -8,6 +8,8 @@ public class WeaponHolder : MonoBehaviour
     public int BulletCharge { get; private set; }
     public bool HasBullet => BulletCharge > 0;
 
+    public float Speed => (Owner.BaseAtkSpeed + CurWeapon.BonusSpeed) * Owner.CurSize;
+
     public Transform TF;
 
     public void OnInit(Character owner)
