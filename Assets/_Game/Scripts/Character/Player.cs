@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : Character
@@ -9,9 +8,9 @@ public class Player : Character
 
     private ParticleSystem curFinishPartical;
 
-    public static Vector3 InitPosition = Vector3.zero;
+    public  static Vector3 InitPosition = Vector3.zero;
 
-    public int reviveTimes;
+    public  int reviveTimes;
     private int untouchCounter;
     private float gainnedCoin;
 
@@ -71,6 +70,7 @@ public class Player : Character
 
     public void InitTransform(Vector3 pos)
     {
+        pos.y = 0;
         TF.position = pos;
         TF.eulerAngles = Cache.GetVector(0f, 210f, 0f);
     }

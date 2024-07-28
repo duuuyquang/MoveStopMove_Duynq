@@ -34,7 +34,6 @@ public class CanvasSettings : UICanvas
     public void MainMenuButton()
     {
         UIManager.Instance.CloseAll();
-        UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
         LevelManager.Instance.OnInit(PlayerData.Instance.curLevel);
         SoundManager.Instance.PlayBtnClick();
     }

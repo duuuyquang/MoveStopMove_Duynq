@@ -271,9 +271,9 @@ public class Character : GameUnit
             ToggleWeapon(false);
             if (BoosterType == BoosterType.Attack)
             {
-                DeactiveAttackBooster();
+                DeactiveAtkBooster();
             }
-            yield return Cache.GetWaitSecs(1f);
+            yield return Cache.GetWaitSecs(.5f);
             ChangeAnimByStatus(StatusType.Normal);
         }
     }
@@ -375,10 +375,13 @@ public class Character : GameUnit
     public bool IsBoosterType(BoosterType type) => BoosterType == type;
     protected virtual void UpdateBoosterStats(Booster booster)
     {
-        if (IsBoosterType(BoosterType.None) && !IsStatus(StatusType.Untouchable))
+        if (BoosterType != booster.Type && !IsStatus(StatusType.Untouchable))
         {
+            DeactiveAtkBooster();
+            DeactiveSpeedBooster();
+            CancelInvoke(nameof(DeactiveSpeedBooster));
             BoosterType = booster.Type;
-            switch(BoosterType)
+            switch (BoosterType)
             {
                 case BoosterType.Attack:
                     ActiveAtkBooster(booster);
@@ -399,7 +402,7 @@ public class Character : GameUnit
         SoundManager.Instance.PlayAtkBoosterEffect(audioSource);
     }
 
-    private void DeactiveAttackBooster()
+    private void DeactiveAtkBooster()
     {
         BoosterType = BoosterType.None;
         BoosterAtkRange = 0f;
@@ -430,7 +433,7 @@ public class Character : GameUnit
         ClearTargets();
         ChangeColorDeath(ColorType);
         ToggleTargetIndicator(false);
-        DeactiveAttackBooster();
+        DeactiveAtkBooster();
         DeactiveSpeedBooster();
         GameManager.Instance.UpdateAliveCountText();
         SoundManager.Instance.PlayDead(audioSource);
@@ -477,6 +480,6 @@ public class Character : GameUnit
     public virtual void ToggleTargetIndicator(bool value){}
     public virtual void OnDespawn(){}
     public virtual void StopMoving(){}
-    public virtual void InitSpeed() {}
+    public virtual void InitSpeed(){}
     #endregion
 }

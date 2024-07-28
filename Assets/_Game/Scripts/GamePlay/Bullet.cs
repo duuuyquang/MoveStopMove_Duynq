@@ -60,7 +60,7 @@ public class Bullet : GameUnit
     {
         if(weaponHolder.Owner.IsBoosterType(BoosterType.Attack))
         {
-            speed = Booster.ATTACK_SPD_INDEX;
+            speed *= Booster.ATTACK_SPD_INDEX;
             TF.localScale = Vector3.one * Booster.ATTACK_BULLET_SIZE_INDEX;
             needGrab = false;
         }
@@ -184,7 +184,7 @@ public class Bullet : GameUnit
 
     private bool CheckValidToHit(Character opponent)
     {
-        if (opponent && opponent != weaponHolder.Owner && CheckValidStatus(opponent) && !IsDropped)
+        if (opponent != weaponHolder.Owner && CheckValidStatus(opponent) && !IsDropped)
         {
             OnHitOpponent(opponent);
             return true;
@@ -211,7 +211,7 @@ public class Bullet : GameUnit
     private void OnTriggerEnter(Collider other)
     {
         Character opponent = Cache.GetChar(other);
-        if(!CheckValidToHit(opponent))
+        if(opponent && !CheckValidToHit(opponent))
         {
             return;
         }

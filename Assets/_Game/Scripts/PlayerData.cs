@@ -8,9 +8,10 @@ public class PlayerData
 {
     public static PlayerData Instance { get; private set; }
 
-    private const string FILE_PATH = "/_Game/Data/";
-    private const string FILE_NAME = "PlayerProfile";
-    public static string FileDirectory => Application.dataPath + FILE_PATH + $"{FILE_NAME}.json";
+    //private const string FILE_PATH = "/_Game/Data/";
+    private const string FILE_PATH = "";
+    private const string FILE_NAME = "/PlayerProfile";
+    public static string FileDirectory => Application.persistentDataPath + FILE_PATH + $"{FILE_NAME}.json";
 
     #region JSON properties
     public string name = "YourName";

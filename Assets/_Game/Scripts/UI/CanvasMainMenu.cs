@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -5,7 +6,11 @@ public class CanvasMainMenu : UICanvas
 {
     [SerializeField] TextMeshProUGUI coinText;
     [SerializeField] TMP_InputField nameInputField;
+    [SerializeField] TMP_Dropdown levelsDropdown;
     [SerializeField] Animator animator;
+
+    private List<string> levelOptions = new();
+    private int selectingLevel = -1;
 
     public void OnOpen()
     {
@@ -13,6 +18,7 @@ public class CanvasMainMenu : UICanvas
         GameManager.Instance.OnMenu();
         CameraFollower.Instance.SetupMenuMode();
         animator.SetTrigger(Const.ANIM_NAME_CANVAS_MENU_IN);
+        GetLevelOptions();
     }
 
     public void PlayButton()
@@ -66,5 +72,34 @@ public class CanvasMainMenu : UICanvas
         LevelManager.Instance.Player.Name = text;
         PlayerData.Instance.name = text;
         PlayerData.SaveData();
+    }
+
+    public void SetLevel(int level)
+    {
+        Debug.Log(level);
+        selectingLevel = level;
+        LevelManager.Instance.OnInit(level);
+        SoundManager.Instance.PlayBtnClick();
+    }
+
+    private void GetLevelOptions()
+    {
+        levelsDropdown.ClearOptions();
+        levelOptions.Clear();
+        for( int i = 0; i <= LevelManager.Instance.TotalLevel; i++ )
+        {
+            if( i <= PlayerData.Instance.curLevel )
+            {
+                levelOptions.Add($"Level {i}");
+            }
+        }
+
+        if (selectingLevel == -1)
+        {
+            selectingLevel = PlayerData.Instance.curLevel;
+        }
+
+        levelsDropdown.AddOptions(levelOptions);
+        levelsDropdown.SetValueWithoutNotify(selectingLevel);
     }
 }

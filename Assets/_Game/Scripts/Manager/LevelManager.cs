@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,15 +8,18 @@ public class LevelManager : Singleton<LevelManager>
     public Level CurLevel { get; private set; }
     public Player Player { get; private set; }
 
+    public int TotalLevel => levels.Count;
+
     void Start()
     {
+        Debug.Log(PlayerData.FileDirectory);
         OnInit();
     }
 
-    public void OnInit(int level = 0)
+    public void OnInit(int level = -1)
     {
         PlayerData.LoadData();
-        if (level == 0)
+        if (level == -1)
         {
             level = PlayerData.Instance.curLevel;
         }

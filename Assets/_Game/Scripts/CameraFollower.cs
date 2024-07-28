@@ -23,7 +23,7 @@ public class CameraFollower : Singleton<CameraFollower>
     //private Vector3 PlayerWeaponPos => LevelManager.Instance.Player.WeaponHolder.TF.position + Vector3.left * 0.3f + Vector3.down * 0.3f;
     private Vector3 PlayerWeaponPos => Player.InitPosition + Vector3.left * 0.6f + Vector3.down * 0.8f;
     private Vector3 SkinShopPos => Player.InitPosition + Vector3.down * 1.5f;
-    private Vector3 GamePlayOffset => new Vector3(0, LevelManager.Instance.Player.CurAttackRange * 3.1f, -LevelManager.Instance.Player.CurAttackRange * 2.5f);
+    private Vector3 GamePlayOffset => new Vector3(0, 1+ LevelManager.Instance.Player.CurAttackRange * 3f, -1 -LevelManager.Instance.Player.CurAttackRange * 2.5f);
 
     void LateUpdate()
     {
@@ -66,27 +66,12 @@ public class CameraFollower : Singleton<CameraFollower>
     public void SetupGamePlayMode()
     {
         StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_GAME_PLAY, PlayerInitalPos, 20f));
-        //StartCoroutine(IECameraTransition());
     }
 
     public void SetupSkinShopMode()
     {
         StartCoroutine(IEGenericTransitionAndLookAt(OFFSET_SKIN_SHOP, SkinShopPos, 10f));
     }
-
-    //IEnumerator IECameraTransition()
-    //{
-    //    int desiredFPS = 45;
-    //    float count = 0f;
-    //    float amountToRotate = EULER_X_GAME_PLAY - TF.eulerAngles.x;
-    //    float rotateUnit = amountToRotate / desiredFPS;
-    //    while (count < amountToRotate)
-    //    {
-    //        TF.Rotate(rotateUnit, 0, 0);
-    //        count += rotateUnit;
-    //        yield return new WaitForEndOfFrame();
-    //    }
-    //}
 
     IEnumerator IEGenericTransitionAndLookAt(Vector3 finalPos, Vector3 lookAtPos, float speed)
     {

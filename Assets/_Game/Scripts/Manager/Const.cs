@@ -21,10 +21,11 @@ public static class Const
     public const string ANIM_NAME_CANVAS_GAMEPLAY       = "gameplay";
 
     public const float  CHARACTER_UPSCALE_UNIT               = 0.15f;
+    public const float  CHARACTER_UPSCALE_POS_OFFSET         = 0.1f;
     public const float  CHARACTER_UPSCALE_VFX_DELAY          = 0.15f;
     public const int    CHARACTER_REVIVE_COUNTDOWN_SECS      = 5;
     public const int    CHARACTER_UNTOUCHABLE_SECS           = 5;
-    public const int    CHARACTER_DEFAULT_MOVE_SPD           = 110;
+    public const int    CHARACTER_DEFAULT_MOVE_SPD           = 120;
     public const int    CHARACTER_MOVE_SPEED_MAX             = 300;
     public const float  CHARACTER_AGENT_MOVE_SPD_DEFAULT     = 2.5f;
     public const float  CHARACTER_AGENT_MOVE_SPD_MAX         = 7f;

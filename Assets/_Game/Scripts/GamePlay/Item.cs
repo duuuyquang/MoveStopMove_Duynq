@@ -18,17 +18,17 @@ public class Item : MonoBehaviour
     [SerializeField] bool isItemInSet = false;
     [SerializeField] bool isSetItem = false;
 
-    [ConditionalProperty("isSetItem")]
+    //[ConditionalProperty("isSetItem")]
     [SerializeField] protected Item headItem;
-    [ConditionalProperty("isSetItem")]
+    //[ConditionalProperty("isSetItem")]
     [SerializeField] protected Item shieldItem;
-    [ConditionalProperty("isSetItem")]
+    //[ConditionalProperty("isSetItem")]
     [SerializeField] protected Item pantsItem;
-    [ConditionalProperty("isSetItem")]
+    //[ConditionalProperty("isSetItem")]
     [SerializeField] protected Item wingItem;
-    [ConditionalProperty("isSetItem")]
+    //[ConditionalProperty("isSetItem")]
     [SerializeField] protected Item tailItem;
-    [ConditionalProperty("isSetItem")]
+    //[ConditionalProperty("isSetItem")]
     [SerializeField] protected ColorType charColorType;
 
     public float BonusAttackRange => bonusAttackRange;

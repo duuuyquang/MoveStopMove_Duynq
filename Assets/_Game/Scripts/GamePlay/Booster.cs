@@ -5,12 +5,12 @@ using Random = UnityEngine.Random;
 public enum BoosterType { None, Attack, Speed }
 public class Booster : GameUnit
 {
-    public const float ATTACK_RANGE_INDEX = 2f;
-    public const float ATTACK_SPD_INDEX = 18f;
+    public const float ATTACK_RANGE_INDEX = 3f;
+    public const float ATTACK_SPD_INDEX = 2f;
     public const float ATTACK_BULLET_SIZE_INDEX = 1f;
 
     public const float SPEED_ACTIVE_SECS = 10f;
-    public const float SPEED_INDEX = 0.5f;
+    public const float SPEED_INDEX = 0.75f;
 
     [SerializeField] Renderer boxRenderer;
     [SerializeField] ColorDataSO colorDataSO;
@@ -81,7 +81,6 @@ public class Booster : GameUnit
     {
         BoosterManager.Instance.SpawnedBoostersList.Remove(this);
         SimplePool.Despawn(this);
-        
     }    
 
     public void UpdateStatsByType()
@@ -102,7 +101,7 @@ public class Booster : GameUnit
     private void OnTriggerEnter(Collider other)
     {
         Character character = Cache.GetChar(other);
-        if (character && character.IsBoosterType(BoosterType.None) && !character.IsStatus(StatusType.Untouchable))
+        if (character && character.BoosterType != Type && !character.IsStatus(StatusType.Untouchable))
         {
             SoundManager.Instance.PlayHitBooster();
             OnDespawn();

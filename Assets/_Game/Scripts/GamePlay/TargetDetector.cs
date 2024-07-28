@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public static class TargetDetector
 {
-    private static bool IsInvalidTarget(Character character, Character enemy) => IsInValidStatus(enemy) || Vector3.Distance(enemy.TF.position, character.TF.position) > character.CurAttackRange;
+    private static bool IsInvalidTarget(Character character, Character enemy) => IsInValidStatus(enemy);
+    private static bool IsOutOfRange(Character character, Character enemy) => Vector3.Distance(enemy.TF.position, character.TF.position) > character.CurAttackRange;
 
     private static bool IsInValidStatus(Character character) => character.IsStatus(StatusType.Dead) || character.IsStatus(StatusType.Untouchable);
     public static void DetectNearestTarget(Character character, List<Character> targetsInRange)
@@ -23,6 +25,12 @@ public static class TargetDetector
         float checkingDist;
         foreach (Character enemy in targetsInRange)
         {
+            if (IsOutOfRange(character, enemy))
+            {
+                enemy.ToggleTargetIndicator(false);
+                continue;
+            }
+
             if (IsInvalidTarget(character, enemy))
             {
                 continue;
