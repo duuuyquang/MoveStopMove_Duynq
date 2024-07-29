@@ -198,7 +198,7 @@ public class Bullet : GameUnit
         SoundManager.Instance.PlayWeaponHit(WeaponHolder.Owner.audioSource);
         WeaponHolder.Owner.OnTargetKilled(opponent);
         EnemyManager.Instance.SetRecordHighestPoint(WeaponHolder.Owner.CombatPoint);
-        opponent.OnDead();
+        opponent.OnDead(WeaponHolder.Owner);
     }
 
     private void SetStayAtCurPos()

@@ -76,9 +76,9 @@ public class Enemy : Character
         atkRangeTF.gameObject.SetActive(true);
     }
 
-    public override void OnDead()
+    public override void OnDead(Character killer)
     {
-        base.OnDead();
+        base.OnDead(killer);
         CurState = null;
         CurTargetChar = null;
     }

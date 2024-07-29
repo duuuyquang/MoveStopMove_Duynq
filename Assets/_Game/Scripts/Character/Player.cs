@@ -13,6 +13,7 @@ public class Player : Character
     public  int reviveTimes;
     private int untouchCounter;
     private float gainnedCoin;
+    public Character Killer { get; private set; }
 
     protected override void Update()
     {
@@ -125,9 +126,10 @@ public class Player : Character
         PlayerData.SaveData();
     }
 
-    public override void OnDead()
+    public override void OnDead(Character killer)
     {
-        base.OnDead();
+        base.OnDead(killer);
+        Killer = killer;
         SetFinishPartical(losePartical, 0.5f);
     }
 

@@ -425,7 +425,7 @@ public class Character : GameUnit
         BoosterType = BoosterType.None;
     }
     #endregion
-    public virtual void OnDead()
+    public virtual void OnDead(Character killer)
     {
         bulletPartical.Play();
         indicator = null;
