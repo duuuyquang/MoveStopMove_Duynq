@@ -11,8 +11,8 @@ public class Bullet : GameUnit
     private Vector3 rotateAxis;
     private Vector3 targetPos;
 
-    private WeaponHolder weaponHolder;
-    private Weapon weaponPrefab;
+    public WeaponHolder WeaponHolder;
+    public Weapon WeaponPrefab { get; private set; }
 
     private bool IsDestination => Vector3.Distance(TF.position + Vector3.up * (TF.position.y - targetPos.y), targetPos) < 0.1f;
     #endregion
@@ -35,7 +35,7 @@ public class Bullet : GameUnit
     public void OnInit(WeaponHolder weaponHolder, Vector3 targetPos)
     {
         this.targetPos = targetPos;
-        this.weaponHolder = weaponHolder;
+        this.WeaponHolder = weaponHolder;
 
         speed       = weaponHolder.Speed;
         spinSpeed   = weaponHolder.CurWeapon.SpinSpeed;
@@ -53,24 +53,23 @@ public class Bullet : GameUnit
 
     private void InitSize()
     {
-        TF.localScale = Vector3.one * weaponHolder.TF.localScale.x;
+        TF.localScale = Vector3.one * WeaponHolder.TF.localScale.x;
     }
 
     private void CheckBooster()
     {
-        if(weaponHolder.Owner.IsBoosterType(BoosterType.Attack))
+        if(WeaponHolder.Owner.IsBoosterType(BoosterType.Attack))
         {
             speed *= Booster.ATTACK_SPD_INDEX;
             TF.localScale = Vector3.one * Booster.ATTACK_BULLET_SIZE_INDEX;
-            needGrab = false;
         }
     }
 
     private void SpawnWeapon()
     {
-        weaponPrefab = WeaponPool.Spawn<Weapon>(weaponHolder.Owner.WeaponType, TF.position, Quaternion.identity);
-        weaponPrefab.TF.SetParent(TF, false);
-        weaponPrefab.OnInit();
+        WeaponPrefab = WeaponPool.Spawn<Weapon>(WeaponHolder.Owner.WeaponType, TF.position, Quaternion.identity);
+        WeaponPrefab.TF.SetParent(TF, false);
+        WeaponPrefab.OnInit();
 
         TF.LookAt(targetPos);
 
@@ -78,7 +77,7 @@ public class Bullet : GameUnit
         TF.eulerAngles += Cache.GetVector(90f, 0f, 0f);
 
         //scale to current size
-        TF.localScale += Vector3.one * (weaponHolder.Owner.CurSize - 1f) * 0.5f;
+        TF.localScale += Vector3.one * (WeaponHolder.Owner.CurSize - 1f) * 0.5f;
     }
 
     private void ProcessBehaviour()
@@ -88,6 +87,7 @@ public class Bullet : GameUnit
         {
             if(!ProcessForSpecificBehaviours())
             {
+                WeaponHolder.ReloadBase();
                 OnDespawn();
             }
         }
@@ -103,9 +103,9 @@ public class Bullet : GameUnit
 
     private bool ProcessReturnWeapon()
     {
-        if (weaponHolder && weaponHolder.CurWeapon.IsReturn && !isReturning)
+        if (WeaponHolder && WeaponHolder.CurWeapon.IsReturn && !isReturning)
         {
-            SetTargetPos(weaponHolder.Owner.TF.position);
+            SetTargetPos(WeaponHolder.Owner.TF.position);
             isReturning = true;
             return true;
         }
@@ -125,12 +125,12 @@ public class Bullet : GameUnit
             }
 
             grabTimer += Time.deltaTime;
-
-            if (!weaponHolder || weaponHolder && (Vector3.Distance(weaponHolder.Owner.TF.position, TF.position) <= 1.5f) || grabTimer >= Const.WEAPON_DROP_TIME)
+            if(grabTimer >= Const.WEAPON_DROP_TIME)
             {
                 dropPartical.Stop();
                 OnDespawn();
             }
+
             return true;
         }
         return false;
@@ -139,19 +139,18 @@ public class Bullet : GameUnit
     private void MovingToTarget()
     {
         TF.position = Vector3.MoveTowards(TF.position, targetPos, speed * Time.deltaTime);
-        weaponPrefab.TF.Rotate(rotateAxis, spinSpeed * Time.deltaTime);
+        WeaponPrefab.TF.Rotate(rotateAxis, spinSpeed * Time.deltaTime);
     }
 
     public void OnDespawn()
     {
-        if(weaponHolder)
-        {
-            weaponHolder.Reload(Const.WEAPON_BASE_BULLET_AMOUNT);
-        }
+        IsDropped = false;
+        isReturning = false;
+        grabTimer = 0f;
 
-        weaponPrefab.TF.SetParent(PoolControl.Instance.WeaponPoolTF);
-        weaponPrefab.TF.localScale = Vector3.one;
-        WeaponPool.Despawn(weaponPrefab);
+        WeaponPrefab.TF.SetParent(PoolControl.Instance.WeaponPoolTF);
+        WeaponPrefab.TF.localScale = Vector3.one;
+        WeaponPool.Despawn(WeaponPrefab);
         SimplePool.Despawn(this);
     }
 
@@ -163,8 +162,8 @@ public class Bullet : GameUnit
 
     private void SetDroppedShape()
     {
-        weaponPrefab.TF.localPosition = Cache.GetVector(0f, 0f, 1f);
-        weaponPrefab.TF.localEulerAngles = Cache.GetVector(-50f, 180f, 0f);
+        WeaponPrefab.TF.localPosition = Cache.GetVector(0f, 0f, 1f);
+        WeaponPrefab.TF.localEulerAngles = Cache.GetVector(-50f, 180f, 0f);
     }
 
     private void SetTargetPos(Vector3 pos)
@@ -184,7 +183,7 @@ public class Bullet : GameUnit
 
     private bool CheckValidToHit(Character opponent)
     {
-        if (opponent != weaponHolder.Owner && CheckValidStatus(opponent) && !IsDropped)
+        if (opponent != WeaponHolder.Owner && CheckValidStatus(opponent) && !IsDropped)
         {
             OnHitOpponent(opponent);
             return true;
@@ -196,9 +195,9 @@ public class Bullet : GameUnit
 
     private void OnHitOpponent(Character opponent)
     {
-        SoundManager.Instance.PlayWeaponHit(weaponHolder.Owner.audioSource);
-        weaponHolder.Owner.OnTargetKilled(opponent);
-        EnemyManager.Instance.SetRecordHighestPoint(weaponHolder.Owner.CombatPoint);
+        SoundManager.Instance.PlayWeaponHit(WeaponHolder.Owner.audioSource);
+        WeaponHolder.Owner.OnTargetKilled(opponent);
+        EnemyManager.Instance.SetRecordHighestPoint(WeaponHolder.Owner.CombatPoint);
         opponent.OnDead();
     }
 
@@ -216,11 +215,17 @@ public class Bullet : GameUnit
             return;
         }
 
-        if(CheckGrabWeapon())
+        if (CheckGrabWeapon())
         {
             return;
         }
-        
+
+        //if(!needGrab)
+        //{
+        //    WeaponHolder.ReloadBase();
+        //    OnDespawn();
+        //}
+        WeaponHolder.ReloadBase();
         OnDespawn();
     }
 }

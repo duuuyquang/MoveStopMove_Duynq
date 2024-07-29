@@ -495,7 +495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c2710db625d55a4ea8efbdf7e87bf60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxEnemiesOnRunTime: 5
+  MaxEnemiesOnRunTime: 6
 --- !u!1 &561257992
 GameObject:
   m_ObjectHideFlags: 0

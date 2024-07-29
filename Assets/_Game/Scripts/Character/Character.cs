@@ -230,19 +230,21 @@ public class Character : GameUnit
 
     #endregion
     #region Attack
-    public void CheckToProcessAttack()
+    public bool CheckToProcessAttack()
     {
         if (IsStanding)
         {
             if (CheckAttackableConditions)
             {
                 ProcessAttack();
+                return true;
             }
         }
         else 
         {
             StopAttack();
         }
+        return false;
     }
 
     private void ProcessAttack()
@@ -463,6 +465,18 @@ public class Character : GameUnit
         if(booster)
         {
             UpdateBoosterStats(booster);
+        }
+
+        Bullet bullet = Cache.GetBullet(other);
+        if(bullet && bullet.IsDropped && WeaponHolder.CurWeapon.IsGrab && !WeaponHolder.HasBullet)
+        {
+            //if(bullet.WeaponPrefab.WeaponType != WeaponHolder.CurWeapon.WeaponType)
+            //{
+            //    ChangeWeapon(bullet.WeaponPrefab.WeaponType);
+            //}
+            ChangeWeapon(bullet.WeaponPrefab.WeaponType);
+            WeaponHolder.CancelReloadBase();
+            bullet.OnDespawn();
         }
     }
 

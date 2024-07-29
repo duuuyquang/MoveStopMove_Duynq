@@ -9,7 +9,7 @@ public class Enemy : Character
     [SerializeField] protected Image targetIndicatorImage;
     [SerializeField] NavMeshAgent agent;
 
-    private IState curState;
+    public IState CurState { get; private set; }
     public override bool IsStanding => Vector3.Distance(agent.velocity, Vector3.zero) < 0.1f;
     public bool IsDestination => agent.remainingDistance < 0.1f;
 
@@ -32,7 +32,7 @@ public class Enemy : Character
         base.Update();
         if (GameManager.IsState(GameState.GamePlay))
         {
-            curState?.OnExecute(this);
+            CurState?.OnExecute(this);
         }
     }
 
@@ -79,7 +79,7 @@ public class Enemy : Character
     public override void OnDead()
     {
         base.OnDead();
-        curState = null;
+        CurState = null;
         CurTargetChar = null;
     }
 
@@ -102,11 +102,11 @@ public class Enemy : Character
 
     public void SetState(IState state)
     {
-        if(curState != state)
+        if(CurState != state)
         {
-            curState?.OnExit(this);
-            curState = state;
-            curState?.OnEnter(this);
+            CurState?.OnExit(this);
+            CurState = state;
+            CurState?.OnEnter(this);
         }
     }
 

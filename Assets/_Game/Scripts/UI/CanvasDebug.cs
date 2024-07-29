@@ -22,6 +22,8 @@ public class CanvasDebug : UICanvas
 
     string boosterType;
     string curStatus;
+
+    string bullet;
     public void Update()
     {
         SetLogText();
@@ -45,6 +47,7 @@ public class CanvasDebug : UICanvas
         itemBonusAtkRangeMulti = LevelManager.Instance.Player.ItemBonusAtkRangeMultiplier.ToString();
 
         boosterType            = LevelManager.Instance.Player.BoosterType.ToString();
+        bullet                 = LevelManager.Instance.Player.WeaponHolder.BulletCharge.ToString();
 
         SetContent();
 
@@ -57,7 +60,8 @@ public class CanvasDebug : UICanvas
         content += $"Stt:{curStatus} - ";
         content += $"Size:{size} - ";
         content += $"Booster:{boosterType}\n";
-        content += $"BonusGold:{bonusGoldMulti} \n";
+        content += $"BonusGold:{bonusGoldMulti} - ";
+        content += $"BulletCharge:{bullet}\n";
         content += $"MoveSpd:{moveSpd} = [{baseMoveSpd} + Booster] * Size\n";
         content += $"AtkSpd:{atkSpd} = [{baseAtkSpd} + {weaponBonusAtkSpd}(w)] * Size\n";
         content += $"AtkRange:{atkRange} = [ {baseAtkRange} + {wpBonusAtkRange}(w) + booster] * {itemBonusAtkRangeMulti}(i) * Size\n";

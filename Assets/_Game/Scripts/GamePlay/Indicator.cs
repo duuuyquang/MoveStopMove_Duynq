@@ -14,11 +14,14 @@ public class Indicator : GameUnit
     [SerializeField] Image backgroundImage;
     [SerializeField] Image pointerImage;
     [SerializeField] Transform pointerImageTF;
+    [SerializeField] TextMeshProUGUI curStateText;
 
     public ColorDataSO colorDataSO;
 
     private float restrictedX;
     private float restrictedY;
+
+    Enemy enemy;
 
     private void LateUpdate()
     {
@@ -30,6 +33,12 @@ public class Indicator : GameUnit
                 pointerImageTF.gameObject.SetActive(false);
                 nameTextMesh.gameObject.SetActive(true);
                 TF.position = charPosOnScreen + Vector3.up * offsetChar;
+                #if UNITY_INCLUDE_TESTS
+                if (enemy && enemy.CurState != null)
+                {
+                    curStateText.text = $"( {enemy.CurState.ToString()} )";
+                }
+                #endif
             }
             else
             {
@@ -54,7 +63,6 @@ public class Indicator : GameUnit
 
         if (!targetChar || targetChar && targetChar.IsStatus(StatusType.Dead))
         {
-            //Destroy(gameObject);
             SimplePool.Despawn(this);
         }
     }
@@ -68,6 +76,13 @@ public class Indicator : GameUnit
         backgroundImage.material = colorDataSO.GetMatGUI(character.ColorType);
         pointerImage.material = colorDataSO.GetMatGUI(character.ColorType);
         nameTextMesh.color = colorDataSO.GetColor(character.ColorType);
+
+        #if UNITY_INCLUDE_TESTS
+        if(character is Enemy)
+        {
+            enemy = character.GetComponent<Enemy>();
+        }
+        #endif
     }
 
     public void UpdateName(string name)

@@ -105,7 +105,7 @@ MonoBehaviour:
   bonusSpeed: 2
   spinSpeed: 0
   isReturn: 0
-  isGrab: 0
+  isGrab: 1
   price: 450
   initPosition: {x: 0, y: 0, z: 0}
   initEulerAngles: {x: 0, y: 0, z: 0}

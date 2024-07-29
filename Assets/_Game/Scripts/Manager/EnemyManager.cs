@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 public class EnemyManager : Singleton<EnemyManager>
 {
-    [SerializeField] int MaxEnemiesOnRunTime = 10;
+    [SerializeField] int MaxEnemiesOnRunTime = 1;
     private int enemiesReadyCount;
     private NavMeshHit navMeshHit;
     public List<Enemy> SpawnedEnemiesList { get; private set; } = new();

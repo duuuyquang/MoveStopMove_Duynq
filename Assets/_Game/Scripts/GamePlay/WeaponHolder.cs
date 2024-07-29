@@ -40,6 +40,10 @@ public class WeaponHolder : MonoBehaviour
         CurBullet = SimplePool.Spawn<Bullet>(PoolType.Bullet, TF.position, Quaternion.identity);
         CurBullet.OnInit(this, targetPos);
         BulletCharge--;
+        if(CurWeapon.IsGrab)
+        {
+            Invoke(nameof(ReloadBase), Const.WEAPON_DROP_TIME);
+        }
     }
 
     public void Reload(int chargeNum)
@@ -47,4 +51,16 @@ public class WeaponHolder : MonoBehaviour
         BulletCharge += chargeNum;
         Owner.ToggleWeapon(true);
     }
+
+    public void ReloadBase()
+    {
+        BulletCharge = Const.WEAPON_BASE_BULLET_AMOUNT;
+        Owner.ToggleWeapon(true);
+    }
+
+    public void CancelReloadBase()
+    {
+        CancelInvoke(nameof(ReloadBase));
+    }
+
 }

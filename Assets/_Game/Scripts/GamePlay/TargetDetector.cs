@@ -25,13 +25,7 @@ public static class TargetDetector
         float checkingDist;
         foreach (Character enemy in targetsInRange)
         {
-            if (IsOutOfRange(character, enemy))
-            {
-                enemy.ToggleTargetIndicator(false);
-                continue;
-            }
-
-            if (IsInvalidTarget(character, enemy))
+            if (IsInvalidTarget(character, enemy) || IsOutOfRange(character, enemy))
             {
                 continue;
             }

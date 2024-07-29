@@ -76,7 +76,6 @@ public class CanvasMainMenu : UICanvas
 
     public void SetLevel(int level)
     {
-        Debug.Log(level);
         selectingLevel = level;
         LevelManager.Instance.OnInit(level);
         SoundManager.Instance.PlayBtnClick();

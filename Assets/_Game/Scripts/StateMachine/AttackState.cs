@@ -16,10 +16,10 @@ public class AttackState : IState
         enemy.StateCounter += Time.deltaTime;
         if (enemy.StateCounter >= enemy.StateDelayTime)
         {
-            if(!enemy.StateIsAttacked)
+            enemy.CheckToProcessAttack();
+            if (!enemy.StateIsAttacked)
             {
-                enemy.CheckToProcessAttack();
-                enemy.StateIsAttacked = true;
+                enemy.StateIsAttacked = enemy.CheckToProcessAttack();
             }
 
             if(enemy.WeaponHolder.CurWeapon.IsGrab)

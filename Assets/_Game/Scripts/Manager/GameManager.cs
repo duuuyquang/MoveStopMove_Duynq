@@ -88,7 +88,7 @@ public class GameManager : Singleton<GameManager>
         StopReviveTimer();
     }
 
-    public void OnPlayDelay(float delay, bool cameraMove = false)
+    public void OnPlayDelay(float delay)
     {
         Invoke(nameof(OnPlay), delay);
     }
