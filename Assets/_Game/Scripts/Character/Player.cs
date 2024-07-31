@@ -42,6 +42,7 @@ public class Player : Character
         CombatPoint = 0;
         ScaleUp.ProcessByInitCombatPoint(this, CombatPoint);
         LoadSavedData();
+        CollectSoul(ColorType);
     }
 
     private void CheckItemInitalStates()
@@ -143,6 +144,7 @@ public class Player : Character
         LoadSavedData();
         InitIndicator();
         SetUntouchable();
+        CollectSoul(ColorType);
     }
 
     private void SetUntouchable()

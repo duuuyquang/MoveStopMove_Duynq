@@ -14,6 +14,7 @@ public class WeaponHolder : MonoBehaviour
 
     public void OnInit(Character owner)
     {
+        CurBullet = null;
         this.Owner = owner;
         ChangeWeapon(owner.WeaponType);
         InitStats();

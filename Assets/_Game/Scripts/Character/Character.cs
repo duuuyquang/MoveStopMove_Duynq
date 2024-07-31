@@ -28,7 +28,6 @@ public class Character : GameUnit
     public BoosterType BoosterType { get; protected set; } = BoosterType.None;
     public float BoosterSpdMultipler { get; set; } = 0.0f;
     public float BoosterAtkRange { get; private set; } = 0f;
-
     #endregion
     #region Movement ---------------------------------------------
     protected float bonusMoveSpeed;
@@ -66,6 +65,9 @@ public class Character : GameUnit
     #region Status ------------------------------------------------
     public StatusType CurStatus { get; protected set; }
     public bool IsStatus(StatusType status) => CurStatus == status;
+    #endregion
+    #region Soul Collector ----------------------------------------
+    protected List<Soul> soulList = new();
     #endregion
     #region DataSO ------------------------------------------------
     public ItemDataSO itemDataSO;
@@ -204,7 +206,7 @@ public class Character : GameUnit
         SetAttackRangeTF(CurAttackRangeTF);
     }
 
-    protected void ChangeColor(ColorType type)
+    public void ChangeColor(ColorType type)
     {
         ColorType = type;
         charRenderer.material = colorDataSO.GetMat(type);
@@ -437,8 +439,18 @@ public class Character : GameUnit
         ToggleTargetIndicator(false);
         DeactiveAtkBooster();
         DeactiveSpeedBooster();
+        OnSoulsStolen(killer);
         GameManager.Instance.UpdateAliveCountText();
         SoundManager.Instance.PlayDead(audioSource);
+    }
+
+    private void OnSoulsStolen(Character killer)
+    {
+        for(int i = 0; i< soulList.Count; i++)
+        {
+            soulList[i].OnStolen(killer);
+        }
+        soulList.Clear();
     }
 
     public void TriggerScaleUpVFX(float delay)
@@ -487,6 +499,13 @@ public class Character : GameUnit
         {
             TargetDetector.RemoveTargetInRange(this, character);
         }
+    }
+
+    public void CollectSoul(ColorType type)
+    {
+        Soul soul = SimplePool.Spawn<Soul>(PoolType.Soul, Vector3.zero, Quaternion.identity);
+        soul.Init(this, type);
+        soulList.Add(soul);
     }
 
     #region empty virtual methods

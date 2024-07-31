@@ -7,8 +7,8 @@ public class PoolControl : Singleton<PoolControl>
 
     public ItemDataSO itemDataSO;
     public int eachWeaponPoolingNum = 10;
-    [SerializeField] Transform weaponPoolTF;
-    public Transform WeaponPoolTF => weaponPoolTF;
+    [field: SerializeField] public Transform WeaponPoolTF { get; private set; }
+    [field: SerializeField] public Transform SoulPoolingTF { get; private set; }
 
     private void Awake()
     {
@@ -41,6 +41,7 @@ public enum PoolType
     Enemy       = 3,
     ItemShop    = 4,
     Booster     = 5,
+    Soul        = 6,
 }
 
 [System.Serializable]

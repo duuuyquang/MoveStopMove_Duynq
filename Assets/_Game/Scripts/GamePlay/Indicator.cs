@@ -27,6 +27,9 @@ public class Indicator : GameUnit
     {
         if(targetChar)
         {
+#if UNITY_INCLUDE_TESTS
+            curStateText.text = "";
+#endif
             Vector3 charPosOnScreen = CameraFollower.Instance.Camera.WorldToScreenPoint(targetChar.TF.position);
             if (IsInScreen(charPosOnScreen))
             {
@@ -34,7 +37,7 @@ public class Indicator : GameUnit
                 nameTextMesh.gameObject.SetActive(true);
                 TF.position = charPosOnScreen + Vector3.up * offsetChar;
                 #if UNITY_INCLUDE_TESTS
-                if (enemy && enemy.CurState != null)
+                if (targetChar is Enemy && enemy && enemy.CurState != null)
                 {
                     curStateText.text = $"( {enemy.CurState.ToString()} )";
                 }

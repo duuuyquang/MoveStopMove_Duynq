@@ -79,6 +79,7 @@ public class CanvasSkinShop : UICanvas
     public void Unequip()
     {
         ChangeItem(ItemType.None, true);
+        LevelManager.Instance.Player.ChangeColor(PlayerData.Instance.colorType);
         PrintBuyButtons();
         choosingItem.ToggleEquippedTag(false);
         SoundManager.Instance.PlayBtnClick();

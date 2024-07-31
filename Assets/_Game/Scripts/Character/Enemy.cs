@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -43,6 +44,20 @@ public class Enemy : Character
         GenerateRandomData();
         SetState(new IdleState());
         ToggleTargetIndicator(false);
+        ClearSoulList();
+        CollectSoul(ColorType);
+    }
+
+    private void ClearSoulList()
+    {
+        //while (soulList.Count > 0)
+        //{
+        //    Soul soul = soulList[0];
+        //    soulList.Remove(soul);
+        //    //Destroy(soul.gameObject);
+        //    SimplePool.Despawn(soul);
+        //}
+        soulList.Clear();
     }
 
     private bool RollSetItem => Random.Range(0, 10) < 3;

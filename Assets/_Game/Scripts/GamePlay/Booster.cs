@@ -28,8 +28,8 @@ public class Booster : GameUnit
         Type = (BoosterType) Random.Range(1, Enum.GetNames(typeof(BoosterType)).Length);
         ChangeColor(Type);
         UpdateStatsByType();
-        ceilPos = new Vector3(TF.position.x, -0.5f, TF.position.z);
-        floorPos = new Vector3(TF.position.x, -1f, TF.position.z);
+        ceilPos = new Vector3(TF.position.x, 0f, TF.position.z);
+        floorPos = new Vector3(TF.position.x, -0.5f, TF.position.z);
         direction = floorPos;
     }
 
