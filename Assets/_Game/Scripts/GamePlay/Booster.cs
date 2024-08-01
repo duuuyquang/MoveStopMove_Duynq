@@ -97,14 +97,4 @@ public class Booster : GameUnit
                 break;
         }
     }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Character character = Cache.GetChar(other);
-        if (character && character.BoosterType != Type && !character.IsStatus(StatusType.Untouchable))
-        {
-            SoundManager.Instance.PlayHitBooster();
-            OnDespawn();
-        }
-    }
 }

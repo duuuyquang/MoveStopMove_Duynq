@@ -282,7 +282,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: d1c750a603ab8d14c8c0ebd21586991d, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 16278b625b109f34292615dbd2605c11, type: 2}
   m_BuildHeightMesh: 0
 --- !u!114 &8724707221156484112
 MonoBehaviour:
@@ -296,7 +296,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f06912370d69394b91f4ae2006c02e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NavMeshData: {fileID: 23800000, guid: d1c750a603ab8d14c8c0ebd21586991d, type: 2}
+  NavMeshData: {fileID: 23800000, guid: 16278b625b109f34292615dbd2605c11, type: 2}
   totalEnemies: 99
 --- !u!1 &8797050798759326412
 GameObject:
@@ -2263,7 +2263,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 1.8000001, y: 1.024, z: 0.1}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 1.023, z: 0}
   m_TimeToStationary: 0.5
@@ -3683,7 +3683,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 1.8000001, y: 1.024, z: 0.1}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 1.023, z: 0}
   m_TimeToStationary: 0.5
@@ -5770,7 +5770,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 1.8000001, y: 1.024, z: 0.1}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 1.023, z: 0}
   m_TimeToStationary: 0.5
@@ -6264,7 +6264,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 1.8130001, y: 2.081, z: 4.544}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: -0.0050000004, y: 2.072, z: 0.030000001}
   m_TimeToStationary: 0.5
@@ -6522,7 +6522,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 1.8000001, y: 1.024, z: 0.1}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 1.023, z: 0}
   m_TimeToStationary: 0.5
@@ -7300,7 +7300,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 1.8000001, y: 1.024, z: 0.1}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 1.023, z: 0}
   m_TimeToStationary: 0.5

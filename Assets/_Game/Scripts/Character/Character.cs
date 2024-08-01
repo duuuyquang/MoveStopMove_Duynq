@@ -73,10 +73,11 @@ public class Character : GameUnit
     public ItemDataSO itemDataSO;
     public ColorDataSO colorDataSO;
     #endregion
-    [SerializeField] ParticleSystem bulletPartical;
-    [SerializeField] ParticleSystem sizeUpPartical;
-    [SerializeField] ParticleSystem attackBoosterPartical;
-    [SerializeField] ParticleSystem speedBoosterPartical;
+    [SerializeField] ParticleSystem bulletParticle;
+    [SerializeField] ParticleSystem sizeUpParticle;
+    [SerializeField] ParticleSystem attackBoosterParticle;
+    [SerializeField] ParticleSystem speedBoosterParticle;
+    [SerializeField] ParticleSystem soulAbsorbParticle;
 
     public AudioSource audioSource;
     protected virtual void Update()
@@ -395,13 +396,14 @@ public class Character : GameUnit
                     Invoke(nameof(DeactiveSpeedBooster), Booster.SPEED_ACTIVE_SECS);
                     break;
             }
+            booster.OnDespawn();
         }
     }
 
     private void ActiveAtkBooster(Booster booster)
     {
         BoosterAtkRange = booster.AtkRange;
-        attackBoosterPartical.Play();
+        attackBoosterParticle.Play();
         SetAttackRangeTF(CurAttackRangeTF);
         SoundManager.Instance.PlayAtkBoosterEffect(audioSource);
     }
@@ -411,25 +413,25 @@ public class Character : GameUnit
         BoosterType = BoosterType.None;
         BoosterAtkRange = 0f;
         SetAttackRangeTF(CurAttackRangeTF);
-        attackBoosterPartical.Stop();
+        attackBoosterParticle.Stop();
     }
 
     private void ActiveSpeedBooster(Booster booster)
     {
         BoosterSpdMultipler = booster.MoveSpdMultiplier;
-        speedBoosterPartical.Play();
+        speedBoosterParticle.Play();
     }
 
     protected virtual void DeactiveSpeedBooster()
     {
         BoosterSpdMultipler = 0f;
-        speedBoosterPartical.Stop();
+        speedBoosterParticle.Stop();
         BoosterType = BoosterType.None;
     }
     #endregion
     public virtual void OnDead(Character killer)
     {
-        bulletPartical.Play();
+        bulletParticle.Play();
         indicator = null;
         Invoke(nameof(OnDespawn), 2f);
         ChangeAnimByStatus(StatusType.Dead);
@@ -462,7 +464,7 @@ public class Character : GameUnit
     {
         if (!IsStatus(StatusType.Dead))
         {
-            sizeUpPartical.Play();
+            sizeUpParticle.Play();
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -482,10 +484,6 @@ public class Character : GameUnit
         Bullet bullet = Cache.GetBullet(other);
         if(bullet && bullet.IsDropped && WeaponHolder.CurWeapon.IsGrab && !WeaponHolder.HasBullet)
         {
-            //if(bullet.WeaponPrefab.WeaponType != WeaponHolder.CurWeapon.WeaponType)
-            //{
-            //    ChangeWeapon(bullet.WeaponPrefab.WeaponType);
-            //}
             ChangeWeapon(bullet.WeaponPrefab.WeaponType);
             WeaponHolder.CancelReloadBase();
             bullet.OnDespawn();
@@ -506,6 +504,11 @@ public class Character : GameUnit
         Soul soul = SimplePool.Spawn<Soul>(PoolType.Soul, Vector3.zero, Quaternion.identity);
         soul.Init(this, type);
         soulList.Add(soul);
+    }
+
+    public void TriggerSoulAbsorbVFX()
+    {
+        soulAbsorbParticle.Play();
     }
 
     #region empty virtual methods

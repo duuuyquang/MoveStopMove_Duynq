@@ -34,4 +34,6 @@ public static class Const
     public const int WEAPON_DROP_TIME           = 5;
 
     public const int COMBAT_TEXT_DEFAULT_SIZE = 80;
+
+    public const float SOUL_FLY_UP_SPEED = 8f;
 }
