@@ -20,7 +20,7 @@ public class CanvasWin : UICanvas
     {
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>().SetCoinText(GameManager.Instance.TotalCoin);
-        LevelManager.Instance.OnInit(PlayerData.Instance.curLevel);
+        LevelManager.Instance.OnInit(LevelManager.Instance.SelectingLevel);
         SoundManager.Instance.PlayBtnClick();
     }
 

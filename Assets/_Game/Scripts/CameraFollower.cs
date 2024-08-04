@@ -25,12 +25,46 @@ public class CameraFollower : Singleton<CameraFollower>
     private Vector3 SkinShopPos => Player.InitPosition + Vector3.down * 1.5f;
     private Vector3 GamePlayOffset => new Vector3(0, 1+ LevelManager.Instance.Player.CurAttackRange * 3f, -1 -LevelManager.Instance.Player.CurAttackRange * 2.5f);
 
+    private RaycastHit viewBlockerHit;
+
+    private Transform curViewBlocker;
+    private Material cachedViewBlockerMat;
+    [SerializeField] ColorDataSO colorDataSO;
+
     void LateUpdate()
     {
         if (GameManager.IsState(GameState.GamePlay) && IsState(CameraState.Normal))
         {
             targetPos = LevelManager.Instance.Player.TF.position + GamePlayOffset;
             TF.position = Vector3.MoveTowards(TF.position, targetPos, speed * Time.fixedDeltaTime);
+            DetectViewBlocker();
+        }
+        
+    }
+
+    void DetectViewBlocker()
+    {
+        Ray ray = Camera.ScreenPointToRay(Camera.WorldToScreenPoint(LevelManager.Instance.Player.TF.position));
+        if (Physics.Raycast(ray, out viewBlockerHit))
+        {
+            Transform objectHit = viewBlockerHit.transform;
+            if (objectHit.CompareTag(Const.TAG_NAME_VIEW_BLOCKER))
+            {
+                if (curViewBlocker == null)
+                {
+                    curViewBlocker = objectHit;
+                    cachedViewBlockerMat = curViewBlocker.GetComponent<Renderer>().material;
+                    curViewBlocker.GetComponent<Renderer>().material = colorDataSO.GetMatUntouchable();
+                }
+            }
+            else if (objectHit.CompareTag(Const.TAG_NAME_PLAYER)) 
+            {
+                if (curViewBlocker != null)
+                {
+                    curViewBlocker.GetComponent<Renderer>().material = cachedViewBlockerMat;
+                    curViewBlocker = null;
+                }
+            }
         }
     }
 

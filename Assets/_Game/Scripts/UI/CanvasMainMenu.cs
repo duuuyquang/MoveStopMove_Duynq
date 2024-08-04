@@ -10,7 +10,6 @@ public class CanvasMainMenu : UICanvas
     [SerializeField] Animator animator;
 
     private List<string> levelOptions = new();
-    private int selectingLevel = -1;
 
     public void OnOpen()
     {
@@ -76,7 +75,7 @@ public class CanvasMainMenu : UICanvas
 
     public void SetLevel(int level)
     {
-        selectingLevel = level;
+        LevelManager.Instance.SelectingLevel = level;
         LevelManager.Instance.OnInit(level);
         SoundManager.Instance.PlayBtnClick();
     }
@@ -93,12 +92,7 @@ public class CanvasMainMenu : UICanvas
             }
         }
 
-        if (selectingLevel == -1)
-        {
-            selectingLevel = PlayerData.Instance.curLevel;
-        }
-
         levelsDropdown.AddOptions(levelOptions);
-        levelsDropdown.SetValueWithoutNotify(selectingLevel);
+        levelsDropdown.SetValueWithoutNotify(LevelManager.Instance.SelectingLevel);
     }
 }

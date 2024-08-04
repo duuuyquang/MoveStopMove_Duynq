@@ -10,6 +10,8 @@ public class LevelManager : Singleton<LevelManager>
 
     public int TotalLevel => levels.Count;
 
+    public int SelectingLevel {get; set;}
+
     void Start()
     {
         Debug.Log(PlayerData.FileDirectory);
@@ -22,6 +24,7 @@ public class LevelManager : Singleton<LevelManager>
         if (level == -1)
         {
             level = PlayerData.Instance.curLevel;
+            SelectingLevel = level;
         }
         SimplePool.ReleaseAll();
         WeaponPool.ReleaseAll();

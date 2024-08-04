@@ -17,7 +17,7 @@ public class CanvasLose : UICanvas
     {
         UIManager.Instance.CloseAll();
         UIManager.Instance.OpenUI<CanvasMainMenu>().OnOpen();
-        LevelManager.Instance.OnInit(PlayerData.Instance.curLevel);
+        LevelManager.Instance.OnInit(LevelManager.Instance.SelectingLevel);
         SoundManager.Instance.PlayBtnClick();
     }
 

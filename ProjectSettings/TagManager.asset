@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Bullet
   - FxTemporaire
+  - ViewBlocker
   layers:
   - Default
   - TransparentFX

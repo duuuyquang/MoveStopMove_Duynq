@@ -832,7 +832,7 @@ Camera:
   m_ShutterSpeed: 0.005
   m_Aperture: 16
   m_FocusDistance: 10
-  m_FocalLength: 50
+  m_FocalLength: 68.05538
   m_BladeCount: 5
   m_Curvature: {x: 2, y: 11}
   m_BarrelClipping: 0.25
@@ -895,6 +895,7 @@ MonoBehaviour:
   speed: 20
   <Camera>k__BackingField: {fileID: 963194227}
   TF: {fileID: 963194228}
+  colorDataSO: {fileID: 11400000, guid: 9e84c9a472450ba47b7affb38dd01b89, type: 2}
 --- !u!81 &963194230
 AudioListener:
   m_ObjectHideFlags: 0

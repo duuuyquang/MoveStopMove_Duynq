@@ -1,9 +1,10 @@
 public static class Const
 {
-    public const string TAG_NAME_ENEMY      = "Enemy";
-    public const string TAG_NAME_PLAYER     = "Player";
-    public const string TAG_NAME_BULLET     = "Bullet";
-    public const string TAG_NAME_ATK_RANGE  = "AttackRange";
+    public const string TAG_NAME_ENEMY          = "Enemy";
+    public const string TAG_NAME_PLAYER         = "Player";
+    public const string TAG_NAME_BULLET         = "Bullet";
+    public const string TAG_NAME_ATK_RANGE      = "AttackRange";
+    public const string TAG_NAME_VIEW_BLOCKER   = "ViewBlocker";
 
     public const string ANIM_NAME_IDLE   = "idle";
     public const string ANIM_NAME_RUN    = "run";
