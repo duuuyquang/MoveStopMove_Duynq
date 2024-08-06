@@ -205,6 +205,7 @@ public class Bullet : GameUnit
     {
         StopMoving();
         SetTargetPos(TF.position);
+        IsDropped = true;
     }
 
     private void OnTriggerEnter(Collider other)

@@ -24,8 +24,8 @@ public class LevelManager : Singleton<LevelManager>
         if (level == -1)
         {
             level = PlayerData.Instance.curLevel;
-            SelectingLevel = level;
         }
+        SelectingLevel = level;
         SimplePool.ReleaseAll();
         WeaponPool.ReleaseAll();
         OnLoad(level);

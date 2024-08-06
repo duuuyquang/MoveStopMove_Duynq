@@ -84,7 +84,7 @@ public class CanvasMainMenu : UICanvas
     {
         levelsDropdown.ClearOptions();
         levelOptions.Clear();
-        for( int i = 0; i <= LevelManager.Instance.TotalLevel; i++ )
+        for( int i = 1; i <= LevelManager.Instance.TotalLevel; i++ )
         {
             if( i <= PlayerData.Instance.curLevel )
             {

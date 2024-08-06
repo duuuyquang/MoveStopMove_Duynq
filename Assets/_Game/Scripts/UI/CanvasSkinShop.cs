@@ -226,6 +226,9 @@ public class CanvasSkinShop : UICanvas
                 LevelManager.Instance.Player.ChangeSet(type);
                 if (saveData)
                 {
+                    PlayerData.Instance.headType = ItemType.None;
+                    PlayerData.Instance.pantsType = ItemType.None;
+                    PlayerData.Instance.shieldType = ItemType.None;
                     PlayerData.Instance.setType = type;
                     PlayerData.SaveData();
                 }

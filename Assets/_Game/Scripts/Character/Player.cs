@@ -123,7 +123,10 @@ public class Player : Character
         StopMoving();
         ToggleAtkRangeTF(false);
         SetFinishPartical(winPartical, 0.5f);
-        PlayerData.Instance.curLevel++;
+        if(PlayerData.Instance.curLevel < LevelManager.Instance.TotalLevel)
+        {
+            PlayerData.Instance.curLevel++;
+        }
         PlayerData.SaveData();
     }
 
